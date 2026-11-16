@@ -17,6 +17,7 @@ erDiagram
     text password_hash
     timestamptz consent_at
     timestamptz created_at
+    timestamptz updated_at
   }
   AUTHORITIES {
     smallint id PK

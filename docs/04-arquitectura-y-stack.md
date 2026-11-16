@@ -46,6 +46,7 @@ todo pasa por el API.
 | D-12 | Envío de la solicitud por correo SMTP desde el API (`nodemailer`) | La Ley 1755/2015 art. 15 admite petición por medio electrónico; no depende de portales sin API | Scraping de portales (frágil y riesgoso); WhatsApp Business API (aprobación y costo) |
 | D-13 | `MAIL_MODE=test` por defecto | Evita radicar denuncias reales por accidente durante desarrollo y video | Enviar siempre a la autoridad |
 | D-14 | Botón al portal oficial (`url_launcher`) como vía alterna | Los portales dan número de radicado explícito; no se automatizan | Scraper del portal |
+| D-15 | Semillas de autoridades como segunda migración SQL de `node-pg-migrate` (16-nov-2026) | Quedan versionadas junto al esquema y se aplican con un solo comando (`npm run migrate`), en orden y una sola vez | Carpeta `db/seed/` con un script aparte |
 
 > Cualquier cambio a esta tabla se registra aquí con la fecha y el motivo.
 
@@ -71,8 +72,7 @@ backend/
 │   ├── config/env.js        # lectura y validación de variables de entorno
 │   ├── db/
 │   │   ├── pool.js
-│   │   ├── migrations/      # SQL versionado
-│   │   └── seed/            # autoridades
+│   │   └── migrations/      # SQL versionado (node-pg-migrate), incluye las semillas de autoridades (D-15)
 │   ├── middleware/          # auth, errores, validación, límites, subida de archivos
 │   ├── modules/
 │   │   ├── auth/  users/  reports/  authorities/  geo/  map/  pqrsd/
