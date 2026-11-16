@@ -7,9 +7,9 @@ function validBody(overrides = {}) {
   return {
     full_name: 'Ana Prueba',
     doc_type: 'CC',
-    doc_number: '1012345678',
+    doc_number: 'TEST0001',
     email: 'ana@example.com',
-    phone: '3001234567',
+    phone: '0000000',
     password: 'clave-segura-1',
     accept_terms: true,
     ...overrides,
@@ -20,10 +20,10 @@ function validBody(overrides = {}) {
 describe('register schema', () => {
   it('trims full_name, doc_number and email, and lowercases the email', () => {
     const data = registerSchema.parse(
-      validBody({ full_name: '  Ana Prueba  ', doc_number: ' 1012345678 ', email: '  Ana@Example.COM ' }),
+      validBody({ full_name: '  Ana Prueba  ', doc_number: ' TEST0001 ', email: '  Ana@Example.COM ' }),
     );
     expect(data.full_name).toBe('Ana Prueba');
-    expect(data.doc_number).toBe('1012345678');
+    expect(data.doc_number).toBe('TEST0001');
     expect(data.email).toBe('ana@example.com');
   });
 

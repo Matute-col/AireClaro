@@ -72,9 +72,9 @@ describeDb('GET and PUT /api/me (database)', () => {
       .send({
         full_name: 'Marta Prueba',
         doc_type: 'CC',
-        doc_number: '52123456',
+        doc_number: 'TEST0002',
         email: 'marta@example.com',
-        phone: '3109876543',
+        phone: '0000000',
         password: 'clave-segura-3',
         accept_terms: true,
       })
@@ -94,9 +94,9 @@ describeDb('GET and PUT /api/me (database)', () => {
     expect(res.body.user).toMatchObject({
       full_name: 'Marta Prueba',
       doc_type: 'CC',
-      doc_number: '52123456',
+      doc_number: 'TEST0002',
       email: 'marta@example.com',
-      phone: '3109876543',
+      phone: '0000000',
     });
     expect(res.body.user.password_hash).toBeUndefined();
   });
@@ -105,7 +105,7 @@ describeDb('GET and PUT /api/me (database)', () => {
     const res = await request(app).put('/api/me').set(auth()).send({
       full_name: '  Marta Lucía Prueba  ',
       doc_type: 'PAS',
-      doc_number: ' ab998877 ',
+      doc_number: ' test0003 ',
       phone: '',
       email: 'hackeado@example.com',
     });
@@ -114,7 +114,7 @@ describeDb('GET and PUT /api/me (database)', () => {
     expect(res.body.user).toMatchObject({
       full_name: 'Marta Lucía Prueba',
       doc_type: 'PAS',
-      doc_number: 'AB998877',
+      doc_number: 'TEST0003',
       phone: null,
       email: 'marta@example.com',
     });

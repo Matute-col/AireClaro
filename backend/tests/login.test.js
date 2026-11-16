@@ -15,7 +15,7 @@ describeDb('POST /api/auth/login (database)', () => {
   const account = {
     full_name: 'Luis Prueba',
     doc_type: 'CE',
-    doc_number: 'AB12345',
+    doc_number: 'TEST0001',
     email: 'luis@example.com',
     password: 'clave-segura-2',
     accept_terms: true,
