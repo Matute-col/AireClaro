@@ -1,0 +1,48 @@
+# --- Secretos y entorno (el repositorio es público) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.jks
+*.keystore
+key.properties
+google-services.json
+
+# --- Node / backend ---
+node_modules/
+npm-debug.log*
+coverage/
+backend/uploads/
+backend/dist/
+
+# --- Flutter / Dart / app ---
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+app/build/
+app/android/.gradle/
+app/android/local.properties
+app/android/app/debug/
+app/android/app/profile/
+app/android/app/release/
+*.iml
+.idea/
+
+# --- Sistema operativo / editores ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# --- Evidencias pesadas (guardar el video fuera del repo; solo el enlace en el documento) ---
+*.mp4
+*.mov
+*.mkv
