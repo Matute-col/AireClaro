@@ -17,8 +17,8 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 ## Historias
 | ID | Estado (Pendiente / En curso / Hecha) | Commit | Notas |
 |---|---|---|---|
-| TS-01 | Hecha | c46665b | `GET /api/health`, helmet, límites, formato de errores; 5 pruebas con jest |
-| TS-02 | Hecha | 3c7d8c0 | Migraciones aplicadas en Neon el 16-nov-2026: 4 tablas + 3 autoridades con `email_verified=false` |
+| TS-01 | Hecha | 5e8a585 | `GET /api/health`, helmet, límites, formato de errores; 5 pruebas con jest |
+| TS-02 | Hecha | 5e90df1 | Migraciones aplicadas en Neon el 16-nov-2026: 4 tablas + 3 autoridades con `email_verified=false` |
 | TS-03 | Pendiente | | |
 | US-01…US-22 | Pendiente | | |
 
@@ -27,6 +27,9 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 - 16-nov-2026 · Semillas de autoridades como segunda migración (D-15 en `docs/04`) · un solo comando, versionado.
 - 16-nov-2026 · Se conserva `users.updated_at` del SQL y se corrige el diagrama ER de `docs/05` · lo usará `PUT /me`.
 - 16-nov-2026 · `npm run migrate` lee `DATABASE_URL` desde `backend/.env` (`--envPath`); probado que un error de conexión no imprime la contraseña.
+
+- 16-nov-2026 · Commits con correo *noreply* de GitHub (se reescribió el autor de los 4 primeros commits de `sprint-1` antes del push) · no exponer el correo personal en el repositorio público.
+- 16-nov-2026 · El manejador de errores registra solo el código del error fuera de `development` · los mensajes del driver pueden incluir datos personales.
 
 ## Problemas abiertos
 (Descripción · estado)
