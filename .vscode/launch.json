@@ -1,0 +1,15 @@
+{
+  // F5 runs the Flutter app on the connected phone against the local API.
+  // Before: `npm run dev` in backend/ and `adb reverse tcp:3000 tcp:3000`.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "AireClaro (celular por USB)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "cwd": "app",
+      "toolArgs": ["--dart-define=API_BASE_URL=http://localhost:3000/api"]
+    }
+  ]
+}
