@@ -1,7 +1,7 @@
 const express = require('express');
 const validate = require('../../middleware/validate');
 const { authLimiter } = require('../../middleware/rateLimit');
-const { registerSchema } = require('./auth.schema');
+const { registerSchema, loginSchema } = require('./auth.schema');
 const controller = require('./auth.controller');
 
 const router = express.Router();
@@ -10,5 +10,6 @@ const router = express.Router();
 router.use(authLimiter);
 
 router.post('/register', validate(registerSchema), controller.register);
+router.post('/login', validate(loginSchema), controller.login);
 
 module.exports = router;

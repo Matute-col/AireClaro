@@ -29,4 +29,26 @@ async function register(data) {
   }
 }
 
-module.exports = { register };
+// Used when the email does not exist, so the response takes about the same time
+// and does not reveal whether an account exists.
+const DUMMY_HASH = bcrypt.hashSync('not-a-real-password', BCRYPT_COST);
+
+function invalidCredentials() {
+  return new AppError(401, 'INVALID_CREDENTIALS', 'Correo o contraseña incorrectos.');
+}
+
+// US-02. Same generic error whether the email or the password is wrong (RF-01).
+async function login({ email, password }) {
+  const { rows } = await query(
+    `SELECT ${PUBLIC_COLUMNS}, password_hash FROM users WHERE email = $1`,
+    [email],
+  );
+  const found = rows[0];
+  const ok = await bcrypt.compare(password, found ? found.password_hash : DUMMY_HASH);
+  if (!found || !ok) throw invalidCredentials();
+
+  const { password_hash: _omit, ...user } = found;
+  return { token: signToken(user.id), user };
+}
+
+module.exports = { register, login };
