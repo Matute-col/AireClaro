@@ -5,6 +5,7 @@ const env = require('./config/env');
 const { globalLimiter } = require('./middleware/rateLimit');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 const authRoutes = require('./modules/auth/auth.routes');
+const usersRoutes = require('./modules/users/users.routes');
 
 const app = express();
 
@@ -21,6 +22,7 @@ api.get('/health', (req, res) => {
 });
 
 api.use('/auth', authRoutes);
+api.use('/me', usersRoutes);
 
 app.use('/api', api);
 
