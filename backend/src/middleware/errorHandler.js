@@ -1,3 +1,4 @@
+const env = require('../config/env');
 const AppError = require('../utils/AppError');
 
 // 404 for any route that was not matched.
@@ -27,7 +28,10 @@ function errorHandler(err, req, res, next) {
       .json({ error: { code: 'PAYLOAD_TOO_LARGE', message: 'La petición es demasiado grande' } });
   }
 
-  console.error(`[error] ${req.method} ${req.path}: ${err.message}`);
+  // Some driver errors (e.g. PostgreSQL) copy the offending input into the message,
+  // which could be personal data. Outside development, log only the error code.
+  const detail = env.NODE_ENV === 'development' ? err.message : err.code || err.name;
+  console.error(`[error] ${req.method} ${req.path}: ${detail}`);
   return res
     .status(500)
     .json({ error: { code: 'INTERNAL_ERROR', message: 'Ocurrió un error inesperado. Intenta de nuevo.' } });
