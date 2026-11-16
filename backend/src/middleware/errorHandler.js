@@ -29,9 +29,11 @@ function errorHandler(err, req, res, next) {
   }
 
   // Some driver errors (e.g. PostgreSQL) copy the offending input into the message,
-  // which could be personal data. Outside development, log only the error code.
-  const detail = env.NODE_ENV === 'development' ? err.message : err.code || err.name;
-  console.error(`[error] ${req.method} ${req.path}: ${detail}`);
+  // which could be personal data. By default only method, path and error code are
+  // logged; the full message only when LOG_ERROR_DETAILS=true is set on purpose.
+  const code = err.code || err.name || 'UNKNOWN';
+  const detail = env.LOG_ERROR_DETAILS ? ` - ${err.message}` : '';
+  console.error(`[error] ${req.method} ${req.path}: ${code}${detail}`);
   return res
     .status(500)
     .json({ error: { code: 'INTERNAL_ERROR', message: 'Ocurrió un error inesperado. Intenta de nuevo.' } });

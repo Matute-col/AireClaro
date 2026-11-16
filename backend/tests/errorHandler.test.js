@@ -21,14 +21,29 @@ describe('errorHandler with unexpected errors', () => {
     expect(JSON.stringify(res.json.mock.calls[0][0])).not.toContain('juan@example.com');
   });
 
-  it('logs only the error code outside development (no personal data)', () => {
+  it('by default logs only method, path and error code (no personal data)', () => {
     const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const err = Object.assign(new Error('invalid input syntax: "juan@example.com"'), { code: '22P02' });
 
     errorHandler(err, { method: 'GET', path: '/api/x' }, fakeRes(), () => {});
 
     const logged = spy.mock.calls.flat().join(' ');
-    expect(logged).toContain('22P02');
+    expect(logged).toBe('[error] GET /api/x: 22P02');
     expect(logged).not.toContain('juan@example.com');
+  });
+
+  it('logs the full message only when LOG_ERROR_DETAILS=true', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    process.env.LOG_ERROR_DETAILS = 'true';
+    try {
+      jest.isolateModules(() => {
+        const { errorHandler: verbose } = require('../src/middleware/errorHandler');
+        const err = Object.assign(new Error('mensaje completo'), { code: '22P02' });
+        verbose(err, { method: 'GET', path: '/api/x' }, fakeRes(), () => {});
+      });
+    } finally {
+      process.env.LOG_ERROR_DETAILS = 'false';
+    }
+    expect(spy.mock.calls.flat().join(' ')).toBe('[error] GET /api/x: 22P02 - mensaje completo');
   });
 });

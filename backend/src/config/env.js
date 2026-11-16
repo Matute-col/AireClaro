@@ -20,6 +20,11 @@ const schema = z.object({
   NOMINATIM_USER_AGENT: z.string().default('AireClaro-UNAD/1.0'),
   CORS_ORIGIN: z.string().default('*'),
   MAIL_MODE: z.enum(['test', 'live', 'off']).default('test'),
+  // Full error messages in logs may contain personal data: off unless set on purpose.
+  LOG_ERROR_DETAILS: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
 });
 
 const parsed = schema.safeParse(process.env);

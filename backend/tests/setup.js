@@ -38,3 +38,4 @@ process.env.TEST_DB_VERIFIED = testUrl ? 'true' : 'false';
 process.env.JWT_SECRET = 'test-secret-only-for-jest-0123456789abcdef';
 process.env.JWT_EXPIRES_IN = '7d';
 process.env.MAIL_MODE = 'test';
+process.env.LOG_ERROR_DETAILS = 'false';
