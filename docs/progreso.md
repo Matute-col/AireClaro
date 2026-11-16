@@ -18,7 +18,7 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | ID | Estado (Pendiente / En curso / Hecha) | Commit | Notas |
 |---|---|---|---|
 | TS-01 | Hecha | c46665b | `GET /api/health`, helmet, límites, formato de errores; 5 pruebas con jest |
-| TS-02 | En curso | 3c7d8c0 | Migraciones escritas; falta ejecutar `npm run migrate` en Neon cuando Mateo pegue `DATABASE_URL` |
+| TS-02 | Hecha | 3c7d8c0 | Migraciones aplicadas en Neon el 16-nov-2026: 4 tablas + 3 autoridades con `email_verified=false` |
 | TS-03 | Pendiente | | |
 | US-01…US-22 | Pendiente | | |
 
@@ -30,8 +30,10 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 
 ## Problemas abiertos
 (Descripción · estado)
-- Por confirmar: si `pg` acepta `channel_binding=require` de la cadena de Neon · se verifica al migrar.
+- `channel_binding=require` de Neon funciona con `pg` · resuelto.
+- `pg` avisa que `sslmode=require` se trata hoy como `verify-full` y cambiará en pg v9 · opcional: usar `sslmode=verify-full` en `DATABASE_URL` (lo decide Mateo).
 - `NOMINATIM_USER_AGENT` en `backend/.env` lleva un marcador `<tu-correo>` · Mateo lo completa a mano.
 
 ## Proveedor de base de datos elegido
 (Se registra en el Sprint 0; **sin** la cadena de conexión.)
+Neon (PostgreSQL gestionado), conexión con SSL.
