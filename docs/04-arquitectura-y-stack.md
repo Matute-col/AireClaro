@@ -13,6 +13,7 @@ flowchart LR
     FS[(Archivos subidos<br/>backend/uploads)]
   end
   DB[(PostgreSQL gestionado)]
+  MAIL[(Servidor de correo SMTP)]
   OSM[(Tiles OpenStreetMap)]
   NOM[(Nominatim)]
   APP --- GPS
@@ -21,6 +22,7 @@ flowchart LR
   API --> DB
   API --> FS
   API -- geocodificación inversa con cache --> NOM
+  API -- correo con PDF adjunto --> MAIL
 ```
 
 Estilo: cliente–servidor, API REST con JSON. La app no habla con la base de datos ni con Nominatim:
@@ -41,16 +43,19 @@ todo pasa por el API.
 | D-09 | `lat` y `lng` como columnas numéricas | Suficiente para el MVP | PostGIS (mejora futura) |
 | D-10 | Riverpod para el estado y `go_router` para la navegación | Patrón claro y ampliamente usado | Provider, Bloc |
 | D-11 | Monorepo (`backend/`, `app/`, `docs/`) | Un solo repositorio que el tutor puede revisar | Dos repositorios |
+| D-12 | Envío de la solicitud por correo SMTP desde el API (`nodemailer`) | La Ley 1755/2015 art. 15 admite petición por medio electrónico; no depende de portales sin API | Scraping de portales (frágil y riesgoso); WhatsApp Business API (aprobación y costo) |
+| D-13 | `MAIL_MODE=test` por defecto | Evita radicar denuncias reales por accidente durante desarrollo y video | Enviar siempre a la autoridad |
+| D-14 | Botón al portal oficial (`url_launcher`) como vía alterna | Los portales dan número de radicado explícito; no se automatizan | Scraper del portal |
 
 > Cualquier cambio a esta tabla se registra aquí con la fecha y el motivo.
 
 ## Paquetes sugeridos
 
 **API (`backend/`)**: `express`, `cors`, `helmet`, `express-rate-limit`, `pg`, `dotenv`, `bcryptjs`,
-`jsonwebtoken`, `multer`, `pdfkit`, `zod`, `node-pg-migrate`. Desarrollo: `nodemon`, `jest`, `supertest`.
+`jsonwebtoken`, `multer`, `pdfkit`, `zod`, `node-pg-migrate`, `nodemailer`. Desarrollo: `nodemon`, `jest`, `supertest`.
 
 **App (`app/`)**: `flutter_riverpod`, `go_router`, `dio`, `flutter_secure_storage`, `image_picker`,
-`geolocator`, `permission_handler`, `flutter_map`, `latlong2`, `share_plus`, `open_filex`, `path_provider`,
+`geolocator`, `permission_handler`, `flutter_map`, `latlong2`, `share_plus`, `open_filex`, `path_provider`, `url_launcher`,
 `intl`. Verifica las versiones compatibles con `flutter pub add` y justifica en este archivo cualquier
 paquete adicional.
 
@@ -105,6 +110,11 @@ app/
 | `NOMINATIM_BASE_URL` | `https://nominatim.openstreetmap.org` |
 | `NOMINATIM_USER_AGENT` | `AireClaro-UNAD/1.0 (contacto: <correo de Mateo>)` |
 | `CORS_ORIGIN` | `*` en desarrollo |
+| `MAIL_MODE` | `test` (por defecto) · `live` · `off` |
+| `MAIL_TEST_TO` | Buzón de prueba de Mateo (recibe todo en modo `test`) |
+| `SMTP_HOST` / `SMTP_PORT` | Del proveedor de correo elegido |
+| `SMTP_USER` / `SMTP_PASS` | **Secretos** del proveedor |
+| `MAIL_FROM` | Remitente del sistema, p. ej. `AireClaro <direccion-verificada@dominio>` |
 
 ## Configuración de la app
 La URL del API se pasa al compilar: `flutter run --dart-define=API_BASE_URL=http://localhost:3000/api`.
@@ -130,12 +140,22 @@ estándar, no exige tarjeta de crédito, permite crear tablas con SQL. Registrar
 guardar la cadena de conexión **solo** en `backend/.env`.
 **Plan B:** instalar PostgreSQL en Windows y usar `DATABASE_URL=postgres://...@localhost:5432/aireclaro`.
 
+## Correo saliente (Sprint 3)
+- El API envía con `nodemailer` por SMTP. **Proveedor:** elegir uno con plan gratuito verificando sus condiciones
+  vigentes el mismo día (límites diarios, verificación del remitente, tarjeta no obligatoria). Plan B: SMTP de una
+  cuenta de correo propia con contraseña de aplicación. Registrar aquí el elegido, sin credenciales.
+- Remitente `MAIL_FROM`; `Reply-To` y `Cc` = correo del ciudadano; asunto y cuerpo según `docs/05`.
+- Adjuntos: el PDF siempre; la evidencia (fotos/video) solo si el total ≤ 15 MB; si no, solo el PDF y el cuerpo
+  indica que la evidencia está disponible a solicitud.
+- Modos: `test` (todo va a `MAIL_TEST_TO`, asunto con prefijo `[PRUEBA]`), `live` (a la autoridad, solo si
+  `email_verified`), `off` (no envía). El modo vigente se muestra al usuario en la app.
+
 ## Seguridad (resumen)
 - Contraseñas con `bcryptjs`; JWT firmado con secreto del entorno; verificación del dueño en cada recurso (RB-01).
 - `helmet`, límite de peticiones (global y más estricto en `/auth`), validación de entradas con `zod`.
 - Archivos: validar tipo MIME y tamaño; nombres de archivo generados por el servidor (UUID); no se sirven
   desde una carpeta pública, solo mediante un endpoint autenticado.
-- Sin secretos ni datos personales en el repositorio ni en los logs.
+- Sin secretos ni datos personales en el repositorio ni en los logs (tampoco las credenciales SMTP ni los cuerpos de los correos).
 
 ## Despliegue
 1. **Desarrollo y demo (mínimo):** API en el PC de Mateo + BD en la nube + celular por USB (`adb reverse`).

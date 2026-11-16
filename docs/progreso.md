@@ -7,7 +7,7 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 ## Estado general
 | Bloque | Estado | Notas |
 |---|---|---|
-| Planificación (docs 01–09) | Hecho | Pendiente validar reglas de autoridad |
+| Planificación (docs 01–09) | Hecho | Ruta híbrida de envío aprobada (US-21/22). Pendiente: Mateo verifica correos/portales y reglas de autoridad |
 | Sprint 0 · Entorno | Pendiente | |
 | Sprint 1 · Backend base y autenticación | Pendiente | |
 | Sprint 2 · Flujo de reporte | Pendiente | |
@@ -20,7 +20,7 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | TS-01 | Pendiente | | |
 | TS-02 | Pendiente | | |
 | TS-03 | Pendiente | | |
-| US-01…US-20 | Pendiente | | |
+| US-01…US-22 | Pendiente | | |
 
 ## Decisiones tomadas durante el desarrollo
 (Fecha · decisión · motivo)

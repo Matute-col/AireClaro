@@ -105,14 +105,25 @@ Enlaces «Editar» por sección. Botón primario «Generar solicitud» → crea 
 
 ### 10 · Vista previa de la solicitud
 Tarjeta desplazable con el texto de la solicitud (`GET /reports/:id/pqrsd`) y el nombre de la autoridad.
-Botones: «Descargar PDF» (descarga y abre), «Compartir» (menú del teléfono) y «Continuar». No hay edición aquí:
-para cambiar algo se vuelve a la revisión antes de guardar.
+Botones, en este orden:
+1. **«Enviar a la autoridad»** (primario; solo si `can_email`). Abre un diálogo: «Se enviará tu solicitud con el
+   PDF y la evidencia a {autoridad}. Recibirás una copia en {correo} y la respuesta llegará a ese correo.»
+   Botones «Cancelar» / «Enviar». En modo de prueba se muestra un aviso: «Modo de prueba: el correo va a un
+   buzón de prueba, no a la autoridad».
+2. **«Radicar en el portal oficial»** (secundario; solo si hay `portal_url`): abre el navegador.
+3. «Descargar PDF» (descarga y abre) y «Compartir» (menú del teléfono).
+4. «Continuar».
+No hay edición aquí: para cambiar algo se vuelve a la revisión antes de guardar. Si el envío falla: mensaje y
+«Reintentar».
 
 ### 11 · Confirmación
-Ícono de éxito, «Reporte generado», número corto del reporte y resumen. Bloque **«¿Cómo hacer seguimiento?»**
-(solo texto): explica que la solicitud debe presentarse ante la autoridad indicada por sus canales de
-atención y que la entidad responde al correo del peticionario; muestra el nombre de la autoridad. Opción
-«Marcar como enviado» (PATCH de estado). Botones «Ver mis reportes» y «Volver al inicio».
+Ícono de éxito, número corto del reporte y resumen. El título depende del caso:
+- **Enviado por correo:** «Solicitud enviada a {autoridad}».
+- **Solo generado:** «Reporte generado», con la opción «Marcar como enviado» (PATCH de estado, `manual`).
+Bloque **«¿Cómo hacer seguimiento?»** (solo texto): la entidad debe responder al correo del peticionario; el
+término general de respuesta es de 15 días siguientes a la recepción (Ley 1755 de 2015); si la entidad no es la
+competente, debe remitirla a la que corresponda. Si se envió por correo, recuerda revisar la copia recibida.
+Botones «Ver mis reportes» y «Volver al inicio».
 
 ### 12 · Mis reportes
 Lista de `ReportCard` (miniatura, placa, tipo, fecha, chip de estado «Generado» / «Enviado»), más reciente
@@ -120,7 +131,8 @@ primero, con paginación al desplazar. Estado vacío: «Aún no tienes reportes�
 
 ### 13 · Detalle del reporte
 Carrusel de evidencia, datos completos, mapa pequeño, autoridad, estado. Botones: «Descargar solicitud»,
-«Compartir», «Marcar como enviado», y «Eliminar» (con confirmación; prioridad Could).
+«Compartir», «Enviar a la autoridad» (si no se ha enviado y `can_email`), «Radicar en el portal oficial»,
+«Marcar como enviado» y «Eliminar» (con confirmación; prioridad Could). El chip de estado indica «Enviado por correo» o «Enviado (manual)».
 
 ### 14 · Mapa de reportes
 Mapa con pines (`GET /map/reports`), filtros por tipo de vehículo y rango de fechas (chips o diálogo). Al tocar

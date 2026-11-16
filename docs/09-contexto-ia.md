@@ -25,8 +25,9 @@ la app según docs/06.»
 **Sprint 2.** «Implementa US-05…US-09 de extremo a extremo (app + API) una historia por vez. Para US-07 respeta las
 reglas de Nominatim del CLAUDE.md. Prueba en el celular con `adb reverse`.» Luego US-10 y US-11.
 
-**Sprint 3.** «Implementa US-12 (PDF con la plantilla de docs/05) y US-13/US-14. Luego US-15, US-16, US-17.
-Después US-19 y US-20 y, si hay tiempo, US-18.»
+**Sprint 3.** «Implementa US-12 (PDF con la plantilla de docs/05) y US-13/US-14. Luego **US-21 (envío por correo,
+siempre con MAIL_MODE=test)** y US-22. Después US-15, US-16, US-17, US-19 y US-20 y, si hay tiempo, US-18.
+No pongas MAIL_MODE=live ni uses correos de autoridades reales sin mi orden explícita.»
 
 ## Reglas para la IA
 - No inventar requisitos ni pantallas; si falta algo, preguntar.

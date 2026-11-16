@@ -22,6 +22,9 @@ erDiagram
     smallint id PK
     text code UK
     text name
+    text email
+    bool email_verified
+    text portal_url
     text note
   }
   REPORTS {
@@ -42,6 +45,9 @@ erDiagram
     text requester_doc_number
     text requester_email
     text requester_phone
+    timestamptz sent_at
+    text sent_via
+    text send_mode
     timestamptz created_at
   }
   REPORT_MEDIA {
@@ -61,6 +67,9 @@ CREATE TABLE authorities (
   id smallserial PRIMARY KEY,
   code text NOT NULL UNIQUE,
   name text NOT NULL,
+  email text,
+  email_verified boolean NOT NULL DEFAULT false,
+  portal_url text,
   note text
 );
 
@@ -95,6 +104,9 @@ CREATE TABLE reports (
   requester_doc_number text NOT NULL,
   requester_email text NOT NULL,
   requester_phone text,
+  sent_at timestamptz,
+  sent_via text CHECK (sent_via IN ('email','manual')),
+  send_mode text CHECK (send_mode IN ('test','live')),
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_reports_user_created ON reports (user_id, created_at DESC);
@@ -114,14 +126,18 @@ CREATE INDEX idx_media_report ON report_media (report_id);
 
 **Datos iniciales (`authorities`):**
 
-| code | name |
-|---|---|
-| `CAR` | Corporación Autónoma Regional de Cundinamarca (CAR) |
-| `SDA` | Secretaría Distrital de Ambiente de Bogotá |
-| `SDM` | Secretaría Distrital de Movilidad de Bogotá |
+| code | name | email (candidato) | portal_url | email_verified |
+|---|---|---|---|---|
+| `CAR` | Corporación Autónoma Regional de Cundinamarca (CAR) | `sau@car.gov.co` | `https://www.car.gov.co` | `false` |
+| `SDA` | Secretaría Distrital de Ambiente de Bogotá | `correspondencia@ambientebogota.gov.co` | `https://forest.ambientebogota.gov.co/ventanillaVirtual/app` | `false` |
+| `SDM` | Secretaría Distrital de Movilidad de Bogotá | *(sin correo hallado)* | `https://www.movilidadbogota.gov.co/peticiones-quejas-reclamos-solicitudes-y-denuncias-pqrsd` | `false` |
 
-El campo `note` queda con «VERIFICAR canal oficial de radicación antes de la demo». Mateo confirmará los
-canales oficiales; no los inventes.
+**Origen de estos datos (investigación del 16-nov-2026):** el correo de la SDA figura en su página oficial de
+canales de atención (no dice expresamente que sirva para radicar PQRS); el de la CAR aparece en el pie de una
+carta de respuesta de la CAR (no se pudo abrir car.gov.co); para la SDM no se halló correo. **Mateo debe
+verificar cada uno en el sitio oficial** antes de poner `email_verified = true`. Hasta entonces el envío real
+queda deshabilitado y solo funciona el modo de prueba. No inventes direcciones. La migración de semillas puede
+llevar estos candidatos (son direcciones institucionales públicas, no secretos).
 
 ## Convenciones del API
 - Prefijo `/api`. JSON en UTF-8. Fechas en ISO 8601 (UTC).
@@ -139,16 +155,17 @@ canales oficiales; no los inventes.
 | `POST /auth/login` | Iniciar sesión | `email, password` | `200 {token, user}` · `401` |
 | `GET /me` | Perfil | — | `200 {user}` |
 | `PUT /me` | Editar perfil | `full_name, doc_type, doc_number, phone?` | `200 {user}` |
-| `GET /authorities` | Lista de autoridades | — | `200 [{id, code, name}]` |
+| `GET /authorities` | Lista de autoridades | — | `200 [{id, code, name, portal_url, can_email}]` (`can_email` = tiene correo verificado; el correo no se expone) |
 | `GET /geo/reverse` | Dirección desde coordenadas | `lat, lng` | `200 {address, municipality, state, suggested_authority_id}` |
 | `POST /reports` | Crear reporte | `multipart/form-data`: `vehicle_type, plate, smoke_color, description?, lat, lng, address?, occurred_at, authority_id?, requester_name, requester_doc_type, requester_doc_number, requester_email, requester_phone?` + `files[]` (1–3) | `201 {report}` |
 | `GET /reports` | Mis reportes | `page=1, limit=20, status?` | `200 {items, page, total}` |
 | `GET /reports/:id` | Detalle | — | `200 {report, media[], authority}` · `404` si no es suyo |
 | `DELETE /reports/:id` | Eliminar | — | `204` |
-| `PATCH /reports/:id/status` | Marcar como enviado | `{status:"enviado"}` | `200 {report}` |
+| `PATCH /reports/:id/status` | Marcar como enviado a mano (portal, compartir) | `{status:"enviado"}` | `200 {report}` con `sent_via=manual` |
 | `GET /reports/:id/media/:mediaId` | Descargar un archivo de evidencia | — | archivo |
 | `GET /reports/:id/pqrsd` | Texto de la solicitud | — | `200 {authority, text}` |
 | `GET /reports/:id/pqrsd.pdf` | PDF de la solicitud | — | `200 application/pdf` |
+| `POST /reports/:id/send` | Enviar la solicitud por correo a la autoridad | `{confirm:true}` | `200 {report, delivery:{mode, sent_at}}` · `409` ya enviado · `422` autoridad sin correo verificado · `502` fallo del servidor de correo |
 | `GET /map/reports` | Reportes para el mapa | `vehicle_type?, from?, to?` | `200 [{id, lat, lng, vehicle_type, occurred_at}]` |
 
 Ejemplo de respuesta de `POST /reports` (resumen):
@@ -224,6 +241,45 @@ observaciones corresponden a lo percibido por el peticionario y no constituyen u
 emisiones. Reporte n.º {id corto}.
 ```
 Tono: factual, sin acusar ni calificar. No afirmar que el vehículo «incumple» la norma.
+
+## Correo a la autoridad (`POST /reports/:id/send`)
+- **De:** `MAIL_FROM`. **Para:** correo de la autoridad (modo `live`) o `MAIL_TEST_TO` (modo `test`, asunto con
+  prefijo `[PRUEBA]`). **Cc y Reply-To:** correo del peticionario.
+- **Asunto:** `Petición ciudadana – presunta emisión anómala de gases – vehículo de placa {placa} – Reporte {id corto}`
+- **Cuerpo (texto plano):**
+  ```
+  Respetados señores:
+
+  Adjunto la petición ciudadana (PDF) sobre un vehículo de placa {placa} observado el {fecha} en {dirección},
+  con la evidencia registrada. Solicito atender la petición conforme a sus competencias y responder al correo
+  del peticionario, que va en copia. Si no es la entidad competente, les ruego remitirla a la que
+  corresponda (Ley 1755 de 2015, art. 21).
+
+  Este mensaje fue generado con la aplicación AireClaro a nombre del peticionario, con su autorización.
+  Las observaciones no constituyen una medición técnica de emisiones.
+
+  {nombre completo} · {tipo y número de documento}
+  ```
+- **Adjuntos:** el PDF; la evidencia solo si el total ≤ 15 MB.
+- **Después de enviar:** `status = enviado`, `sent_via = email`, `sent_at = now()`, `send_mode = test|live`.
+  Si el SMTP falla, no se cambia nada y se responde `502`. No se guardan cuerpos de correos en los logs.
+
+## Base legal y límites (investigación del 16-nov-2026)
+- **Ley 1755 de 2015**, art. 15: la petición puede presentarse «a través de cualquier medio idóneo para la
+  comunicación o transferencia de datos»; para las electrónicas, la fecha y hora de radicación son las que registra
+  el medio, y ninguna autoridad puede negarse a recibir peticiones respetuosas. Art. 16: contenido mínimo (autoridad,
+  nombre e identificación, dirección de notificación, objeto, razones, documentos). Art. 21: si la entidad no es
+  competente, remite en 5 días y copia al ciudadano. Art. 14: término general de 15 días «siguientes» a la
+  recepción (el texto no aclara si son hábiles; no afirmarlo sin confirmarlo).
+- **Respuesta al ciudadano:** llega al correo/dirección que él indicó en la petición.
+- **Competencia:** la Resolución 762 de 2022 (según un concepto no vinculante del Ministerio de Ambiente) asigna los
+  operativos de emisiones a las autoridades ambientales con las de tránsito, y la sanción de tránsito sigue la
+  Ley 769 de 2002. Por eso la SDM es un destinatario válido y el art. 21 cubre el envío a la entidad equivocada.
+- **Portales:** Bogotá Te Escucha (`bogota.gov.co/sdqs`) permite radicar con o sin registro y entrega número de
+  radicado; no lista el correo como canal de radicación. No se automatizan los portales (sin API pública
+  verificada, posibles controles anti-bot, frágil y de riesgo legal/ético): se ofrece el botón al portal (RF-18).
+- **No confirmado:** que cada entidad genere un número de radicado automático al recibir el correo. Verificar con
+  una prueba real autorizada por Mateo o con la entidad.
 
 > Nota para Mateo: el marco jurídico del documento maestro cita la Ley 1437 de 2011 para el derecho de
 > petición. Verifica si conviene mencionar también la Ley 1755 de 2015, que regula el derecho fundamental

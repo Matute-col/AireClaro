@@ -6,7 +6,8 @@ Lee este archivo completo al iniciar cada sesión. Es corto a propósito: el det
 AireClaro es un sistema de información (app móvil Android + API) para el **reporte ciudadano de emisiones
 vehiculares contaminantes en el corredor Soacha–Bogotá**. El usuario captura evidencia (foto o video), la
 ubicación y los datos del vehículo, y la app genera una **solicitud tipo PQRSD en PDF** dirigida a la autoridad
-ambiental competente.
+competente y la **envía por correo** (con confirmación del usuario) o lleva al ciudadano al portal oficial para
+radicarla.
 
 Es el prototipo funcional (nivel de madurez **TRL 5**) del proyecto de grado de Ingeniería de Sistemas de
 Mateo Alejandro Bernal Cardona (UNAD). Mateo es desarrollador junior: **explica brevemente qué haces y por qué**
@@ -16,8 +17,8 @@ cuando tomes decisiones, sin sermonear.
 - Video del prototipo: martes 17 / miércoles 18 de noviembre de 2026. Entrega final: domingo 22 de noviembre.
 - **Prioridad absoluta: un flujo que funcione de punta a punta en un celular Android real** (registrarse →
   crear reporte → generar PDF → ver historial) antes que funcionalidades extra.
-- Si vas atrasado, recorta en este orden: mapa (RF-10), eliminar reporte, editar perfil, imagen dentro del PDF,
-  pruebas automatizadas extra. Ver `docs/07-plan-de-desarrollo.md`.
+- Si vas atrasado, recorta en el orden de `docs/07-plan-de-desarrollo.md`. **Nunca se recorta** el flujo de
+  reporte, el PDF, el envío por correo (US-21) ni la seguridad del repositorio.
 
 ## Idioma
 - Interfaz de usuario, mensajes de error visibles y documentación: **español (Colombia)**.
@@ -28,7 +29,7 @@ cuando tomes decisiones, sin sermonear.
 - **App:** Flutter (Dart), solo Android en este alcance. Mapas con `flutter_map` + OpenStreetMap.
 - **API:** Node.js (LTS) + Express. Autenticación con JWT. Validación con `zod`.
 - **Base de datos:** PostgreSQL (servicio gestionado gratuito en la nube; ver Sprint 0).
-- **PDF:** generado en el servidor con `pdfkit`.
+- **PDF:** generado en el servidor con `pdfkit`. **Correo:** `nodemailer` por SMTP (ver `docs/04` y `docs/05`).
 - **Geocodificación inversa:** Nominatim (OpenStreetMap), siempre a través de nuestro API, nunca directo desde la app.
 - Control de versiones: Git/GitHub (repositorio público).
 
@@ -61,7 +62,8 @@ Si dos documentos se contradicen, avisa a Mateo antes de elegir.
 - **Una historia de usuario por vez**, con su criterio de aceptación. Termina, prueba, haz commit, y recién ahí sigue.
 - Antes de escribir código en un sprint nuevo, entra en **modo plan** y propón el plan; espera aprobación.
 - **No amplíes el alcance.** Fuera de alcance: panel de administrador, recuperación de contraseña, modo sin
-  conexión, envío automático de correos, iOS, lectura automática de placas (OCR), medición de emisiones.
+  conexión, automatizar portales web de las autoridades (scraping), WhatsApp automático, iOS, lectura automática
+  de placas (OCR), medición de emisiones.
 - No agregues dependencias sin necesidad. Si agregas una, anótala en `docs/04-arquitectura-y-stack.md`.
 - Mantén el código simple y legible: es un proyecto académico que Mateo debe poder explicar.
 - Cada tarea termina con: código funcionando + prueba (automática o pasos manuales) + commit pequeño.
@@ -71,7 +73,10 @@ Si dos documentos se contradicen, avisa a Mateo antes de elegir.
 - Mantén `backend/.env` en `.gitignore` y un `backend/.env.example` sin valores reales.
 - Contraseñas con hash (bcrypt). JWT con secreto desde el entorno. `helmet` y límite de peticiones activos.
 - La carpeta de archivos subidos (`backend/uploads/`) no se versiona.
-- No registres en logs contraseñas, tokens ni datos personales.
+- No registres en logs contraseñas, tokens ni datos personales (ni cuerpos de correos).
+- **Correo:** `MAIL_MODE=test` por defecto (todo va a `MAIL_TEST_TO`). **Nunca** envíes a una autoridad real en
+  desarrollo ni pongas `live` sin una orden explícita de Mateo. Solo se envía a autoridades con
+  `email_verified = true`. Credenciales SMTP solo en `backend/.env`. No inventes direcciones de correo.
 
 ## Reglas de servicios externos (OpenStreetMap)
 - Mostrar siempre la atribución «© OpenStreetMap contributors» en el mapa.

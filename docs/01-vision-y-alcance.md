@@ -32,15 +32,15 @@ autoridades competentes.
 
 | Prioridad | Funcionalidad |
 |---|---|
-| Debe tener (Must) | Registro e inicio de sesión · consentimiento de datos · captura de evidencia · ubicación y hora · datos del vehículo · datos del peticionario · generación de solicitud PQRSD en PDF · autoridad destinataria · descargar/compartir PDF · historial de reportes |
-| Debería tener (Should) | Mapa de reportes · detalle de reporte · pantalla de información · perfil |
+| Debe tener (Must) | Registro e inicio de sesión · consentimiento de datos · captura de evidencia · ubicación y hora · datos del vehículo · datos del peticionario · generación de solicitud PQRSD en PDF · autoridad destinataria · descargar/compartir PDF · **envío por correo a la autoridad** · historial de reportes |
+| Debería tener (Should) | Mapa de reportes · detalle de reporte · pantalla de información · perfil · botón al portal oficial de la autoridad |
 | Podría tener (Could) | Eliminar reporte · APK para la demo · despliegue del API en la nube · mini prueba piloto con usuarios |
 
 ## Fuera de alcance (no implementar)
 - Panel de administrador (RF-12) y gestión de usuarios por un administrador.
 - Recuperación de contraseña y verificación de correo.
 - Modo sin conexión / borradores sin red.
-- Envío automático de la solicitud a las autoridades (el usuario descarga o comparte el PDF).
+- Automatizar portales web de las autoridades (scraping o integraciones no oficiales) y envío por WhatsApp automático. El envío por **correo** sí está en alcance (RF-17); en portales, la radicación es manual (RF-18).
 - Seguimiento del estado real del trámite ante la autoridad.
 - Medición técnica o certificación de emisiones, sanciones o comparendos, seguimiento judicial.
 - Lectura automática de placas (OCR), notificaciones push, iOS, versión web.
@@ -68,6 +68,8 @@ autoridades competentes.
 | Cámara/GPS en el celular | Probar temprano en dispositivo real; permisos en AndroidManifest |
 | Límites de servicios gratuitos (BD, Nominatim, tiles OSM) | Cache de geocodificación, uso ligero, plan B de BD local |
 | Repositorio público con secretos | `.gitignore`, `.env.example`, revisión antes de cada push |
+| Enviar denuncias reales por accidente o a un correo no verificado | `MAIL_MODE=test` por defecto; `email_verified` por autoridad; confirmación del usuario |
+| La entidad no confirma la radicación del correo | Botón alterno al portal oficial; texto de seguimiento; aclararlo en limitaciones |
 
 ## Glosario
 - **PQRSD:** petición, queja, reclamo, sugerencia o denuncia.

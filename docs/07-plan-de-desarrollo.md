@@ -18,6 +18,9 @@ Orden pensado para que el backend pueda arrancar mientras Flutter se descarga e 
       errores relevantes; licencias aceptadas.
 - [ ] Celular: opciones de desarrollador activadas, depuración USB activa, `adb devices` lo lista.
 - [ ] Paquete de planificación copiado en la raíz del repositorio; primer commit y push.
+- [ ] Proveedor de correo (SMTP) elegido con condiciones verificadas el mismo día, y buzón de prueba propio
+      para `MAIL_TEST_TO`. Credenciales solo en `backend/.env`.
+- [ ] **Mateo:** verificar en los sitios oficiales los correos y portales de CAR, SDA y SDM (`docs/05`).
 
 **Hecho cuando:** `node -v`, `flutter doctor`, `adb devices` y la conexión a la BD responden bien.
 Evidencia: capturas en `docs/evidencias/sprint0/`.
@@ -49,6 +52,8 @@ Evidencia: capturas en `docs/evidencias/sprint0/`.
 | US-18 | Eliminar reporte | RF-16 | Baja | 3 |
 | US-19 | Pruebas automáticas y análisis estático | RNF-10 | Media | 3 |
 | US-20 | README, APK y evidencias | RNF-07 | Media | 3 |
+| US-21 | Enviar la solicitud por correo a la autoridad (modo prueba/live, confirmación, adjuntos) | RF-17, RF-08 | Alta | 3 |
+| US-22 | Botón «Radicar en el portal oficial» | RF-18 | Media | 3 |
 
 Criterios de aceptación: los de `docs/02` (RF) y los pasos de `docs/03` (UC).
 
@@ -67,8 +72,9 @@ grabación del video es lo más tarde mañana. Si el tiempo no alcanza, se aplic
 
 ## Orden de recorte (de lo primero que se sacrifica a lo último)
 1. US-18 Eliminar reporte · 2. APK (se demuestra por cable) · 3. Filtros del mapa · 4. US-03 Editar perfil ·
-5. US-16 Información · 6. US-11 Detalle (queda la lista) · 7. Miniatura del PDF.
-**Nunca se recorta:** registro/login, flujo de reporte, autoridad, PDF, historial, seguridad del repositorio.
+5. US-16 Información · 6. US-22 Botón al portal · 7. US-11 Detalle (queda la lista) · 8. Miniatura del PDF.
+**Nunca se recorta:** registro/login, flujo de reporte, autoridad, PDF, **envío por correo (US-21)**, historial,
+seguridad del repositorio.
 
 ## Riesgos
 
@@ -78,6 +84,8 @@ grabación del video es lo más tarde mañana. Si el tiempo no alcanza, se aplic
 | BD en la nube no disponible | Plan B: PostgreSQL local |
 | Nominatim lento o bloqueado | Cache, límite de 1 petición/s, selección manual de autoridad |
 | Fallos con el GPS en interior | Probar al aire libre; permitir mover el pin |
+| Correo rechazado o enviado a una dirección equivocada | `MAIL_MODE=test` por defecto; `email_verified`; probar con buzón propio |
+| Límites del proveedor de correo gratuito | Verificar condiciones el día; adjuntar solo PDF si la evidencia es pesada |
 | Secretos subidos al repo público | `.gitignore`, `.env.example`, revisión antes de cada push (`docs/09`) |
 | Falta de tiempo | Orden de recorte; sprints pequeños; nunca dejar la rama principal rota |
 

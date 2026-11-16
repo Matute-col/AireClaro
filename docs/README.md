@@ -34,5 +34,7 @@ actores, pantallas y stack). Cambios respecto a ese documento, que deben refleja
 entrega final:
 - Mapas: **OpenStreetMap** (con `flutter_map` y Nominatim) en lugar de Google Maps Platform.
 - **Fuera de alcance** en esta fase: panel de administrador (RF-12), recuperación de contraseña, modo sin
-  conexión, envío automático de correos.
+  conexión, automatización de portales web.
+- **Envío:** RF-08 se amplía («descargar, compartir o enviar») con RF-17 (envío por correo a la autoridad) y
+  RF-18 (acceso al portal oficial), según la investigación legal y de canales del 16-nov-2026 (`docs/05`).
 - La app es **solo Android** en el prototipo (la versión web queda como trabajo futuro).

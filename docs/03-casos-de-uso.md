@@ -3,7 +3,7 @@
 ## Actores
 - **Ciudadano reportante:** motociclista, ciclista o peatón del corredor. Usa la app con una cuenta.
 - **Servicios externos (secundarios):** OpenStreetMap (mapa) y Nominatim (dirección a partir de coordenadas).
-- **Autoridad destinataria:** recibe el PDF fuera del sistema. No es un actor del sistema.
+- **Autoridad destinataria:** recibe la solicitud por correo (enviado por el sistema) o por radicación manual del ciudadano. No es un actor del sistema.
 
 ## Diagrama general
 
@@ -23,12 +23,16 @@ flowchart LR
     UC10[UC-10 Eliminar reporte]
     UC11[UC-11 Ver mapa de reportes]
     UC12[UC-12 Consultar información]
+    UC13[UC-13 Enviar solicitud a la autoridad por correo]
+    UC14[UC-14 Radicar en el portal oficial]
   end
   N([Nominatim / OpenStreetMap])
-  C --> UC01 & UC02 & UC03 & UC04 & UC05 & UC07 & UC08 & UC09 & UC10 & UC11 & UC12
+  C --> UC01 & UC02 & UC03 & UC04 & UC05 & UC07 & UC08 & UC09 & UC10 & UC11 & UC12 & UC13 & UC14
   UC05 -. incluye .-> UC06
   UC05 -. usa .-> N
   UC11 -. usa .-> N
+  M([Servidor de correo SMTP])
+  UC13 -. usa .-> M
 ```
 
 ## Secuencia: crear reporte y generar la solicitud
@@ -121,3 +125,20 @@ sequenceDiagram
 
 ### UC-12 Consultar información
 - **Flujo:** pestaña «Info» → pasos, autoridades y alcance. **Req.:** RF-14.
+
+### UC-13 Enviar la solicitud a la autoridad por correo
+- **Actor:** ciudadano; servidor de correo. **Precondición:** reporte guardado (estado `generado`) cuya autoridad
+  tiene correo verificado.
+- **Flujo principal:** 1) En la vista previa pulsa «Enviar a la autoridad». 2) La app muestra un diálogo con la
+  autoridad destinataria y el aviso de que recibirá una copia. 3) Confirma. 4) El API genera el PDF y envía el
+  correo con el PDF y la evidencia adjuntos (ciudadano en copia y como «responder a»). 5) El reporte pasa a
+  `enviado` con fecha y modo. 6) La app muestra la confirmación y el texto de seguimiento.
+- **Alternos:** a) La autoridad no tiene correo verificado → el botón no aparece y se ofrece UC-14. b) Ya fue
+  enviado → mensaje, sin reenvío. c) Fallo del servidor de correo → error y «Reintentar» (el estado no cambia).
+  d) Modo de prueba → la pantalla avisa que el correo va a un buzón de prueba, no a la autoridad.
+- **Postcondición:** reporte `enviado` por correo. **Req.:** RF-17, RF-08.
+
+### UC-14 Radicar en el portal oficial
+- **Flujo:** vista previa o detalle → «Radicar en el portal oficial» → se abre en el navegador la página oficial
+  de la autoridad. El usuario descarga el PDF, lo adjunta allí y vuelve para pulsar «Marcar como enviado».
+- **Alterno:** la autoridad no tiene `portal_url` → el botón no aparece. **Req.:** RF-18.
