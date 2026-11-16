@@ -1,8 +1,9 @@
 const rateLimit = require('express-rate-limit');
+const env = require('../config/env');
 
 const FIFTEEN_MINUTES = 15 * 60 * 1000;
 
-function limiter(limit) {
+function createLimiter(limit) {
   return rateLimit({
     windowMs: FIFTEEN_MINUTES,
     limit,
@@ -19,8 +20,12 @@ function limiter(limit) {
   });
 }
 
-// Global: 100 requests per 15 min per IP. Auth: 10 per 15 min (used from US-01).
-const globalLimiter = limiter(100);
-const authLimiter = limiter(10);
+// Under jest the limits are raised so the test suite itself is not blocked;
+// tests/rateLimit.test.js checks the limiter behavior with a small limit.
+const isTest = env.NODE_ENV === 'test';
 
-module.exports = { globalLimiter, authLimiter };
+// Global: 100 requests per 15 min per IP. Auth: 10 per 15 min.
+const globalLimiter = createLimiter(isTest ? 1000 : 100);
+const authLimiter = createLimiter(isTest ? 1000 : 10);
+
+module.exports = { createLimiter, globalLimiter, authLimiter };

@@ -4,6 +4,7 @@ const cors = require('cors');
 const env = require('./config/env');
 const { globalLimiter } = require('./middleware/rateLimit');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
+const authRoutes = require('./modules/auth/auth.routes');
 
 const app = express();
 
@@ -18,6 +19,8 @@ api.use(globalLimiter);
 api.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
+
+api.use('/auth', authRoutes);
 
 app.use('/api', api);
 
