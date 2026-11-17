@@ -10,6 +10,8 @@ import '../features/home/home_screen.dart';
 import '../features/profile/edit_profile_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/welcome/welcome_screen.dart';
+import '../shared/widgets/coming_soon_screen.dart';
+import '../shared/widgets/main_shell.dart';
 
 /// Route paths from docs/06 (plus /splash, shown while the session is checked).
 class Routes {
@@ -20,6 +22,9 @@ class Routes {
   static const login = '/login';
   static const register = '/register';
   static const home = '/home';
+  static const map = '/map';
+  static const reports = '/reports';
+  static const info = '/info';
   static const profile = '/profile';
   static const editProfile = '/profile/edit';
 
@@ -63,7 +68,40 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.welcome, builder: (context, state) => const WelcomeScreen()),
       GoRoute(path: Routes.login, builder: (context, state) => const LoginScreen()),
       GoRoute(path: Routes.register, builder: (context, state) => const RegisterScreen()),
-      GoRoute(path: Routes.home, builder: (context, state) => const HomeScreen()),
+
+      // The four main screens share the bottom bar.
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            MainShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(routes: [
+            GoRoute(path: Routes.home, builder: (context, state) => const HomeScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: Routes.map,
+              builder: (context, state) =>
+                  const ComingSoonScreen(title: 'Mapa de reportes', icon: Icons.map_outlined),
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: Routes.reports,
+              builder: (context, state) =>
+                  const ComingSoonScreen(title: 'Mis reportes', icon: Icons.list_alt),
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: Routes.info,
+              builder: (context, state) =>
+                  const ComingSoonScreen(title: '¿Cómo funciona?', icon: Icons.help_outline),
+            ),
+          ]),
+        ],
+      ),
+
+      // Outside the shell: no bottom bar.
       GoRoute(
         path: Routes.profile,
         builder: (context, state) => const ProfileScreen(),
