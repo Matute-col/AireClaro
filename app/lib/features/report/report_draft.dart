@@ -86,11 +86,12 @@ class ReportDraftController extends Notifier<ReportDraft> {
     state = state.copyWith(evidence: state.evidence.where((f) => f != file).toList());
   }
 
-  void setVehicle({
-    required String vehicleType,
-    required String plate,
-    required String smokeColor,
-    required String description,
+  /// Step 2 saves each change, so going back and forth keeps the data.
+  void updateVehicle({
+    String? vehicleType,
+    String? plate,
+    String? smokeColor,
+    String? description,
   }) {
     state = state.copyWith(
       vehicleType: vehicleType,
@@ -100,6 +101,23 @@ class ReportDraftController extends Notifier<ReportDraft> {
     );
   }
 }
+
+/// Values sent to the API with the text shown to the user (docs/05, docs/06).
+const vehicleTypeLabels = {
+  'bus': 'Bus o buseta',
+  'microbus': 'Microbús',
+  'camion': 'Camión',
+  'tractomula': 'Tractomula',
+  'otro': 'Otro',
+};
+
+const smokeColorLabels = {
+  'negro': 'Negro',
+  'gris': 'Gris',
+  'blanco': 'Blanco',
+};
+
+const maxDescriptionLength = 500;
 
 final reportDraftProvider =
     NotifierProvider<ReportDraftController, ReportDraft>(ReportDraftController.new);
