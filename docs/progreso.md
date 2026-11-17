@@ -27,9 +27,11 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | US-05 | Hecha | 6e0baad | App: paso 1 (foto, video ≤ 15 s, galería; máx. 3; miniaturas; tarjeta «Video» con tamaño). API: `multer` a carpeta temporal, nombres UUID, tipo real por bytes iniciales, límites 8/25 MB. Prueba (a) en el celular aprobada el 16-nov-2026 (cámara sin permiso, corte de video a 15 s) |
 | US-06 | Hecha | 680709c | App: paso 2 (tipo, placa ABC123/ABC12D, humo, descripción ≤ 500). API: esquema `zod` del vehículo. Prueba (a) aprobada el 16-nov-2026 |
 | US-07 | Hecha | ceea7a3 | API: `GET /geo/reverse` (Nominatim con cola de 1 petición/s, caché 24 h, `User-Agent`), regla de autoridad sobre campos administrativos, `GET /authorities`. App: paso 3 con GPS, mapa OSM, pin movible, dirección, fecha fija. Consulta real: Soacha → CAR, Bogotá → SDA. Prueba (b) aprobada el 16-nov-2026 (11/11) |
-| US-08 | Hecha (falta prueba en celular) | 4f0c7f4 | App: paso 4 precargado del perfil y editable solo para el reporte. API: mismas reglas del perfil. Prueba (c) pendiente |
-| US-09 | Hecha (falta prueba en celular) | f246904 | API: `POST /reports` multipart en una transacción (archivos a `reports/<id>/`, limpieza ante cualquier error, dueño desde el token, autoridad elegida o regla de `docs/05`). App: revisión con mapa pequeño, autoridad sugerida y «Cambiar», progreso de subida, «Reporte creado» en Inicio. La prueba de propiedad 404 llega con `GET /reports/:id` (US-10/US-11). Prueba (c) pendiente |
-| US-10…US-22 | Pendiente | | |
+| US-08 | Hecha | 4f0c7f4 | App: paso 4 precargado del perfil y editable solo para el reporte. API: mismas reglas del perfil. Prueba (c) aprobada el 16-nov-2026 |
+| US-09 | Hecha | f246904 | API: `POST /reports` multipart en una transacción (archivos a `reports/<id>/`, limpieza ante cualquier error, dueño desde el token, autoridad elegida o regla de `docs/05`). App: revisión con mapa pequeño, autoridad sugerida y «Cambiar», progreso de subida, «Reporte creado» en Inicio. Prueba (c) aprobada el 16-nov-2026 (evidencia en `backend/uploads/reports/<id>/`) |
+| US-10 | Hecha (falta prueba en celular) | 3d34ebd | API: `GET /reports` (solo los del usuario, más reciente primero, `page/limit/status`, miniatura) y `GET /reports/:id/media/:mediaId` solo para el dueño (404 si no). App: «Mis reportes» con miniaturas autenticadas, chips de estado, paginación al desplazar, recarga, vacío y error; número en Inicio. Prueba (d) pendiente |
+| US-11 | Hecha (falta prueba en celular) | c40a929 | API: `GET /reports/:id` con prueba de propiedad (otro usuario → 404 igual que inexistente; sin correo de la autoridad ni rutas de archivo). App: detalle con carrusel, datos, mapa pequeño, autoridad, estado y peticionario; tras crear un reporte se abre su detalle. Prueba (d) pendiente |
+| US-12…US-22 | Pendiente | | |
 
 ## Decisiones tomadas durante el desarrollo
 (Fecha · decisión · motivo)
@@ -59,6 +61,9 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 - 16-nov-2026 · Después de crear un reporte: Inicio con «Reporte creado» (US-09); al detalle desde US-11; a la vista previa en el Sprint 3.
 
 - 16-nov-2026 · Regla de autoridad solo sobre campos administrativos de Nominatim (no calle ni barrio; ambiguo → sin sugerencia) · los datos reales traen un barrio «UPZs de Bogotá» (`docs/05`).
+
+- 16-nov-2026 · `GET /reports/:id/media/:mediaId` se adelantó a US-10 (lo necesitan las miniaturas); `GET /reports/:id` en US-11.
+- 16-nov-2026 · Tras crear un reporte: Inicio con «Reporte creado» y el detalle encima (desde US-11). En el Sprint 3 pasará a la vista previa.
 
 ## Problemas abiertos
 - `backend/src/db/pool.js` registraba `err.message` sin pasar por `LOG_ERROR_DETAILS` · resuelto el 16-nov-2026 (ece1a24).
