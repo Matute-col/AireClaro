@@ -7,9 +7,9 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 ## Estado general
 | Bloque | Estado | Notas |
 |---|---|---|
-| Planificación (docs 01–09) | Hecho | Ruta híbrida de envío aprobada (US-21/22). Pendiente: Mateo verifica correos/portales y reglas de autoridad |
+| Planificación (docs 01–09) | Hecho | Ruta híbrida de envío aprobada (US-21/22). Correos y portales de autoridades verificados por Mateo (16-nov-2026). Pendiente: validar la regla de asignación de autoridad (`docs/05`) |
 | Sprint 0 · Entorno | Pendiente | |
-| Sprint 1 · Backend base y autenticación | En curso | Rama `sprint-1` |
+| Sprint 1 · Backend base y autenticación | Hecho | Rama `sprint-1`. Probado en el celular el 16-nov-2026. Pendiente con aprobación de Mateo: push, merge a `main` y tag `v0.1-sprint1` |
 | Sprint 2 · Flujo de reporte | Pendiente | |
 | Sprint 3 · PDF, mapa, pruebas | Pendiente | |
 | Validación TRL 5 y video | Pendiente | |
@@ -21,9 +21,9 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | TS-02 | Hecha | 5e90df1 | Migraciones aplicadas en Neon el 16-nov-2026: 4 tablas + 3 autoridades con `email_verified=false` |
 | TS-03 | Hecha | eb812fd | App Flutter en `app/` (id `com.aireclaro.app`): tema M3, `go_router`, `dio` con token y manejo de 401, `flutter_secure_storage`, validadores iguales al API. URL del API por `--dart-define=API_BASE_URL` |
 | US-01 | Hecha | eb47f5c, ec86672 | API: `POST /api/auth/register`. App: pantalla de registro con consentimiento y política (Ley 1581). Probado en el celular el 16-nov-2026: botón deshabilitado, contraseñas distintas, registro válido, correo duplicado, API apagado |
-| US-02 | Hecha (falta prueba en celular) | 3d02e25, 224abe7 | App: login, `/splash` que valida el token con `GET /me` (sin red → «Reintentar»), 401 → login con «Tu sesión expiró». Pruebas automáticas; pendiente la prueba en el celular junto con US-04 |
-| US-03 | Hecha (falta prueba en celular) | 1a1bd53, 26d96a0 | App: Perfil, editar (nombre, documento, teléfono; correo solo lectura), política y cerrar sesión con confirmación. Pendiente la prueba en el celular |
-| US-04 | Hecha (falta prueba en celular) | fb93657 | Bienvenida, Inicio y barra inferior (`StatefulShellRoute`). Mapa, Mis reportes e Info son pantallas «Muy pronto»; «Nuevo reporte» muestra un aviso hasta el Sprint 2. La tarjeta «Mis reportes» aún no muestra el número (llega con `GET /reports`, US-10) |
+| US-02 | Hecha | 3d02e25, 224abe7 | App: login, `/splash` que valida el token con `GET /me` (sin red → «Reintentar»), 401 → login con «Tu sesión expiró». Probado en el celular el 16-nov-2026 |
+| US-03 | Hecha | 1a1bd53, 26d96a0 | App: Perfil, editar (nombre, documento, teléfono; correo solo lectura), política y cerrar sesión con confirmación. Probado en el celular el 16-nov-2026 |
+| US-04 | Hecha | fb93657 | Bienvenida, Inicio y barra inferior (`StatefulShellRoute`). Mapa, Mis reportes e Info son pantallas «Muy pronto»; «Nuevo reporte» muestra un aviso hasta el Sprint 2. La tarjeta «Mis reportes» aún no muestra el número (llega con `GET /reports`, US-10). Probado en el celular el 16-nov-2026 |
 | US-05…US-22 | Pendiente | | |
 
 ## Decisiones tomadas durante el desarrollo
@@ -46,8 +46,11 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 - 16-nov-2026 · App: HTTP sin cifrar solo en los manifiestos `debug` y `profile`; prueba en el celular con `adb reverse tcp:3000 tcp:3000`.
 
 - 16-nov-2026 · App: ruta `/splash` adicional para validar la sesión al abrir (D-17 en `docs/04`).
+- 16-nov-2026 · Autoridades verificadas por Mateo: SDA y CAR con `email_verified=true`, SDM sin correo (solo portal). Nueva migración `1794876283606_update-authorities-verified`, aplicada primero en `test` (`npm test` en verde) y luego en la base principal · los datos de autoridades solo cambian por migración. `MAIL_MODE` sigue en `test`.
 
 ## Problemas abiertos
+- `backend/src/db/pool.js` registra `err.message` de errores de conexión inactiva sin pasar por `LOG_ERROR_DETAILS` · bajo riesgo (mensajes del driver de red, no de consultas); opcional alinearlo en el Sprint 2.
+- Diferencias visuales con Figma sin revisar (Claude no tiene acceso al Figma) · Mateo compara cuando pueda.
 (Descripción · estado)
 - `channel_binding=require` de Neon funciona con `pg` · resuelto.
 - `pg` avisa que `sslmode=require` se trata hoy como `verify-full` y cambiará en pg v9 · opcional: usar `sslmode=verify-full` en `DATABASE_URL` (lo decide Mateo).
