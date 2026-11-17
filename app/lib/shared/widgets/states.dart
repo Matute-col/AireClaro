@@ -87,10 +87,20 @@ class LoadingOverlay extends StatelessWidget {
 
 /// Inline message box (error or info) shown above a form.
 class MessageBanner extends StatelessWidget {
-  const MessageBanner({super.key, required this.message, this.isError = true});
+  const MessageBanner({
+    super.key,
+    required this.message,
+    this.isError = true,
+    this.actionLabel,
+    this.onAction,
+  });
 
   final String message;
   final bool isError;
+
+  /// Optional button inside the banner, e.g. «Reintentar».
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +118,8 @@ class MessageBanner extends StatelessWidget {
           Icon(isError ? Icons.error_outline : Icons.info_outline, color: color),
           const SizedBox(width: AppSpacing.sm),
           Expanded(child: Text(message)),
+          if (actionLabel != null && onAction != null)
+            TextButton(onPressed: onAction, child: Text(actionLabel!)),
         ],
       ),
     );

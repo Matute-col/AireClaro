@@ -83,6 +83,14 @@ class _AppTextFieldState extends State<AppTextField> {
   }
 }
 
+/// Turns what the user types into uppercase (document number, plate).
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    return newValue.copyWith(text: newValue.text.toUpperCase());
+  }
+}
+
 /// Dropdown with a visible label. [options] maps the value sent to the API to
 /// the text shown to the user.
 class AppDropdown<T> extends StatelessWidget {
