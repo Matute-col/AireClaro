@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/router.dart';
 import '../../core/theme.dart';
 import '../auth/auth_controller.dart';
+import '../report/report_draft.dart';
 
 /// Screen 04 · Inicio: greeting, «Nuevo reporte» and shortcuts.
 class HomeScreen extends ConsumerWidget {
@@ -33,10 +34,10 @@ class HomeScreen extends ConsumerWidget {
           SizedBox(
             height: 72,
             child: FilledButton.icon(
-              // The report flow arrives in Sprint 2 (US-05…US-09).
-              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Muy pronto podrás crear reportes desde aquí.')),
-              ),
+              onPressed: () {
+                ref.read(reportDraftProvider.notifier).reset();
+                context.push(Routes.reportEvidence);
+              },
               icon: const Icon(Icons.add_a_photo_outlined, size: 28),
               label: Text(
                 'Nuevo reporte',

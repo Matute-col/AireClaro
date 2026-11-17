@@ -7,6 +7,7 @@
 // - If both URLs point to the same host, the run stops.
 // Connection strings are never printed.
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const dotenv = require('dotenv');
 
@@ -39,3 +40,5 @@ process.env.JWT_SECRET = 'test-secret-only-for-jest-0123456789abcdef';
 process.env.JWT_EXPIRES_IN = '7d';
 process.env.MAIL_MODE = 'test';
 process.env.LOG_ERROR_DETAILS = 'false';
+// Evidence uploads go to a temporary folder, never to backend/uploads/.
+process.env.UPLOAD_DIR = path.join(os.tmpdir(), 'aireclaro-test-uploads');

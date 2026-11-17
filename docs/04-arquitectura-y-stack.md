@@ -64,6 +64,13 @@ paquete adicional.
 
 **Instalados en la app (Sprint 1, 16-nov-2026):** `material_ui` 1.11 (de la plantilla, D-16), `flutter_riverpod` 3.5 (sin generación de código), `go_router` 18.1, `dio` 5.11, `flutter_secure_storage` 11.2. Los demás se agregan con la historia que los use. Pruebas sin paquetes de mocks: dobles escritos a mano en `app/test/helpers/`.
 
+**Agregados en el Sprint 2:**
+- `multer` (API, US-05): recibir `multipart/form-data` con límites de cantidad y tamaño, guardando en disco con
+  nombres generados. El tipo real se verifica leyendo los primeros bytes del archivo (`src/utils/fileType.js`, sin
+  paquete adicional).
+- `image_picker` (app, US-05): tomar foto, grabar video (máx. 15 s) y elegir de la galería; reduce las fotos a
+  1600 px de lado y calidad 80 (RNF-02).
+
 ## Estructura del backend
 
 ```
@@ -134,8 +141,9 @@ La URL del API se pasa al compilar: `flutter run --dart-define=API_BASE_URL=http
   se usa HTTPS.
 
 ### Permisos de Android (AndroidManifest principal)
-`INTERNET`, `CAMERA`, `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`. La app debe pedir los permisos en el
-momento de usarlos y explicar para qué.
+`INTERNET`, `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`. La app debe pedir los permisos en el momento de
+usarlos y explicar para qué. **`CAMERA` no se declara** (16-nov-2026, aprobado por Mateo): `image_picker` usa la
+app de cámara del sistema, que no necesita el permiso; si se declarara, Android obligaría a pedirlo antes de abrirla.
 
 ## Base de datos en la nube (Sprint 0)
 Elegir un proveedor de PostgreSQL gestionado con plan gratuito **verificando sus condiciones vigentes el

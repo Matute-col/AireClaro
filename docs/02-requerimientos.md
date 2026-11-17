@@ -14,6 +14,9 @@ Cambios respecto al documento maestro (reflejarlos allí al final):
 - Base legal del envío: Ley 1755 de 2015, art. 15 (petición por cualquier medio idóneo, incluido el electrónico),
   art. 16 (contenido mínimo) y art. 21 (remisión por competencia). Ver `docs/05`.
 - Se retira «versión web» de RNF-05: el prototipo es solo Android.
+- RF-02 (16-nov-2026, aprobado por Mateo): el límite de 15 s se aplica al **grabar** (lo controla la app de cámara
+  del teléfono; algunos modelos lo ignoran). La duración de los videos no se mide ni se muestra (no se agrega
+  `video_player`); el control efectivo es el tope de 25 MB por video (RNF-02).
 
 ## Actores
 - **Ciudadano reportante** (usuario con cuenta).

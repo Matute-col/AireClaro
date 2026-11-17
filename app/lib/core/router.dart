@@ -9,6 +9,7 @@ import '../features/auth/splash_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/profile/edit_profile_screen.dart';
 import '../features/profile/profile_screen.dart';
+import '../features/report/evidence_step_screen.dart';
 import '../features/welcome/welcome_screen.dart';
 import '../shared/widgets/coming_soon_screen.dart';
 import '../shared/widgets/main_shell.dart';
@@ -27,6 +28,10 @@ class Routes {
   static const info = '/info';
   static const profile = '/profile';
   static const editProfile = '/profile/edit';
+
+  // New report flow (outside the shell: no bottom bar).
+  static const reportEvidence = '/report/evidence';
+  static const reportVehicle = '/report/vehicle';
 
   /// Screens that are only for people without a session.
   static const public = {welcome, login, register};
@@ -102,6 +107,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // Outside the shell: no bottom bar.
+      GoRoute(
+        path: Routes.reportEvidence,
+        builder: (context, state) => const EvidenceStepScreen(),
+      ),
+      GoRoute(
+        path: Routes.reportVehicle,
+        builder: (context, state) =>
+            const ComingSoonScreen(title: 'Nuevo reporte', icon: Icons.local_shipping_outlined),
+      ),
       GoRoute(
         path: Routes.profile,
         builder: (context, state) => const ProfileScreen(),

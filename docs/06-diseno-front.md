@@ -77,9 +77,11 @@ Tarjetas: «Mis reportes» (con el número de reportes), «Mapa de reportes», �
 
 ### 05 · Nuevo reporte, paso 1 de 4: Evidencia
 `StepProgress` 1/4. Título «Captura la evidencia». Botones: «Tomar foto», «Grabar video (máx. 15 s)»,
-«Elegir de la galería». Miniaturas con botón para quitar (los videos muestran un ícono y la duración).
+«Elegir de la galería». Miniaturas con botón para quitar (los videos muestran una tarjeta «Video» con ícono y
+tamaño; sin duración, ver cambio del 16-nov-2026 en `docs/02`).
 Ayuda: «Procura que se vea la placa y el humo». Máximo 3 archivos. «Siguiente» activo con ≥ 1 archivo.
-Fotos: `imageQuality ≈ 80`, `maxWidth ≈ 1600`. Pedir permiso de cámara al usarla.
+Fotos: `imageQuality ≈ 80`, `maxWidth ≈ 1600`. La cámara se abre con la app de cámara del sistema (no se declara
+el permiso `CAMERA`, ver `docs/04`).
 
 ### 06 · Paso 2 de 4: Datos del vehículo
 **Tipo de vehículo** (desplegable: Bus o buseta, Microbús, Camión, Tractomula, Otro) · **Placa** (mayúsculas
