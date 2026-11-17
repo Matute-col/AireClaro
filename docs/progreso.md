@@ -26,8 +26,10 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | US-04 | Hecha | fb93657 | Bienvenida, Inicio y barra inferior (`StatefulShellRoute`). Mapa, Mis reportes e Info son pantallas «Muy pronto»; «Nuevo reporte» muestra un aviso hasta el Sprint 2. La tarjeta «Mis reportes» aún no muestra el número (llega con `GET /reports`, US-10). Probado en el celular el 16-nov-2026 |
 | US-05 | Hecha | 6e0baad | App: paso 1 (foto, video ≤ 15 s, galería; máx. 3; miniaturas; tarjeta «Video» con tamaño). API: `multer` a carpeta temporal, nombres UUID, tipo real por bytes iniciales, límites 8/25 MB. Prueba (a) en el celular aprobada el 16-nov-2026 (cámara sin permiso, corte de video a 15 s) |
 | US-06 | Hecha | 680709c | App: paso 2 (tipo, placa ABC123/ABC12D, humo, descripción ≤ 500). API: esquema `zod` del vehículo. Prueba (a) aprobada el 16-nov-2026 |
-| US-07 | Hecha (falta prueba en celular) | ceea7a3 | API: `GET /geo/reverse` (Nominatim con cola de 1 petición/s, caché 24 h, `User-Agent`), regla de autoridad sobre campos administrativos, `GET /authorities`. App: paso 3 con GPS, mapa OSM, pin movible, dirección, fecha fija. Consulta real: Soacha → CAR, Bogotá → SDA. Prueba (b) pendiente |
-| US-08…US-22 | Pendiente | | |
+| US-07 | Hecha | ceea7a3 | API: `GET /geo/reverse` (Nominatim con cola de 1 petición/s, caché 24 h, `User-Agent`), regla de autoridad sobre campos administrativos, `GET /authorities`. App: paso 3 con GPS, mapa OSM, pin movible, dirección, fecha fija. Consulta real: Soacha → CAR, Bogotá → SDA. Prueba (b) aprobada el 16-nov-2026 (11/11) |
+| US-08 | Hecha (falta prueba en celular) | 4f0c7f4 | App: paso 4 precargado del perfil y editable solo para el reporte. API: mismas reglas del perfil. Prueba (c) pendiente |
+| US-09 | Hecha (falta prueba en celular) | f246904 | API: `POST /reports` multipart en una transacción (archivos a `reports/<id>/`, limpieza ante cualquier error, dueño desde el token, autoridad elegida o regla de `docs/05`). App: revisión con mapa pequeño, autoridad sugerida y «Cambiar», progreso de subida, «Reporte creado» en Inicio. La prueba de propiedad 404 llega con `GET /reports/:id` (US-10/US-11). Prueba (c) pendiente |
+| US-10…US-22 | Pendiente | | |
 
 ## Decisiones tomadas durante el desarrollo
 (Fecha · decisión · motivo)
