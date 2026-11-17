@@ -47,6 +47,11 @@ router.get('/', async (req, res) => {
   res.json(await reportsService.list(req.user.id, parsed.data));
 });
 
+// GET /api/reports/:id → {report, media, authority}, only for the owner.
+router.get('/:id', requireUuidParams('id'), async (req, res) => {
+  res.json(await reportsService.getById(req.user.id, req.params.id));
+});
+
 // GET /api/reports/:id/media/:mediaId → the file, only for the owner.
 router.get('/:id/media/:mediaId', requireUuidParams('id', 'mediaId'), async (req, res, next) => {
   const file = await reportsService.getMediaFile(req.user.id, req.params.id, req.params.mediaId);

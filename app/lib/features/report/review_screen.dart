@@ -1,4 +1,3 @@
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
@@ -8,7 +7,7 @@ import '../../core/api_error.dart';
 import '../../core/router.dart';
 import '../../core/theme.dart';
 import '../../shared/widgets/buttons.dart';
-import '../../shared/widgets/osm_map.dart';
+import '../../shared/widgets/report_mini_map.dart';
 import '../../shared/widgets/states.dart';
 import '../history/reports_list_controller.dart';
 import 'authorities_repository.dart';
@@ -70,7 +69,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       _error = null;
     });
     try {
-      await ref.read(reportsRepositoryProvider).create(
+      final reportId = await ref.read(reportsRepositoryProvider).create(
             ref.read(reportDraftProvider),
             onProgress: (value) {
               if (mounted) setState(() => _progress = value);
@@ -82,12 +81,16 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
         const SnackBar(content: Text('Reporte creado.')),
       );
       final draft = ref.read(reportDraftProvider.notifier);
+      final router = GoRouter.of(context);
       // «Mis reportes» and the count on Inicio must include the new report.
       ref.invalidate(reportsListProvider);
       ref.invalidate(reportsCountProvider);
-      context.go(Routes.home);
-      // Clear the draft once this screen is gone (there are no drafts, docs/06).
-      WidgetsBinding.instance.addPostFrameCallback((_) => draft.reset());
+      // Inicio, with the new report's detail on top («Atrás» returns to Inicio).
+      router.go(Routes.home);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        router.push(Routes.reportDetail(reportId));
+        draft.reset(); // the flow screens are gone: clear the draft (no drafts, docs/06)
+      });
     } on ApiException catch (error) {
       if (!mounted) return;
       setState(() {
@@ -160,7 +163,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _SmallMap(point: LatLng(draft.lat!, draft.lng!)),
+                      ReportMiniMap(point: LatLng(draft.lat!, draft.lng!)),
                       const SizedBox(height: AppSpacing.sm),
                       _Lines([
                         ('Dirección', draft.address ?? 'Sin dirección aproximada'),
@@ -311,47 +314,6 @@ class _Lines extends StatelessWidget {
             ])),
           ),
       ],
-    );
-  }
-}
-
-/// Non-interactive map with the report pin.
-class _SmallMap extends StatelessWidget {
-  const _SmallMap({required this.point});
-
-  final LatLng point;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 160,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppSpacing.radius),
-        child: Stack(
-          children: [
-            FlutterMap(
-              options: MapOptions(
-                initialCenter: point,
-                initialZoom: 16,
-                interactionOptions: const InteractionOptions(flags: InteractiveFlag.none),
-              ),
-              children: [
-                const OsmTileLayer(),
-                MarkerLayer(markers: [
-                  Marker(
-                    point: point,
-                    width: 40,
-                    height: 40,
-                    alignment: Alignment.topCenter,
-                    child: const Icon(Icons.location_on, size: 40, color: AppColors.error),
-                  ),
-                ]),
-              ],
-            ),
-            const OsmAttribution(),
-          ],
-        ),
-      ),
     );
   }
 }

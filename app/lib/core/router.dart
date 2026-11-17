@@ -6,6 +6,7 @@ import '../features/auth/auth_controller.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/auth/splash_screen.dart';
+import '../features/history/report_detail_screen.dart';
 import '../features/history/reports_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/profile/edit_profile_screen.dart';
@@ -30,6 +31,7 @@ class Routes {
   static const home = '/home';
   static const map = '/map';
   static const reports = '/reports';
+  static String reportDetail(String id) => '/reports/$id';
   static const info = '/info';
   static const profile = '/profile';
   static const editProfile = '/profile/edit';
@@ -114,6 +116,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // Outside the shell: no bottom bar.
+      GoRoute(
+        path: '/reports/:id',
+        builder: (context, state) =>
+            ReportDetailScreen(reportId: state.pathParameters['id']!),
+      ),
       GoRoute(
         path: Routes.reportEvidence,
         builder: (context, state) => const EvidenceStepScreen(),

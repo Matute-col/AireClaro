@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api_client.dart';
 import '../../core/api_error.dart';
 import '../../core/validators.dart';
+import '../history/report_detail.dart';
 import '../history/report_summary.dart';
 import 'report_draft.dart';
 
@@ -55,6 +56,16 @@ class ReportsRepository {
         },
       );
       return (response.data!['report'] as Map<String, dynamic>)['id'] as String;
+    } catch (error) {
+      throw toApiException(error);
+    }
+  }
+
+  /// Report detail (only the owner's reports; otherwise the API answers 404).
+  Future<ReportDetail> getById(String id) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>('/reports/$id');
+      return ReportDetail.fromJson(response.data!);
     } catch (error) {
       throw toApiException(error);
     }

@@ -166,4 +166,47 @@ async function getMediaFile(userId, reportId, mediaId) {
   return { absolutePath: storage.resolveStored(rows[0].file_path), mimeType: rows[0].mime_type };
 }
 
-module.exports = { create, resolveAuthority, list, getMediaFile, NOT_FOUND_MESSAGE };
+/**
+ * Report detail (US-11): {report, media, authority}. Only for the owner (RB-01): any
+ * other user gets the same 404 as a report that does not exist.
+ * The authority email is never returned, only whether it is verified (can_email).
+ */
+async function getById(userId, reportId) {
+  const { rows } = await query(
+    `SELECT r.id, r.vehicle_type, r.plate, r.smoke_color, r.description, r.lat, r.lng,
+            r.address, r.occurred_at, r.status, r.sent_at, r.sent_via, r.send_mode,
+            r.requester_name, r.requester_doc_type, r.requester_doc_number,
+            r.requester_email, r.requester_phone, r.created_at,
+            a.id AS authority_id, a.code AS authority_code, a.name AS authority_name,
+            a.portal_url AS authority_portal_url,
+            (a.email IS NOT NULL AND a.email_verified) AS authority_can_email
+       FROM reports r
+       JOIN authorities a ON a.id = r.authority_id
+      WHERE r.id = $1 AND r.user_id = $2`,
+    [reportId, userId],
+  );
+  if (!rows[0]) throw new AppError(404, 'NOT_FOUND', NOT_FOUND_MESSAGE);
+
+  const {
+    authority_id: id,
+    authority_code: code,
+    authority_name: name,
+    authority_portal_url: portalUrl,
+    authority_can_email: canEmail,
+    ...report
+  } = rows[0];
+
+  const { rows: media } = await query(
+    `SELECT id, kind, mime_type, size_bytes FROM report_media
+      WHERE report_id = $1 ORDER BY file_path`,
+    [reportId],
+  );
+
+  return {
+    report,
+    media,
+    authority: { id, code, name, portal_url: portalUrl, can_email: canEmail },
+  };
+}
+
+module.exports = { create, resolveAuthority, list, getById, getMediaFile, NOT_FOUND_MESSAGE };

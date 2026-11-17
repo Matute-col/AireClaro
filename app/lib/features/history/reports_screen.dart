@@ -57,8 +57,11 @@ class ReportsScreen extends ConsumerWidget {
             itemCount: state.items.length + 1,
             itemBuilder: (context, index) {
               if (index < state.items.length) {
-                // The detail screen arrives with US-11.
-                return ReportCard(report: state.items[index]);
+                final report = state.items[index];
+                return ReportCard(
+                  report: report,
+                  onTap: () => context.push(Routes.reportDetail(report.id)),
+                );
               }
               return _ListFooter(state: state, onRetry: controller.loadMore);
             },

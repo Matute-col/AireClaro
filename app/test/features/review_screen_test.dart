@@ -88,6 +88,10 @@ void main() {
       routes: [
         GoRoute(path: Routes.home, builder: (_, _) => const Scaffold(body: Text('Pantalla de inicio'))),
         GoRoute(path: Routes.reportReview, builder: (_, _) => const ReviewScreen()),
+        GoRoute(
+          path: '/reports/:id',
+          builder: (_, state) => Scaffold(body: Text('Detalle ${state.pathParameters['id']}')),
+        ),
       ],
     );
     addTearDown(router.dispose);
@@ -149,14 +153,14 @@ void main() {
     expect(generate(tester).onPressed, isNotNull);
   });
 
-  testWidgets('«Generar solicitud» creates the report, goes home and clears the draft',
+  testWidgets('«Generar solicitud» creates the report, opens its detail and clears the draft',
       (tester) async {
     await pumpReview(tester, completeDraft());
     await tester.tap(find.text('Generar solicitud'));
     await tester.pumpAndSettle();
 
     expect(reports.sent?.authorityId, 1);
-    expect(find.text('Pantalla de inicio'), findsOneWidget);
+    expect(find.text('Detalle new-report-id'), findsOneWidget);
     expect(find.text('Reporte creado.'), findsOneWidget);
     expect(container.read(reportDraftProvider).isEmpty, isTrue);
   });
@@ -174,7 +178,7 @@ void main() {
     reports.error = null;
     await tester.tap(find.text('Reintentar'));
     await tester.pumpAndSettle();
-    expect(find.text('Pantalla de inicio'), findsOneWidget);
+    expect(find.text('Detalle new-report-id'), findsOneWidget);
   });
 
   testWidgets('server validation errors are listed', (tester) async {
