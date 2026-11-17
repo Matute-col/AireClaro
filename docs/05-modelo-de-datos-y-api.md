@@ -159,7 +159,7 @@ se ofrece «Radicar en el portal oficial». No inventes direcciones; cualquier c
 | `PUT /me` | Editar perfil | `full_name, doc_type, doc_number, phone?` | `200 {user}` |
 | `GET /authorities` | Lista de autoridades | — | `200 [{id, code, name, portal_url, can_email}]` (`can_email` = tiene correo verificado; el correo no se expone) |
 | `GET /geo/reverse` | Dirección desde coordenadas | `lat, lng` | `200 {address, municipality, state, suggested_authority_id}` |
-| `POST /reports` | Crear reporte | `multipart/form-data`: `vehicle_type, plate, smoke_color, description?, lat, lng, address?, occurred_at, authority_id?, requester_name, requester_doc_type, requester_doc_number, requester_email, requester_phone?` + `files[]` (1–3) | `201 {report}` |
+| `POST /reports` | Crear reporte | `multipart/form-data`: `vehicle_type, plate, smoke_color, description?, lat, lng, address?, occurred_at, authority_id?, requester_name, requester_doc_type, requester_doc_number, requester_email, requester_phone?` + `files[]` (1–3) | `201 {report}` con `status: generado`, `authority` y `media[]` · `400` validación, tipo de archivo (`INVALID_FILE_TYPE`), más de 3 archivos (`TOO_MANY_FILES`) o sin autoridad (`AUTHORITY_REQUIRED`) · `413` archivo grande. Reporte y archivos en una sola transacción; el dueño sale del token |
 | `GET /reports` | Mis reportes | `page=1, limit=20, status?` | `200 {items, page, total}` |
 | `GET /reports/:id` | Detalle | — | `200 {report, media[], authority}` · `404` si no es suyo |
 | `DELETE /reports/:id` | Eliminar | — | `204` |

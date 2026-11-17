@@ -55,4 +55,71 @@ const requesterFields = {
   requester_phone: profileFields.phone,
 };
 
-module.exports = { VEHICLE_TYPES, SMOKE_COLORS, normalizePlate, vehicleFields, requesterFields };
+// US-09 · Location, time and authority. Multipart fields arrive as text.
+const emptyToUndefined = (value) => (value === '' || value === null ? undefined : value);
+
+function coordinate(name, limit) {
+  const message = `La ${name} debe estar entre -${limit} y ${limit}.`;
+  return z.preprocess(
+    emptyToUndefined,
+    z.coerce
+      .number({ error: `La ${name} es obligatoria.` })
+      .min(-limit, { error: message })
+      .max(limit, { error: message }),
+  );
+}
+
+// Small tolerance for phone clocks that run a bit fast.
+const CLOCK_TOLERANCE_MS = 5 * 60 * 1000;
+
+const locationFields = {
+  lat: coordinate('latitud', 90),
+  lng: coordinate('longitud', 180),
+
+  address: z.preprocess(
+    (value) => (typeof value === 'string' && value.trim() === '' ? null : value),
+    z
+      .string()
+      .trim()
+      .max(300, { error: 'La dirección puede tener máximo 300 caracteres.' })
+      .nullish()
+      .transform((value) => value ?? null),
+  ),
+
+  occurred_at: z.preprocess(
+    emptyToUndefined,
+    z.coerce
+      .date({ error: 'La fecha y hora del reporte no son válidas.' })
+      .refine((date) => date.getTime() <= Date.now() + CLOCK_TOLERANCE_MS, {
+        error: 'La fecha y hora del reporte no pueden estar en el futuro.',
+      }),
+  ),
+
+  // Optional: without it the server applies the authority rule (docs/05).
+  authority_id: z.preprocess(
+    emptyToUndefined,
+    z.coerce
+      .number({ error: 'Elige una autoridad válida.' })
+      .int({ error: 'Elige una autoridad válida.' })
+      .positive({ error: 'Elige una autoridad válida.' })
+      .optional(),
+  ),
+};
+
+// POST /reports. Unknown fields (e.g. user_id, status) are dropped: the owner
+// comes only from the token and every new report starts as «generado».
+const createReportSchema = z.object({
+  ...vehicleFields,
+  ...locationFields,
+  ...requesterFields,
+});
+
+module.exports = {
+  VEHICLE_TYPES,
+  SMOKE_COLORS,
+  normalizePlate,
+  vehicleFields,
+  requesterFields,
+  locationFields,
+  createReportSchema,
+};

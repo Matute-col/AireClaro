@@ -12,6 +12,7 @@ import '../features/profile/profile_screen.dart';
 import '../features/report/evidence_step_screen.dart';
 import '../features/report/location_step_screen.dart';
 import '../features/report/requester_step_screen.dart';
+import '../features/report/review_screen.dart';
 import '../features/report/vehicle_step_screen.dart';
 import '../features/welcome/welcome_screen.dart';
 import '../shared/widgets/coming_soon_screen.dart';
@@ -129,11 +130,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.reportRequester,
         builder: (context, state) => const RequesterStepScreen(),
       ),
-      // Review (US-09).
       GoRoute(
         path: Routes.reportReview,
-        builder: (context, state) =>
-            const ComingSoonScreen(title: 'Revisión', icon: Icons.fact_check_outlined),
+        builder: (context, state) => const ReviewScreen(),
       ),
       GoRoute(
         path: Routes.profile,

@@ -17,4 +17,9 @@ async function getIdByCode(code) {
   return rows[0]?.id ?? null;
 }
 
-module.exports = { list, getIdByCode };
+async function getById(id) {
+  const { rows } = await query('SELECT id, code, name FROM authorities WHERE id = $1', [id]);
+  return rows[0] ?? null;
+}
+
+module.exports = { list, getIdByCode, getById };
