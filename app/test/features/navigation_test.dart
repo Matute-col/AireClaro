@@ -1,6 +1,8 @@
 import 'package:aireclaro/app.dart';
 import 'package:aireclaro/core/token_storage.dart';
 import 'package:aireclaro/features/auth/auth_repository.dart';
+import 'package:aireclaro/features/report/reports_repository.dart';
+import 'package:aireclaro/shared/widgets/auth_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -13,6 +15,8 @@ Future<void> pumpApp(WidgetTester tester, {String? savedToken}) async {
     overrides: [
       authRepositoryProvider.overrideWithValue(FakeAuthRepository()),
       tokenStorageProvider.overrideWithValue(MemoryTokenStorage(savedToken)),
+      reportsRepositoryProvider.overrideWithValue(FakeReportsListRepository(total: 3)),
+      authTokenProvider.overrideWith((ref) async => null),
     ],
     child: const AireClaroApp(),
   ));
@@ -37,6 +41,7 @@ void main() {
 
     expect(find.text('Hola, Ana'), findsOneWidget);
     expect(find.text('Nuevo reporte'), findsOneWidget);
+    expect(find.text('3 reportes'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
   });
 

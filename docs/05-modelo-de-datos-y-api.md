@@ -145,7 +145,8 @@ se ofrece «Radicar en el portal oficial». No inventes direcciones; cualquier c
 - Autenticación: cabecera `Authorization: Bearer <token>` en todo salvo `/health`, `/auth/register`, `/auth/login`.
 - Errores: `{ "error": { "code": "VALIDATION_ERROR", "message": "texto en español", "details": [...] } }`
   con códigos HTTP 400, 401, 403, 404, 409, 413, 429, 500.
-- Límites: peticiones globales 100 cada 15 min por IP; `/auth/*` 10 cada 15 min.
+- Límites: peticiones globales 300 cada 15 min por IP; `/auth/*` 10 cada 15 min. (Cambio del 16-nov-2026, aprobado
+  por Mateo: antes 100; cada miniatura de evidencia en «Mis reportes» es una petición autenticada.)
 
 ## Endpoints
 
@@ -158,12 +159,12 @@ se ofrece «Radicar en el portal oficial». No inventes direcciones; cualquier c
 | `PUT /me` | Editar perfil | `full_name, doc_type, doc_number, phone?` | `200 {user}` |
 | `GET /authorities` | Lista de autoridades | — | `200 [{id, code, name, portal_url, can_email}]` (`can_email` = tiene correo verificado; el correo no se expone) |
 | `GET /geo/reverse` | Dirección desde coordenadas | `lat, lng` | `200 {address, municipality, state, suggested_authority_id}` |
-| `POST /reports` | Crear reporte | `multipart/form-data`: `vehicle_type, plate, smoke_color, description?, lat, lng, address?, occurred_at, authority_id?, requester_name, requester_doc_type, requester_doc_number, requester_email, requester_phone?` + `files[]` (1–3) | `201 {report}` |
-| `GET /reports` | Mis reportes | `page=1, limit=20, status?` | `200 {items, page, total}` |
-| `GET /reports/:id` | Detalle | — | `200 {report, media[], authority}` · `404` si no es suyo |
+| `POST /reports` | Crear reporte | `multipart/form-data`: `vehicle_type, plate, smoke_color, description?, lat, lng, address?, occurred_at, authority_id?, requester_name, requester_doc_type, requester_doc_number, requester_email, requester_phone?` + `files[]` (1–3) | `201 {report}` con `status: generado`, `authority` y `media[]` · `400` validación, tipo de archivo (`INVALID_FILE_TYPE`), más de 3 archivos (`TOO_MANY_FILES`) o sin autoridad (`AUTHORITY_REQUIRED`) · `413` archivo grande. Reporte y archivos en una sola transacción; el dueño sale del token |
+| `GET /reports` | Mis reportes | `page=1, limit=20 (máx. 50), status?` | `200 {items, page, total}`, más reciente primero; cada item: `id, plate, vehicle_type, smoke_color, status, address, occurred_at, created_at, authority{code,name}, thumbnail_media_id` (una foto; `null` si solo hay videos), `media_count` |
+| `GET /reports/:id` | Detalle | — | `200 {report, media[], authority}` (`authority` con `can_email`, sin el correo; `media` sin rutas de archivo) · `404` si no es suyo, no existe o el id no es válido (misma respuesta) |
 | `DELETE /reports/:id` | Eliminar | — | `204` |
 | `PATCH /reports/:id/status` | Marcar como enviado a mano (portal, compartir) | `{status:"enviado"}` | `200 {report}` con `sent_via=manual` |
-| `GET /reports/:id/media/:mediaId` | Descargar un archivo de evidencia | — | archivo |
+| `GET /reports/:id/media/:mediaId` | Descargar un archivo de evidencia | — | archivo con su `Content-Type` · `404` si no es suyo, no existe o el id no es válido (misma respuesta en los tres casos) |
 | `GET /reports/:id/pqrsd` | Texto de la solicitud | — | `200 {authority, text}` |
 | `GET /reports/:id/pqrsd.pdf` | PDF de la solicitud | — | `200 application/pdf` |
 | `POST /reports/:id/send` | Enviar la solicitud por correo a la autoridad | `{confirm:true}` | `200 {report, delivery:{mode, sent_at}}` · `409` ya enviado · `422` autoridad sin correo verificado · `502` fallo del servidor de correo |
@@ -184,15 +185,23 @@ Ejemplo de respuesta de `POST /reports` (resumen):
 - Archivos: de 1 a 3; imágenes `image/jpeg|png|webp` ≤ 8 MB; video `video/mp4|quicktime` ≤ 25 MB.
 - `accept_terms` debe ser `true`; se guarda `consent_at = now()`.
 
-## Asignación de la autoridad (propuesta; **Mateo debe validarla**)
-1. `GET /geo/reverse` obtiene de Nominatim (`format=jsonv2&addressdetails=1&accept-language=es&zoom=16`)
-   ciudad/municipio/departamento.
-2. Se normaliza el texto (minúsculas, sin tildes). Si contiene `bogota` → **SDA**. Si contiene `soacha` o
-   `cundinamarca` → **CAR**. En otro caso → sin sugerencia; el usuario elige.
+## Asignación de la autoridad (confirmada por Mateo el 16-nov-2026)
+1. `GET /geo/reverse` obtiene de Nominatim (`format=jsonv2&addressdetails=1&accept-language=es&zoom=16`) la
+   dirección con sus campos administrativos.
+2. La regla mira **solo** los campos administrativos (`city`, `town`, `village`, `municipality`, `county`,
+   `subregion`, `state_district`, `state`, `region`), nunca la calle ni el barrio: una «Avenida Bogotá» en Soacha
+   o el barrio «UPZs de Bogotá» que devuelve Nominatim no deben contar. Se normaliza el texto (minúsculas, sin
+   tildes). Si contiene `bogota` → **SDA**. Si contiene `soacha` o `cundinamarca` → **CAR**. Si coinciden las
+   dos (caso ambiguo) o ninguna → sin sugerencia; el usuario elige. El usuario siempre puede cambiarla.
 3. El servidor repite la regla al crear el reporte si no llega `authority_id`.
-4. Probar con coordenadas reales aproximadas: Soacha ≈ 4.579, −74.217; centro de Bogotá ≈ 4.610, −74.082.
-5. **Cache:** en memoria, clave = coordenadas redondeadas a 4 decimales, TTL 24 h; cola para no superar
-   1 petición por segundo; cabecera `User-Agent` desde `NOMINATIM_USER_AGENT`.
+4. **Prueba real (16-nov-2026):** Soacha (4.579, −74.217) → `city: Soacha ciudad`, `subregion: Soacha`,
+   `state: Cundinamarca` → **CAR**. Centro de Bogotá (4.610, −74.082) → `city: Bogotá ciudad`,
+   `state: Bogotá, Distrito Capital` → **SDA**. Ninguno fue ambiguo. Las respuestas se guardan como datos de
+   prueba en `backend/tests/helpers/nominatim.js`.
+5. **Cache:** en memoria, clave = coordenadas redondeadas a 4 decimales, TTL 24 h, máximo 1000 entradas; cola
+   global para no superar 1 petición por segundo; cabecera `User-Agent` desde `NOMINATIM_USER_AGENT`; tiempo
+   límite 5 s. Si Nominatim falla: `502 GEOCODER_UNAVAILABLE` y la app deja continuar (la autoridad se elige en
+   la revisión).
 
 ## Plantilla de la solicitud (texto y PDF)
 

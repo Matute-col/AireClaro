@@ -1,15 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'app.dart';
 import 'core/config.dart';
 
-void main() {
+Future<void> main() async {
   if (!AppConfig.hasApiBaseUrl) {
     // Without the API URL nothing works: say it clearly instead of failing later.
     runApp(const _MissingConfigApp());
     return;
   }
+  // Spanish (Colombia) month and day names for dates.
+  await initializeDateFormatting('es_CO');
   runApp(const ProviderScope(child: AireClaroApp()));
 }
 

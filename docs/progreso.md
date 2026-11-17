@@ -10,7 +10,7 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | Planificación (docs 01–09) | Hecho | Ruta híbrida de envío aprobada (US-21/22). Correos y portales de autoridades verificados por Mateo (16-nov-2026). Pendiente: validar la regla de asignación de autoridad (`docs/05`) |
 | Sprint 0 · Entorno | Pendiente | |
 | Sprint 1 · Backend base y autenticación | Hecho | Rama `sprint-1`. Probado en el celular el 16-nov-2026. Pendiente con aprobación de Mateo: push, merge a `main` y tag `v0.1-sprint1` |
-| Sprint 2 · Flujo de reporte | Pendiente | |
+| Sprint 2 · Flujo de reporte | Hecho | Rama `sprint-2`, cerrado el 16-nov-2026: pruebas (a)–(d) aprobadas en el celular; merge a `main` y tag `v0.2-sprint2`. Revisión y retrospectiva en `docs/sprints/sprint-2.md` |
 | Sprint 3 · PDF, mapa, pruebas | Pendiente | |
 | Validación TRL 5 y video | Pendiente | |
 
@@ -24,7 +24,14 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | US-02 | Hecha | 3d02e25, 224abe7 | App: login, `/splash` que valida el token con `GET /me` (sin red → «Reintentar»), 401 → login con «Tu sesión expiró». Probado en el celular el 16-nov-2026 |
 | US-03 | Hecha | 1a1bd53, 26d96a0 | App: Perfil, editar (nombre, documento, teléfono; correo solo lectura), política y cerrar sesión con confirmación. Probado en el celular el 16-nov-2026 |
 | US-04 | Hecha | fb93657 | Bienvenida, Inicio y barra inferior (`StatefulShellRoute`). Mapa, Mis reportes e Info son pantallas «Muy pronto»; «Nuevo reporte» muestra un aviso hasta el Sprint 2. La tarjeta «Mis reportes» aún no muestra el número (llega con `GET /reports`, US-10). Probado en el celular el 16-nov-2026 |
-| US-05…US-22 | Pendiente | | |
+| US-05 | Hecha | 6e0baad | App: paso 1 (foto, video ≤ 15 s, galería; máx. 3; miniaturas; tarjeta «Video» con tamaño). API: `multer` a carpeta temporal, nombres UUID, tipo real por bytes iniciales, límites 8/25 MB. Prueba (a) en el celular aprobada el 16-nov-2026 (cámara sin permiso, corte de video a 15 s) |
+| US-06 | Hecha | 680709c | App: paso 2 (tipo, placa ABC123/ABC12D, humo, descripción ≤ 500). API: esquema `zod` del vehículo. Prueba (a) aprobada el 16-nov-2026 |
+| US-07 | Hecha | ceea7a3 | API: `GET /geo/reverse` (Nominatim con cola de 1 petición/s, caché 24 h, `User-Agent`), regla de autoridad sobre campos administrativos, `GET /authorities`. App: paso 3 con GPS, mapa OSM, pin movible, dirección, fecha fija. Consulta real: Soacha → CAR, Bogotá → SDA. Prueba (b) aprobada el 16-nov-2026 (11/11) |
+| US-08 | Hecha | 4f0c7f4 | App: paso 4 precargado del perfil y editable solo para el reporte. API: mismas reglas del perfil. Prueba (c) aprobada el 16-nov-2026 |
+| US-09 | Hecha | f246904 | API: `POST /reports` multipart en una transacción (archivos a `reports/<id>/`, limpieza ante cualquier error, dueño desde el token, autoridad elegida o regla de `docs/05`). App: revisión con mapa pequeño, autoridad sugerida y «Cambiar», progreso de subida, «Reporte creado» en Inicio. Prueba (c) aprobada el 16-nov-2026 (evidencia en `backend/uploads/reports/<id>/`) |
+| US-10 | Hecha | 3d34ebd | API: `GET /reports` (solo los del usuario, más reciente primero, `page/limit/status`, miniatura) y `GET /reports/:id/media/:mediaId` solo para el dueño (404 si no). App: «Mis reportes» con miniaturas autenticadas, chips de estado, paginación al desplazar, recarga, vacío y error; número en Inicio. Prueba (d) aprobada el 16-nov-2026 |
+| US-11 | Hecha | c40a929 | API: `GET /reports/:id` con prueba de propiedad (otro usuario → 404 igual que inexistente; sin correo de la autoridad ni rutas de archivo). App: detalle con carrusel, datos, mapa pequeño, autoridad, estado y peticionario; tras crear un reporte se abre su detalle. Prueba (d) aprobada el 16-nov-2026 |
+| US-12…US-22 | Pendiente | | |
 
 ## Decisiones tomadas durante el desarrollo
 (Fecha · decisión · motivo)
@@ -48,8 +55,33 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 - 16-nov-2026 · App: ruta `/splash` adicional para validar la sesión al abrir (D-17 en `docs/04`).
 - 16-nov-2026 · Autoridades verificadas por Mateo: SDA y CAR con `email_verified=true`, SDM sin correo (solo portal). Nueva migración `1794876283606_update-authorities-verified`, aplicada primero en `test` (`npm test` en verde) y luego en la base principal · los datos de autoridades solo cambian por migración. `MAIL_MODE` sigue en `test`.
 
+- 16-nov-2026 · Límite global de peticiones 300 cada 15 min (antes 100); `/auth/*` sigue en 10 · cada miniatura es una petición (`docs/05`).
+- 16-nov-2026 · Sin `video_player`: los videos se muestran como tarjeta «Video» con tamaño; el límite de 15 s lo aplica la cámara al grabar y el tope real es 25 MB (`docs/02`, `docs/06`).
+- 16-nov-2026 · No se declara el permiso `CAMERA`: `image_picker` usa la cámara del sistema (`docs/04`).
+- 16-nov-2026 · Después de crear un reporte: Inicio con «Reporte creado» (US-09); al detalle desde US-11; a la vista previa en el Sprint 3.
+
+- 16-nov-2026 · Regla de autoridad solo sobre campos administrativos de Nominatim (no calle ni barrio; ambiguo → sin sugerencia) · los datos reales traen un barrio «UPZs de Bogotá» (`docs/05`).
+
+- 16-nov-2026 · `GET /reports/:id/media/:mediaId` se adelantó a US-10 (lo necesitan las miniaturas); `GET /reports/:id` en US-11.
+- 16-nov-2026 · Tras crear un reporte: Inicio con «Reporte creado» y el detalle encima (desde US-11). En el Sprint 3 pasará a la vista previa.
+
+## Sprint 2 · Revisión y retrospectiva (resumen; detalle en `docs/sprints/sprint-2.md`)
+- **Qué se hizo:** US-05…US-11 de punta a punta (API + app): evidencia, vehículo, ubicación con mapa y Nominatim,
+  peticionario, revisión con autoridad y `POST /reports` en una transacción, «Mis reportes» y detalle. 117 pruebas
+  del API y 76 de la app; cuatro pruebas en el celular (a)–(d) aprobadas.
+- **Qué salió bien:** una historia por commit; pruebas de propiedad (404) y de limpieza de archivos; la consulta
+  real a Nominatim confirmó la regla (Soacha → CAR, Bogotá → SDA); las pruebas de widget detectaron un fallo real
+  del mapa antes de llegar al celular.
+- **Qué mejorar:** comandos largos de Bash fallaron dos veces por comillas (se usaron archivos en su lugar); finales
+  de línea mezclados (falta `.gitattributes`); `.vscode/extensions.json` no está ignorado (solo sin commit).
+- **Para el Sprint 3:** US-12 (texto y PDF), US-13 (vista previa, descarga y compartir), US-14 (confirmación y
+  «marcar como enviado»), **US-21 (envío por correo, siempre `MAIL_MODE=test`)**, US-22 (portal oficial), US-15
+  (mapa), US-16, US-17, US-19, US-20 y, si hay tiempo, US-18. Tras crear un reporte se irá a la vista previa.
+
 ## Problemas abiertos
-- `backend/src/db/pool.js` registra `err.message` de errores de conexión inactiva sin pasar por `LOG_ERROR_DETAILS` · bajo riesgo (mensajes del driver de red, no de consultas); opcional alinearlo en el Sprint 2.
+- `.vscode/extensions.json` aparece como «sin seguimiento» porque `.gitignore` lo excluye a propósito de la regla `.vscode/*` · Mateo decidió no subirlo; opcional: agregarlo a `.git/info/exclude` (local).
+- La miniatura de «Mis reportes» es una foto cualquiera (siempre la misma) del reporte: `report_media` no guarda el orden de subida · aceptable para el prototipo.
+- `backend/src/db/pool.js` registraba `err.message` sin pasar por `LOG_ERROR_DETAILS` · resuelto el 16-nov-2026 (ece1a24).
 - Diferencias visuales con Figma sin revisar (Claude no tiene acceso al Figma) · Mateo compara cuando pueda.
 (Descripción · estado)
 - `channel_binding=require` de Neon funciona con `pg` · resuelto.

@@ -46,6 +46,20 @@ class Validators {
 
   static String cleanPhone(String? value) => (value ?? '').replaceAll(RegExp(r'[\s-]'), '');
 
+  static final _plateRegex = RegExp(r'^([A-Z]{3}\d{3}|[A-Z]{3}\d{2}[A-Z])$');
+
+  /// Plate «ABC123» (cars, buses, trucks) or «ABC12D» (motorcycles), like the API.
+  static String? plate(String? value) {
+    final text = normalizePlate(value);
+    if (text.isEmpty) return 'La placa es obligatoria.';
+    if (!_plateRegex.hasMatch(text)) return 'La placa debe tener el formato ABC123 o ABC12D.';
+    return null;
+  }
+
+  /// Uppercase, without spaces or dashes.
+  static String normalizePlate(String? value) =>
+      (value ?? '').toUpperCase().replaceAll(RegExp(r'[\s-]'), '');
+
   static String? password(String? value) {
     final text = value ?? '';
     if (text.isEmpty) return 'La contraseña es obligatoria.';

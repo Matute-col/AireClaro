@@ -6,9 +6,16 @@ import '../features/auth/auth_controller.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/auth/splash_screen.dart';
+import '../features/history/report_detail_screen.dart';
+import '../features/history/reports_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/profile/edit_profile_screen.dart';
 import '../features/profile/profile_screen.dart';
+import '../features/report/evidence_step_screen.dart';
+import '../features/report/location_step_screen.dart';
+import '../features/report/requester_step_screen.dart';
+import '../features/report/review_screen.dart';
+import '../features/report/vehicle_step_screen.dart';
 import '../features/welcome/welcome_screen.dart';
 import '../shared/widgets/coming_soon_screen.dart';
 import '../shared/widgets/main_shell.dart';
@@ -24,9 +31,17 @@ class Routes {
   static const home = '/home';
   static const map = '/map';
   static const reports = '/reports';
+  static String reportDetail(String id) => '/reports/$id';
   static const info = '/info';
   static const profile = '/profile';
   static const editProfile = '/profile/edit';
+
+  // New report flow (outside the shell: no bottom bar).
+  static const reportEvidence = '/report/evidence';
+  static const reportVehicle = '/report/vehicle';
+  static const reportLocation = '/report/location';
+  static const reportRequester = '/report/requester';
+  static const reportReview = '/report/review';
 
   /// Screens that are only for people without a session.
   static const public = {welcome, login, register};
@@ -87,8 +102,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: Routes.reports,
-              builder: (context, state) =>
-                  const ComingSoonScreen(title: 'Mis reportes', icon: Icons.list_alt),
+              builder: (context, state) => const ReportsScreen(),
             ),
           ]),
           StatefulShellBranch(routes: [
@@ -102,6 +116,31 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // Outside the shell: no bottom bar.
+      GoRoute(
+        path: '/reports/:id',
+        builder: (context, state) =>
+            ReportDetailScreen(reportId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: Routes.reportEvidence,
+        builder: (context, state) => const EvidenceStepScreen(),
+      ),
+      GoRoute(
+        path: Routes.reportVehicle,
+        builder: (context, state) => const VehicleStepScreen(),
+      ),
+      GoRoute(
+        path: Routes.reportLocation,
+        builder: (context, state) => const LocationStepScreen(),
+      ),
+      GoRoute(
+        path: Routes.reportRequester,
+        builder: (context, state) => const RequesterStepScreen(),
+      ),
+      GoRoute(
+        path: Routes.reportReview,
+        builder: (context, state) => const ReviewScreen(),
+      ),
       GoRoute(
         path: Routes.profile,
         builder: (context, state) => const ProfileScreen(),

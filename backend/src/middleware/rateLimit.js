@@ -24,8 +24,9 @@ function createLimiter(limit) {
 // tests/rateLimit.test.js checks the limiter behavior with a small limit.
 const isTest = env.NODE_ENV === 'test';
 
-// Global: 100 requests per 15 min per IP. Auth: 10 per 15 min.
-const globalLimiter = createLimiter(isTest ? 1000 : 100);
+// Global: 300 requests per 15 min per IP (each evidence thumbnail is one request).
+// Auth: 10 per 15 min.
+const globalLimiter = createLimiter(isTest ? 1000 : 300);
 const authLimiter = createLimiter(isTest ? 1000 : 10);
 
 module.exports = { createLimiter, globalLimiter, authLimiter };
