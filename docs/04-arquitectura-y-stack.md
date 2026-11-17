@@ -47,6 +47,8 @@ todo pasa por el API.
 | D-13 | `MAIL_MODE=test` por defecto | Evita radicar denuncias reales por accidente durante desarrollo y video | Enviar siempre a la autoridad |
 | D-14 | Botón al portal oficial (`url_launcher`) como vía alterna | Los portales dan número de radicado explícito; no se automatizan | Scraper del portal |
 | D-15 | Semillas de autoridades como segunda migración SQL de `node-pg-migrate` (16-nov-2026) | Quedan versionadas junto al esquema y se aplican con un solo comando (`npm run migrate`), en orden y una sola vez | Carpeta `db/seed/` con un script aparte |
+| D-16 | Material como paquete `material_ui` (import `package:material_ui/material_ui.dart`) (16-nov-2026) | Flutter 3.50 separó Material del framework y la plantilla de `flutter create` ya lo usa | Import antiguo `package:flutter/material.dart` |
+| D-17 | Ruta `/splash` adicional y `android:allowBackup="false"` (16-nov-2026) | `/splash` valida el token con `GET /me` al abrir (sesión persistente con «Reintentar» sin red); sin respaldo automático el token cifrado no se restaura en otro equipo (recomendación de `flutter_secure_storage`) | Abrir directo en `/home` sin validar el token |
 
 > Cualquier cambio a esta tabla se registra aquí con la fecha y el motivo.
 
@@ -59,6 +61,8 @@ todo pasa por el API.
 `geolocator`, `permission_handler`, `flutter_map`, `latlong2`, `share_plus`, `open_filex`, `path_provider`, `url_launcher`,
 `intl`. Verifica las versiones compatibles con `flutter pub add` y justifica en este archivo cualquier
 paquete adicional.
+
+**Instalados en la app (Sprint 1, 16-nov-2026):** `material_ui` 1.11 (de la plantilla, D-16), `flutter_riverpod` 3.5 (sin generación de código), `go_router` 18.1, `dio` 5.11, `flutter_secure_storage` 11.2. Los demás se agregan con la historia que los use. Pruebas sin paquetes de mocks: dobles escritos a mano en `app/test/helpers/`.
 
 ## Estructura del backend
 

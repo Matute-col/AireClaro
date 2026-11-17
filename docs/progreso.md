@@ -21,9 +21,10 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | TS-02 | Hecha | 5e90df1 | Migraciones aplicadas en Neon el 16-nov-2026: 4 tablas + 3 autoridades con `email_verified=false` |
 | TS-03 | Hecha | eb812fd | App Flutter en `app/` (id `com.aireclaro.app`): tema M3, `go_router`, `dio` con token y manejo de 401, `flutter_secure_storage`, validadores iguales al API. URL del API por `--dart-define=API_BASE_URL` |
 | US-01 | Hecha | eb47f5c, ec86672 | API: `POST /api/auth/register`. App: pantalla de registro con consentimiento y política (Ley 1581). Probado en el celular el 16-nov-2026: botón deshabilitado, contraseñas distintas, registro válido, correo duplicado, API apagado |
-| US-02 | En curso | 3d02e25 | API hecha: `POST /api/auth/login` con mensaje genérico. Falta la app (sesión persistente) |
-| US-03 | En curso | 1a1bd53 | API hecha: `GET/PUT /api/me` (mismas reglas que el registro, el correo no cambia). Falta la app |
-| US-04…US-22 | Pendiente | | |
+| US-02 | Hecha (falta prueba en celular) | 3d02e25, 224abe7 | App: login, `/splash` que valida el token con `GET /me` (sin red → «Reintentar»), 401 → login con «Tu sesión expiró». Pruebas automáticas; pendiente la prueba en el celular junto con US-04 |
+| US-03 | Hecha (falta prueba en celular) | 1a1bd53, 26d96a0 | App: Perfil, editar (nombre, documento, teléfono; correo solo lectura), política y cerrar sesión con confirmación. Pendiente la prueba en el celular |
+| US-04 | Hecha (falta prueba en celular) | fb93657 | Bienvenida, Inicio y barra inferior (`StatefulShellRoute`). Mapa, Mis reportes e Info son pantallas «Muy pronto»; «Nuevo reporte» muestra un aviso hasta el Sprint 2. La tarjeta «Mis reportes» aún no muestra el número (llega con `GET /reports`, US-10) |
+| US-05…US-22 | Pendiente | | |
 
 ## Decisiones tomadas durante el desarrollo
 (Fecha · decisión · motivo)
@@ -43,6 +44,8 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 - 16-nov-2026 · App: `android:allowBackup="false"` · recomendado por `flutter_secure_storage`; el token cifrado no se restaura en otro equipo.
 - 16-nov-2026 · App: Riverpod sin generación de código y dobles de prueba escritos a mano (sin paquetes de mocks) · menos dependencias y más fácil de explicar.
 - 16-nov-2026 · App: HTTP sin cifrar solo en los manifiestos `debug` y `profile`; prueba en el celular con `adb reverse tcp:3000 tcp:3000`.
+
+- 16-nov-2026 · App: ruta `/splash` adicional para validar la sesión al abrir (D-17 en `docs/04`).
 
 ## Problemas abiertos
 (Descripción · estado)
