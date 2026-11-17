@@ -17,6 +17,7 @@ erDiagram
     text password_hash
     timestamptz consent_at
     timestamptz created_at
+    timestamptz updated_at
   }
   AUTHORITIES {
     smallint id PK
@@ -126,18 +127,18 @@ CREATE INDEX idx_media_report ON report_media (report_id);
 
 **Datos iniciales (`authorities`):**
 
-| code | name | email (candidato) | portal_url | email_verified |
+| code | name | email | portal_url | email_verified |
 |---|---|---|---|---|
-| `CAR` | Corporación Autónoma Regional de Cundinamarca (CAR) | `sau@car.gov.co` | `https://www.car.gov.co` | `false` |
-| `SDA` | Secretaría Distrital de Ambiente de Bogotá | `correspondencia@ambientebogota.gov.co` | `https://forest.ambientebogota.gov.co/ventanillaVirtual/app` | `false` |
-| `SDM` | Secretaría Distrital de Movilidad de Bogotá | *(sin correo hallado)* | `https://www.movilidadbogota.gov.co/peticiones-quejas-reclamos-solicitudes-y-denuncias-pqrsd` | `false` |
+| `CAR` | Corporación Autónoma Regional de Cundinamarca (CAR) | `sau@car.gov.co` | `https://sidcar.car.gov.co/Modulos/Buzon/RadicarPQR.aspx` | `true` |
+| `SDA` | Secretaría Distrital de Ambiente de Bogotá | `atencionalciudadano@ambientebogota.gov.co` | `https://www.bogota.gov.co/sdqs` | `true` |
+| `SDM` | Secretaría Distrital de Movilidad de Bogotá | *(sin correo)* | `https://www.movilidadbogota.gov.co/radicacionwebsdm/formulario.php` | `false` |
 
-**Origen de estos datos (investigación del 16-nov-2026):** el correo de la SDA figura en su página oficial de
-canales de atención (no dice expresamente que sirva para radicar PQRS); el de la CAR aparece en el pie de una
-carta de respuesta de la CAR (no se pudo abrir car.gov.co); para la SDM no se halló correo. **Mateo debe
-verificar cada uno en el sitio oficial** antes de poner `email_verified = true`. Hasta entonces el envío real
-queda deshabilitado y solo funciona el modo de prueba. No inventes direcciones. La migración de semillas puede
-llevar estos candidatos (son direcciones institucionales públicas, no secretos).
+**Origen de estos datos:** la migración `1794830400001_seed-authorities` cargó candidatos sin verificar
+(investigación del 16-nov-2026). El 16-nov-2026 Mateo verificó los correos y portales en los sitios oficiales, y la
+migración `1794876283606_update-authorities-verified` los dejó como aparecen arriba (aplicada en la rama `test` y
+en la base principal). `email_verified = true` solo permite el envío real con `MAIL_MODE=live`, que requiere una
+orden explícita de Mateo; con `MAIL_MODE=test` (por defecto) todo va a `MAIL_TEST_TO`. La SDM no tiene correo: solo
+se ofrece «Radicar en el portal oficial». No inventes direcciones; cualquier cambio va en una nueva migración.
 
 ## Convenciones del API
 - Prefijo `/api`. JSON en UTF-8. Fechas en ISO 8601 (UTC).
