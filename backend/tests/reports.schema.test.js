@@ -40,3 +40,45 @@ describe('report vehicle fields (US-06)', () => {
     );
   });
 });
+
+describe('report requester fields (US-08)', () => {
+  const { requesterFields } = require('../src/modules/reports/reports.schema');
+  const requesterSchema = z.object(requesterFields);
+  const requester = {
+    requester_name: 'Ana Prueba',
+    requester_doc_type: 'CC',
+    requester_doc_number: '0000000',
+    requester_email: 'Ana@Ejemplo.test',
+  };
+
+  function requesterErrors(data) {
+    const result = requesterSchema.safeParse(data);
+    return result.success ? {} : Object.fromEntries(result.error.issues.map((i) => [i.path[0], i.message]));
+  }
+
+  it('accepts the profile data and normalizes email and phone', () => {
+    const parsed = requesterSchema.parse({ ...requester, requester_phone: '300 000-0000' });
+    expect(parsed.requester_email).toBe('ana@ejemplo.test');
+    expect(parsed.requester_phone).toBe('3000000000');
+  });
+
+  it('phone is optional (empty → null)', () => {
+    expect(requesterSchema.parse({ ...requester, requester_phone: '' }).requester_phone).toBeNull();
+  });
+
+  it('there is no anonymous option: name, document and email are required', () => {
+    const errors = requesterErrors({});
+    expect(Object.keys(errors).sort()).toEqual([
+      'requester_doc_number',
+      'requester_doc_type',
+      'requester_email',
+      'requester_name',
+    ]);
+  });
+
+  it('uses the same rules as the profile', () => {
+    const errors = requesterErrors({ ...requester, requester_doc_number: '1.234', requester_email: 'x' });
+    expect(errors.requester_doc_number).toMatch(/entre 4 y 20/);
+    expect(errors.requester_email).toBe('Escribe un correo electrónico válido.');
+  });
+});

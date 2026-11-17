@@ -1,7 +1,8 @@
 const { z } = require('zod');
+const { profileFields } = require('../users/users.schema');
 
 // Report fields (docs/05 · Validaciones). Built step by step:
-// US-06 vehicle data; location and requester fields are added with US-07/US-08.
+// US-06 vehicle data, US-08 requester data; the full create schema arrives with US-09.
 
 const VEHICLE_TYPES = ['bus', 'microbus', 'camion', 'tractomula', 'otro'];
 const SMOKE_COLORS = ['negro', 'gris', 'blanco'];
@@ -40,4 +41,18 @@ const vehicleFields = {
   ),
 };
 
-module.exports = { VEHICLE_TYPES, SMOKE_COLORS, normalizePlate, vehicleFields };
+// US-08 · Requester (peticionario): the same rules as the user profile, so the
+// data prefilled from the profile is always valid. There is no anonymous option.
+const requesterFields = {
+  requester_name: profileFields.full_name,
+  requester_doc_type: profileFields.doc_type,
+  requester_doc_number: profileFields.doc_number,
+  requester_email: z
+    .string({ error: 'El correo es obligatorio.' })
+    .trim()
+    .toLowerCase()
+    .pipe(z.email({ error: 'Escribe un correo electrónico válido.' })),
+  requester_phone: profileFields.phone,
+};
+
+module.exports = { VEHICLE_TYPES, SMOKE_COLORS, normalizePlate, vehicleFields, requesterFields };

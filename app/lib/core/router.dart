@@ -11,6 +11,7 @@ import '../features/profile/edit_profile_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/report/evidence_step_screen.dart';
 import '../features/report/location_step_screen.dart';
+import '../features/report/requester_step_screen.dart';
 import '../features/report/vehicle_step_screen.dart';
 import '../features/welcome/welcome_screen.dart';
 import '../shared/widgets/coming_soon_screen.dart';
@@ -36,6 +37,7 @@ class Routes {
   static const reportVehicle = '/report/vehicle';
   static const reportLocation = '/report/location';
   static const reportRequester = '/report/requester';
+  static const reportReview = '/report/review';
 
   /// Screens that are only for people without a session.
   static const public = {welcome, login, register};
@@ -123,11 +125,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.reportLocation,
         builder: (context, state) => const LocationStepScreen(),
       ),
-      // Step 4 (requester) arrives with US-08.
       GoRoute(
         path: Routes.reportRequester,
+        builder: (context, state) => const RequesterStepScreen(),
+      ),
+      // Review (US-09).
+      GoRoute(
+        path: Routes.reportReview,
         builder: (context, state) =>
-            const ComingSoonScreen(title: 'Nuevo reporte', icon: Icons.person_outline),
+            const ComingSoonScreen(title: 'Revisión', icon: Icons.fact_check_outlined),
       ),
       GoRoute(
         path: Routes.profile,
