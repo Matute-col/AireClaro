@@ -10,7 +10,7 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | Planificación (docs 01–09) | Hecho | Ruta híbrida de envío aprobada (US-21/22). Correos y portales de autoridades verificados por Mateo (16-nov-2026). Pendiente: validar la regla de asignación de autoridad (`docs/05`) |
 | Sprint 0 · Entorno | Pendiente | |
 | Sprint 1 · Backend base y autenticación | Hecho | Rama `sprint-1`. Probado en el celular el 16-nov-2026. Pendiente con aprobación de Mateo: push, merge a `main` y tag `v0.1-sprint1` |
-| Sprint 2 · Flujo de reporte | Pendiente | |
+| Sprint 2 · Flujo de reporte | En curso | Rama `sprint-2` |
 | Sprint 3 · PDF, mapa, pruebas | Pendiente | |
 | Validación TRL 5 y video | Pendiente | |
 
@@ -24,7 +24,9 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | US-02 | Hecha | 3d02e25, 224abe7 | App: login, `/splash` que valida el token con `GET /me` (sin red → «Reintentar»), 401 → login con «Tu sesión expiró». Probado en el celular el 16-nov-2026 |
 | US-03 | Hecha | 1a1bd53, 26d96a0 | App: Perfil, editar (nombre, documento, teléfono; correo solo lectura), política y cerrar sesión con confirmación. Probado en el celular el 16-nov-2026 |
 | US-04 | Hecha | fb93657 | Bienvenida, Inicio y barra inferior (`StatefulShellRoute`). Mapa, Mis reportes e Info son pantallas «Muy pronto»; «Nuevo reporte» muestra un aviso hasta el Sprint 2. La tarjeta «Mis reportes» aún no muestra el número (llega con `GET /reports`, US-10). Probado en el celular el 16-nov-2026 |
-| US-05…US-22 | Pendiente | | |
+| US-05 | Hecha (falta prueba en celular) | 6e0baad | App: paso 1 (foto, video ≤ 15 s, galería; máx. 3; miniaturas; tarjeta «Video» con tamaño). API: `multer` a carpeta temporal, nombres UUID, tipo real por bytes iniciales, límites 8/25 MB. Prueba (a) pendiente |
+| US-06 | Hecha (falta prueba en celular) | 680709c | App: paso 2 (tipo, placa ABC123/ABC12D, humo, descripción ≤ 500). API: esquema `zod` del vehículo. Prueba (a) pendiente |
+| US-07…US-22 | Pendiente | | |
 
 ## Decisiones tomadas durante el desarrollo
 (Fecha · decisión · motivo)
@@ -48,8 +50,13 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 - 16-nov-2026 · App: ruta `/splash` adicional para validar la sesión al abrir (D-17 en `docs/04`).
 - 16-nov-2026 · Autoridades verificadas por Mateo: SDA y CAR con `email_verified=true`, SDM sin correo (solo portal). Nueva migración `1794876283606_update-authorities-verified`, aplicada primero en `test` (`npm test` en verde) y luego en la base principal · los datos de autoridades solo cambian por migración. `MAIL_MODE` sigue en `test`.
 
+- 16-nov-2026 · Límite global de peticiones 300 cada 15 min (antes 100); `/auth/*` sigue en 10 · cada miniatura es una petición (`docs/05`).
+- 16-nov-2026 · Sin `video_player`: los videos se muestran como tarjeta «Video» con tamaño; el límite de 15 s lo aplica la cámara al grabar y el tope real es 25 MB (`docs/02`, `docs/06`).
+- 16-nov-2026 · No se declara el permiso `CAMERA`: `image_picker` usa la cámara del sistema (`docs/04`).
+- 16-nov-2026 · Después de crear un reporte: Inicio con «Reporte creado» (US-09); al detalle desde US-11; a la vista previa en el Sprint 3.
+
 ## Problemas abiertos
-- `backend/src/db/pool.js` registra `err.message` de errores de conexión inactiva sin pasar por `LOG_ERROR_DETAILS` · bajo riesgo (mensajes del driver de red, no de consultas); opcional alinearlo en el Sprint 2.
+- `backend/src/db/pool.js` registraba `err.message` sin pasar por `LOG_ERROR_DETAILS` · resuelto el 16-nov-2026 (ece1a24).
 - Diferencias visuales con Figma sin revisar (Claude no tiene acceso al Figma) · Mateo compara cuando pueda.
 (Descripción · estado)
 - `channel_binding=require` de Neon funciona con `pg` · resuelto.
