@@ -7,6 +7,8 @@ import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/auth/splash_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/profile/edit_profile_screen.dart';
+import '../features/profile/profile_screen.dart';
 import '../features/welcome/welcome_screen.dart';
 
 /// Route paths from docs/06 (plus /splash, shown while the session is checked).
@@ -18,6 +20,8 @@ class Routes {
   static const login = '/login';
   static const register = '/register';
   static const home = '/home';
+  static const profile = '/profile';
+  static const editProfile = '/profile/edit';
 
   /// Screens that are only for people without a session.
   static const public = {welcome, login, register};
@@ -60,6 +64,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.login, builder: (context, state) => const LoginScreen()),
       GoRoute(path: Routes.register, builder: (context, state) => const RegisterScreen()),
       GoRoute(path: Routes.home, builder: (context, state) => const HomeScreen()),
+      GoRoute(
+        path: Routes.profile,
+        builder: (context, state) => const ProfileScreen(),
+        routes: [
+          GoRoute(path: 'edit', builder: (context, state) => const EditProfileScreen()),
+        ],
+      ),
     ],
   );
 });
