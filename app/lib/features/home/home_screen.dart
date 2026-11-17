@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/router.dart';
 import '../../core/theme.dart';
 import '../auth/auth_controller.dart';
+import '../history/reports_list_controller.dart';
 import '../report/report_draft.dart';
 
 /// Screen 04 · Inicio: greeting, «Nuevo reporte» and shortcuts.
@@ -49,7 +50,11 @@ class HomeScreen extends ConsumerWidget {
           _ShortcutCard(
             icon: Icons.list_alt,
             title: 'Mis reportes',
-            subtitle: 'Consulta tus reportes y su estado',
+            subtitle: ref.watch(reportsCountProvider).when(
+                  data: (n) => n == 1 ? '1 reporte' : '$n reportes',
+                  loading: () => 'Cargando…',
+                  error: (_, _) => 'Consulta tus reportes y su estado',
+                ),
             onTap: () => context.go(Routes.reports),
           ),
           _ShortcutCard(

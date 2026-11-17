@@ -10,6 +10,7 @@ import '../../core/theme.dart';
 import '../../shared/widgets/buttons.dart';
 import '../../shared/widgets/osm_map.dart';
 import '../../shared/widgets/states.dart';
+import '../history/reports_list_controller.dart';
 import 'authorities_repository.dart';
 import 'evidence_step_screen.dart';
 import 'location_step_screen.dart';
@@ -81,6 +82,9 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
         const SnackBar(content: Text('Reporte creado.')),
       );
       final draft = ref.read(reportDraftProvider.notifier);
+      // «Mis reportes» and the count on Inicio must include the new report.
+      ref.invalidate(reportsListProvider);
+      ref.invalidate(reportsCountProvider);
       context.go(Routes.home);
       // Clear the draft once this screen is gone (there are no drafts, docs/06).
       WidgetsBinding.instance.addPostFrameCallback((_) => draft.reset());

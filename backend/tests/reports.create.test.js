@@ -8,6 +8,7 @@ const { query } = require('../src/db/pool');
 const files = require('./helpers/files');
 const { soacha } = require('./helpers/nominatim');
 const { describeDb, resetUsers, closeDb } = require('./helpers/db');
+const { registerUser, authorityId, validFields, postReport } = require('./helpers/reports');
 
 // Uploads go to the temporary folder set in tests/setup.js, never backend/uploads/.
 const uploadDir = process.env.UPLOAD_DIR;
@@ -15,56 +16,6 @@ const tmpDir = path.join(uploadDir, 'tmp');
 const tmpFiles = () => (fs.existsSync(tmpDir) ? fs.readdirSync(tmpDir) : []);
 
 const MB = 1024 * 1024;
-
-async function registerUser(email) {
-  const res = await request(app)
-    .post('/api/auth/register')
-    .send({
-      full_name: 'Luis Prueba',
-      doc_type: 'CC',
-      doc_number: 'TEST0009',
-      email,
-      password: 'clave-segura-9',
-      accept_terms: true,
-    })
-    .expect(201);
-  return { token: res.body.token, id: res.body.user.id };
-}
-
-async function authorityId(code) {
-  const { rows } = await query('SELECT id FROM authorities WHERE code = $1', [code]);
-  return rows[0].id;
-}
-
-/** Valid report fields as the app sends them (multipart text fields). */
-function validFields(overrides = {}) {
-  return {
-    vehicle_type: 'bus',
-    plate: 'abc-123',
-    smoke_color: 'negro',
-    description: 'Humo negro al arrancar',
-    lat: '4.579',
-    lng: '-74.217',
-    address: 'Carrera 3A, Ubaté, Soacha ciudad',
-    occurred_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-    requester_name: 'Luis Prueba',
-    requester_doc_type: 'CC',
-    requester_doc_number: 'TEST0009',
-    requester_email: 'luis@example.com',
-    requester_phone: '',
-    ...overrides,
-  };
-}
-
-/** POST /api/reports with fields and attachments [{buffer, name}]. */
-function postReport(token, fields, attachments = [{ buffer: files.jpeg(), name: 'placa.jpg' }]) {
-  const req = request(app).post('/api/reports').set('Authorization', `Bearer ${token}`);
-  for (const [key, value] of Object.entries(fields)) {
-    if (value !== undefined) req.field(key, value);
-  }
-  for (const { buffer, name } of attachments) req.attach('files', buffer, name);
-  return req;
-}
 
 describe('POST /api/reports without a token', () => {
   it('401 and nothing is stored', async () => {

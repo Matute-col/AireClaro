@@ -6,6 +6,7 @@ import '../features/auth/auth_controller.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
 import '../features/auth/splash_screen.dart';
+import '../features/history/reports_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/profile/edit_profile_screen.dart';
 import '../features/profile/profile_screen.dart';
@@ -99,8 +100,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: Routes.reports,
-              builder: (context, state) =>
-                  const ComingSoonScreen(title: 'Mis reportes', icon: Icons.list_alt),
+              builder: (context, state) => const ReportsScreen(),
             ),
           ]),
           StatefulShellBranch(routes: [

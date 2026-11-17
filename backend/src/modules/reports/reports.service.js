@@ -1,4 +1,4 @@
-const { getPool } = require('../../db/pool');
+const { getPool, query } = require('../../db/pool');
 const AppError = require('../../utils/AppError');
 const storage = require('../../utils/storage');
 const authoritiesService = require('../authorities/authorities.service');
@@ -108,4 +108,62 @@ async function create(userId, data, files) {
   }
 }
 
-module.exports = { create, resolveAuthority };
+const NOT_FOUND_MESSAGE = 'No encontramos este reporte.';
+
+/**
+ * «Mis reportes» (US-10): only the user's reports, newest first, paginated.
+ * thumbnail_media_id is one photo of the report (null if it only has videos).
+ */
+async function list(userId, { page, limit, status }) {
+  const params = [userId];
+  let filter = 'r.user_id = $1';
+  if (status) {
+    params.push(status);
+    filter += ` AND r.status = $${params.length}`;
+  }
+
+  const { rows: countRows } = await query(
+    `SELECT count(*)::int AS total FROM reports r WHERE ${filter}`,
+    params,
+  );
+
+  const { rows } = await query(
+    `SELECT r.id, r.plate, r.vehicle_type, r.smoke_color, r.status, r.address,
+            r.occurred_at, r.created_at, a.code AS authority_code, a.name AS authority_name,
+            (SELECT m.id FROM report_media m
+              WHERE m.report_id = r.id AND m.kind = 'photo'
+              ORDER BY m.file_path LIMIT 1) AS thumbnail_media_id,
+            (SELECT count(*)::int FROM report_media m WHERE m.report_id = r.id) AS media_count
+       FROM reports r
+       JOIN authorities a ON a.id = r.authority_id
+      WHERE ${filter}
+      ORDER BY r.created_at DESC, r.id DESC
+      LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+    [...params, limit, (page - 1) * limit],
+  );
+
+  const items = rows.map(({ authority_code: code, authority_name: name, ...item }) => ({
+    ...item,
+    authority: { code, name },
+  }));
+  return { items, page, total: countRows[0].total };
+}
+
+/**
+ * One evidence file, only for the report owner (RB-01). Someone else's report gets the
+ * same 404 as a report that does not exist, so its existence is not revealed.
+ * @returns {{absolutePath: string, mimeType: string}}
+ */
+async function getMediaFile(userId, reportId, mediaId) {
+  const { rows } = await query(
+    `SELECT m.file_path, m.mime_type
+       FROM report_media m
+       JOIN reports r ON r.id = m.report_id
+      WHERE m.id = $1 AND r.id = $2 AND r.user_id = $3`,
+    [mediaId, reportId, userId],
+  );
+  if (!rows[0]) throw new AppError(404, 'NOT_FOUND', NOT_FOUND_MESSAGE);
+  return { absolutePath: storage.resolveStored(rows[0].file_path), mimeType: rows[0].mime_type };
+}
+
+module.exports = { create, resolveAuthority, list, getMediaFile, NOT_FOUND_MESSAGE };

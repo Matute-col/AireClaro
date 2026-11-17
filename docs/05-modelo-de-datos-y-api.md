@@ -160,11 +160,11 @@ se ofrece «Radicar en el portal oficial». No inventes direcciones; cualquier c
 | `GET /authorities` | Lista de autoridades | — | `200 [{id, code, name, portal_url, can_email}]` (`can_email` = tiene correo verificado; el correo no se expone) |
 | `GET /geo/reverse` | Dirección desde coordenadas | `lat, lng` | `200 {address, municipality, state, suggested_authority_id}` |
 | `POST /reports` | Crear reporte | `multipart/form-data`: `vehicle_type, plate, smoke_color, description?, lat, lng, address?, occurred_at, authority_id?, requester_name, requester_doc_type, requester_doc_number, requester_email, requester_phone?` + `files[]` (1–3) | `201 {report}` con `status: generado`, `authority` y `media[]` · `400` validación, tipo de archivo (`INVALID_FILE_TYPE`), más de 3 archivos (`TOO_MANY_FILES`) o sin autoridad (`AUTHORITY_REQUIRED`) · `413` archivo grande. Reporte y archivos en una sola transacción; el dueño sale del token |
-| `GET /reports` | Mis reportes | `page=1, limit=20, status?` | `200 {items, page, total}` |
+| `GET /reports` | Mis reportes | `page=1, limit=20 (máx. 50), status?` | `200 {items, page, total}`, más reciente primero; cada item: `id, plate, vehicle_type, smoke_color, status, address, occurred_at, created_at, authority{code,name}, thumbnail_media_id` (una foto; `null` si solo hay videos), `media_count` |
 | `GET /reports/:id` | Detalle | — | `200 {report, media[], authority}` · `404` si no es suyo |
 | `DELETE /reports/:id` | Eliminar | — | `204` |
 | `PATCH /reports/:id/status` | Marcar como enviado a mano (portal, compartir) | `{status:"enviado"}` | `200 {report}` con `sent_via=manual` |
-| `GET /reports/:id/media/:mediaId` | Descargar un archivo de evidencia | — | archivo |
+| `GET /reports/:id/media/:mediaId` | Descargar un archivo de evidencia | — | archivo con su `Content-Type` · `404` si no es suyo, no existe o el id no es válido (misma respuesta en los tres casos) |
 | `GET /reports/:id/pqrsd` | Texto de la solicitud | — | `200 {authority, text}` |
 | `GET /reports/:id/pqrsd.pdf` | PDF de la solicitud | — | `200 application/pdf` |
 | `POST /reports/:id/send` | Enviar la solicitud por correo a la autoridad | `{confirm:true}` | `200 {report, delivery:{mode, sent_at}}` · `409` ya enviado · `422` autoridad sin correo verificado · `502` fallo del servidor de correo |

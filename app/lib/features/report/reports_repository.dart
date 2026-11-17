@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api_client.dart';
 import '../../core/api_error.dart';
 import '../../core/validators.dart';
+import '../history/report_summary.dart';
 import 'report_draft.dart';
 
 /// Text fields of POST /reports built from the draft (docs/05).
@@ -54,6 +55,19 @@ class ReportsRepository {
         },
       );
       return (response.data!['report'] as Map<String, dynamic>)['id'] as String;
+    } catch (error) {
+      throw toApiException(error);
+    }
+  }
+
+  /// «Mis reportes»: newest first, [limit] per page.
+  Future<ReportsPage> list({int page = 1, int limit = 20}) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '/reports',
+        queryParameters: {'page': page, 'limit': limit},
+      );
+      return ReportsPage.fromJson(response.data!);
     } catch (error) {
       throw toApiException(error);
     }
