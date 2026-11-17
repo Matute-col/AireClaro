@@ -32,6 +32,12 @@ class ReportDraft {
     this.plate = '',
     this.smokeColor,
     this.description = '',
+    this.lat,
+    this.lng,
+    this.address,
+    this.municipality,
+    this.suggestedAuthorityId,
+    this.occurredAt,
   });
 
   final List<EvidenceFile> evidence;
@@ -41,6 +47,18 @@ class ReportDraft {
   final String plate;
   final String? smokeColor;
   final String description;
+
+  // Step 3 · location and time (US-07)
+  final double? lat;
+  final double? lng;
+  final String? address;
+  final String? municipality;
+  final int? suggestedAuthorityId;
+
+  /// Set automatically when step 3 opens; the user cannot edit it (RF-03).
+  final DateTime? occurredAt;
+
+  bool get hasLocation => lat != null && lng != null;
 
   bool get isEmpty =>
       evidence.isEmpty &&
@@ -55,6 +73,9 @@ class ReportDraft {
     String? plate,
     String? smokeColor,
     String? description,
+    double? lat,
+    double? lng,
+    DateTime? occurredAt,
   }) {
     return ReportDraft(
       evidence: evidence ?? this.evidence,
@@ -62,6 +83,30 @@ class ReportDraft {
       plate: plate ?? this.plate,
       smokeColor: smokeColor ?? this.smokeColor,
       description: description ?? this.description,
+      lat: lat ?? this.lat,
+      lng: lng ?? this.lng,
+      // The address data is kept; use withGeo() to replace it.
+      address: address,
+      municipality: municipality,
+      suggestedAuthorityId: suggestedAuthorityId,
+      occurredAt: occurredAt ?? this.occurredAt,
+    );
+  }
+
+  /// Same draft with the address data replaced (null clears it).
+  ReportDraft withGeo({String? address, String? municipality, int? suggestedAuthorityId}) {
+    return ReportDraft(
+      evidence: evidence,
+      vehicleType: vehicleType,
+      plate: plate,
+      smokeColor: smokeColor,
+      description: description,
+      lat: lat,
+      lng: lng,
+      address: address,
+      municipality: municipality,
+      suggestedAuthorityId: suggestedAuthorityId,
+      occurredAt: occurredAt,
     );
   }
 }
@@ -84,6 +129,24 @@ class ReportDraftController extends Notifier<ReportDraft> {
 
   void removeEvidence(EvidenceFile file) {
     state = state.copyWith(evidence: state.evidence.where((f) => f != file).toList());
+  }
+
+  /// Step 3 opens: date and time are taken now, only the first time (RF-03).
+  void startLocationStep(DateTime now) {
+    if (state.occurredAt == null) state = state.copyWith(occurredAt: now);
+  }
+
+  /// New pin position: the previous address no longer applies.
+  void setPoint(double lat, double lng) {
+    state = state.copyWith(lat: lat, lng: lng).withGeo();
+  }
+
+  void setGeo({String? address, String? municipality, int? suggestedAuthorityId}) {
+    state = state.withGeo(
+      address: address,
+      municipality: municipality,
+      suggestedAuthorityId: suggestedAuthorityId,
+    );
   }
 
   /// Step 2 saves each change, so going back and forth keeps the data.

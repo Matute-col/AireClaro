@@ -70,6 +70,11 @@ paquete adicional.
   paquete adicional).
 - `image_picker` (app, US-05): tomar foto, grabar video (máx. 15 s) y elegir de la galería; reduce las fotos a
   1600 px de lado y calidad 80 (RNF-02).
+- `geolocator` (app, US-07): posición GPS y permiso de ubicación (pedirlo, abrir los ajustes); por eso no se usa
+  `permission_handler`.
+- `flutter_map` + `latlong2` (app, US-07): mapa con tiles de OpenStreetMap y pin (D-04). Atribución
+  «© OpenStreetMap contributors» siempre visible y `userAgentPackageName = com.aireclaro.app`.
+- `intl` (app, US-07): fecha y hora en formato de Colombia (`es_CO`).
 
 ## Estructura del backend
 

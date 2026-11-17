@@ -185,15 +185,23 @@ Ejemplo de respuesta de `POST /reports` (resumen):
 - Archivos: de 1 a 3; imágenes `image/jpeg|png|webp` ≤ 8 MB; video `video/mp4|quicktime` ≤ 25 MB.
 - `accept_terms` debe ser `true`; se guarda `consent_at = now()`.
 
-## Asignación de la autoridad (propuesta; **Mateo debe validarla**)
-1. `GET /geo/reverse` obtiene de Nominatim (`format=jsonv2&addressdetails=1&accept-language=es&zoom=16`)
-   ciudad/municipio/departamento.
-2. Se normaliza el texto (minúsculas, sin tildes). Si contiene `bogota` → **SDA**. Si contiene `soacha` o
-   `cundinamarca` → **CAR**. En otro caso → sin sugerencia; el usuario elige.
+## Asignación de la autoridad (confirmada por Mateo el 16-nov-2026)
+1. `GET /geo/reverse` obtiene de Nominatim (`format=jsonv2&addressdetails=1&accept-language=es&zoom=16`) la
+   dirección con sus campos administrativos.
+2. La regla mira **solo** los campos administrativos (`city`, `town`, `village`, `municipality`, `county`,
+   `subregion`, `state_district`, `state`, `region`), nunca la calle ni el barrio: una «Avenida Bogotá» en Soacha
+   o el barrio «UPZs de Bogotá» que devuelve Nominatim no deben contar. Se normaliza el texto (minúsculas, sin
+   tildes). Si contiene `bogota` → **SDA**. Si contiene `soacha` o `cundinamarca` → **CAR**. Si coinciden las
+   dos (caso ambiguo) o ninguna → sin sugerencia; el usuario elige. El usuario siempre puede cambiarla.
 3. El servidor repite la regla al crear el reporte si no llega `authority_id`.
-4. Probar con coordenadas reales aproximadas: Soacha ≈ 4.579, −74.217; centro de Bogotá ≈ 4.610, −74.082.
-5. **Cache:** en memoria, clave = coordenadas redondeadas a 4 decimales, TTL 24 h; cola para no superar
-   1 petición por segundo; cabecera `User-Agent` desde `NOMINATIM_USER_AGENT`.
+4. **Prueba real (16-nov-2026):** Soacha (4.579, −74.217) → `city: Soacha ciudad`, `subregion: Soacha`,
+   `state: Cundinamarca` → **CAR**. Centro de Bogotá (4.610, −74.082) → `city: Bogotá ciudad`,
+   `state: Bogotá, Distrito Capital` → **SDA**. Ninguno fue ambiguo. Las respuestas se guardan como datos de
+   prueba en `backend/tests/helpers/nominatim.js`.
+5. **Cache:** en memoria, clave = coordenadas redondeadas a 4 decimales, TTL 24 h, máximo 1000 entradas; cola
+   global para no superar 1 petición por segundo; cabecera `User-Agent` desde `NOMINATIM_USER_AGENT`; tiempo
+   límite 5 s. Si Nominatim falla: `502 GEOCODER_UNAVAILABLE` y la app deja continuar (la autoridad se elige en
+   la revisión).
 
 ## Plantilla de la solicitud (texto y PDF)
 
