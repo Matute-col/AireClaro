@@ -19,8 +19,8 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 |---|---|---|---|
 | TS-01 | Hecha | 5e8a585 | `GET /api/health`, helmet, límites, formato de errores; 5 pruebas con jest |
 | TS-02 | Hecha | 5e90df1 | Migraciones aplicadas en Neon el 16-nov-2026: 4 tablas + 3 autoridades con `email_verified=false` |
-| TS-03 | Pendiente | | |
-| US-01 | En curso | eb47f5c | API hecha: `POST /api/auth/register` (zod, bcrypt, `consent_at`, 409 correo duplicado). Falta la pantalla en la app |
+| TS-03 | Hecha | eb812fd | App Flutter en `app/` (id `com.aireclaro.app`): tema M3, `go_router`, `dio` con token y manejo de 401, `flutter_secure_storage`, validadores iguales al API. URL del API por `--dart-define=API_BASE_URL` |
+| US-01 | Hecha | eb47f5c, ec86672 | API: `POST /api/auth/register`. App: pantalla de registro con consentimiento y política (Ley 1581). Probado en el celular el 16-nov-2026: botón deshabilitado, contraseñas distintas, registro válido, correo duplicado, API apagado |
 | US-02 | En curso | 3d02e25 | API hecha: `POST /api/auth/login` con mensaje genérico. Falta la app (sesión persistente) |
 | US-03 | En curso | 1a1bd53 | API hecha: `GET/PUT /api/me` (mismas reglas que el registro, el correo no cambia). Falta la app |
 | US-04…US-22 | Pendiente | | |
@@ -39,10 +39,16 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 - 16-nov-2026 · Login compara contra un hash ficticio si el correo no existe · mismo mensaje y tiempo de respuesta.
 - 16-nov-2026 · `PUT /me` reemplaza el perfil completo (sin `phone` → null); `doc_number` se guarda en mayúsculas.
 
+- 16-nov-2026 · App: Flutter 3.50 trae Material como paquete aparte (`material_ui`); se usa el import de la plantilla oficial · es lo que genera `flutter create`.
+- 16-nov-2026 · App: `android:allowBackup="false"` · recomendado por `flutter_secure_storage`; el token cifrado no se restaura en otro equipo.
+- 16-nov-2026 · App: Riverpod sin generación de código y dobles de prueba escritos a mano (sin paquetes de mocks) · menos dependencias y más fácil de explicar.
+- 16-nov-2026 · App: HTTP sin cifrar solo en los manifiestos `debug` y `profile`; prueba en el celular con `adb reverse tcp:3000 tcp:3000`.
+
 ## Problemas abiertos
 (Descripción · estado)
 - `channel_binding=require` de Neon funciona con `pg` · resuelto.
-- `pg` avisa que `sslmode=require` se trata hoy como `verify-full` y cambiará en pg v9 · opcional: usar `sslmode=verify-full` en `DATABASE_URL` (lo decide Mateo). También aplica a `TEST_DATABASE_URL`; el aviso aparece en la salida de `npm test`.
+- `pg` avisa que `sslmode=require` se trata hoy como `verify-full` y cambiará en pg v9 · opcional: usar `sslmode=verify-full` en `DATABASE_URL` (lo decide Mateo).
+ También aplica a `TEST_DATABASE_URL`; el aviso aparece en la salida de `npm test`.
 - `NOMINATIM_USER_AGENT` en `backend/.env` lleva un marcador `<tu-correo>` · Mateo lo completa a mano.
 
 ## Proveedor de base de datos elegido
