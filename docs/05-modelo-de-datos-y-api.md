@@ -145,7 +145,8 @@ se ofrece «Radicar en el portal oficial». No inventes direcciones; cualquier c
 - Autenticación: cabecera `Authorization: Bearer <token>` en todo salvo `/health`, `/auth/register`, `/auth/login`.
 - Errores: `{ "error": { "code": "VALIDATION_ERROR", "message": "texto en español", "details": [...] } }`
   con códigos HTTP 400, 401, 403, 404, 409, 413, 429, 500.
-- Límites: peticiones globales 100 cada 15 min por IP; `/auth/*` 10 cada 15 min.
+- Límites: peticiones globales 300 cada 15 min por IP; `/auth/*` 10 cada 15 min. (Cambio del 16-nov-2026, aprobado
+  por Mateo: antes 100; cada miniatura de evidencia en «Mis reportes» es una petición autenticada.)
 
 ## Endpoints
 
