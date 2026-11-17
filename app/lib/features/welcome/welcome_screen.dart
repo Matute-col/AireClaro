@@ -25,6 +25,11 @@ class WelcomeScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: AppSpacing.xl),
+              PrimaryButton(
+                label: 'Iniciar sesión',
+                onPressed: () => context.push(Routes.login),
+              ),
+              const SizedBox(height: AppSpacing.sm),
               SecondaryButton(
                 label: 'Crear cuenta',
                 onPressed: () => context.push(Routes.register),

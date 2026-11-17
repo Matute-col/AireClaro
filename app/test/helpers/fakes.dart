@@ -11,6 +11,17 @@ const testUser = User(
   email: 'ana@ejemplo.test',
 );
 
+const networkError = ApiException(
+  code: ApiException.networkCode,
+  message: 'No pudimos conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.',
+);
+
+const unauthorizedError = ApiException(
+  code: 'UNAUTHORIZED',
+  message: 'Tu sesión no es válida. Inicia sesión de nuevo.',
+  statusCode: 401,
+);
+
 /// Keeps the token in memory instead of the phone's secure storage.
 class MemoryTokenStorage implements TokenStorage {
   MemoryTokenStorage([this.token]);
@@ -31,6 +42,8 @@ class MemoryTokenStorage implements TokenStorage {
 class FakeAuthRepository implements AuthRepository {
   ApiException? error;
   RegisterData? lastRegister;
+  String? lastLoginEmail;
+  int meCalls = 0;
 
   @override
   Future<AuthResult> register(RegisterData data) async {
@@ -40,6 +53,19 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<AuthResult> login({required String email, required String password}) async {
+    lastLoginEmail = email;
+    if (error != null) throw error!;
+    return const AuthResult(token: 'test-token', user: testUser);
+  }
+
+  @override
+  Future<User> me() async {
+    meCalls++;
+    if (error != null) throw error!;
+    return testUser;
+  }
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
-

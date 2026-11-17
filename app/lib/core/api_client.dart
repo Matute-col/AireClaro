@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/auth/auth_controller.dart';
 import 'config.dart';
 import 'token_storage.dart';
 
@@ -47,11 +48,12 @@ Dio createApiClient({
   return dio;
 }
 
-/// App-wide HTTP client. Session expiry handling is connected in the auth feature.
+/// App-wide HTTP client. A 401 on an authenticated request closes the session
+/// and the router shows the login with «Tu sesión expiró».
 final apiClientProvider = Provider<Dio>((ref) {
   return createApiClient(
     baseUrl: AppConfig.apiBaseUrl,
     tokenStorage: ref.watch(tokenStorageProvider),
-    onUnauthorized: () {},
+    onUnauthorized: () => ref.read(authControllerProvider.notifier).sessionExpired(),
   );
 });

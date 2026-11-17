@@ -64,6 +64,28 @@ class AuthRepository {
       throw toApiException(error);
     }
   }
+
+  Future<AuthResult> login({required String email, required String password}) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        '/auth/login',
+        data: {'email': email, 'password': password},
+      );
+      return AuthResult.fromJson(response.data!);
+    } catch (error) {
+      throw toApiException(error);
+    }
+  }
+
+  /// Current user (GET /me). Also used to check that a saved token still works.
+  Future<User> me() async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>('/me');
+      return User.fromJson(response.data!['user'] as Map<String, dynamic>);
+    } catch (error) {
+      throw toApiException(error);
+    }
+  }
 }
 
 final authRepositoryProvider = Provider<AuthRepository>(
