@@ -44,6 +44,26 @@
 | CP-29 | Dueño del reporte | Intentar enviar el reporte de otro usuario | 404 | RB-01 |
 | CP-30 | Fotogramas del video (US-23) | Crear un reporte con un video | 4 fotogramas en el detalle bajo el video y en ANEXOS del PDF («Fotogramas del video 1 (4)»), en cuadrícula; si la extracción falla, el reporte se crea sin ellos y la app lo avisa | RF-19 |
 
+## Revisión de estados (US-17, 18-nov-2026)
+Cada pantalla que habla con el API tiene estado de carga con texto, estado vacío cuando aplica y error con
+mensaje en español y «Reintentar». Los errores de red y del servidor pasan por `toApiException` (con prueba).
+
+| Pantalla | Cargando | Vacío | Error / sin conexión | Otros |
+|---|---|---|---|---|
+| Arranque (sesión) | «Verificando tu sesión…» | — | `ErrorState` + Reintentar | 401 → Bienvenida |
+| Login / Registro | botón con indicador | — | aviso + Reintentar | correo duplicado y credenciales en el campo |
+| Inicio | «Cargando…» en la tarjeta | «0 reportes» | texto por defecto | — |
+| Paso 1 Evidencia | indicador al abrir cámara/galería | «0 de 3 archivos» | aviso al fallar cámara o galería | HEIC y tamaño; fotogramas: «Sin fotogramas» + aviso |
+| Paso 3 Ubicación | indicador sobre el mapa | «Marca en el mapa…» | dirección no disponible → se puede seguir | permiso denegado / GPS apagado → «Activar ubicación» |
+| Revisión | progreso de subida en % | — | aviso + Reintentar | autoridades: carga y Reintentar |
+| Mis reportes | «Cargando tus reportes…» | «Aún no tienes reportes» + Nuevo reporte | `ErrorState` + Reintentar; error al paginar al final | recarga deslizando |
+| Detalle | «Cargando el reporte…» | — | Reintentar; 404 «No encontramos este reporte» | — |
+| Vista previa | «Generando la solicitud…» | — | Reintentar; 404 | descarga, envío (409/422/502/503) |
+| Confirmación | «Cargando…» | — | Reintentar | — |
+| Mapa | «Cargando reportes…» | «No hay reportes con estos filtros.» | aviso + Reintentar | — |
+| ¿Cómo funciona? | «Cargando autoridades…» | — | aviso + Reintentar (el resto funciona) | — |
+| Cualquier pantalla | — | — | 401 con sesión → Login «Tu sesión expiró» (CP-20) | 429 y 500 con mensaje claro |
+
 ## Registro de evidencias
 Carpeta `docs/evidencias/`: capturas por caso (`CP-06.png`), resultados de `npm test` y `flutter analyze`,
 y la tabla de resultados.

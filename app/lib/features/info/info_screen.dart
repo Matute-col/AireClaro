@@ -67,7 +67,7 @@ class InfoScreen extends ConsumerWidget {
           authorities.when(
             loading: () => const Padding(
               padding: EdgeInsets.all(AppSpacing.md),
-              child: Center(child: CircularProgressIndicator()),
+              child: LoadingState(message: 'Cargando autoridades…'),
             ),
             error: (error, _) => MessageBanner(
               message: toApiException(error).message,
