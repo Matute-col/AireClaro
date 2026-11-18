@@ -76,6 +76,11 @@ paquete adicional.
   «© OpenStreetMap contributors» siempre visible y `userAgentPackageName = com.aireclaro.app`.
 - `intl` (app, US-07): fecha y hora en formato de Colombia (`es_CO`).
 
+**Agregados en el Sprint 3:**
+- `pdfkit` (API, US-12): genera el PDF de la solicitud en el servidor (D-07).
+- `pdf-parse` (API, solo desarrollo, US-12): las pruebas leen el texto del PDF generado para verificar el
+  contenido del art. 16 y que tildes, eñ y signos («», ¿, n.º) salgan bien.
+
 ## Estructura del backend
 
 ```

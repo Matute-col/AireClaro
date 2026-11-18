@@ -6,6 +6,12 @@ const webp = () => Buffer.concat([Buffer.from('RIFF'), Buffer.alloc(4), Buffer.f
 const mp4 = () => Buffer.concat([Buffer.from([0, 0, 0, 0x18]), Buffer.from('ftypisom'), Buffer.alloc(60)]);
 const mov = () => Buffer.concat([Buffer.from([0, 0, 0, 0x14]), Buffer.from('ftypqt  '), Buffer.alloc(60)]);
 const heic = () => Buffer.concat([Buffer.from([0, 0, 0, 0x18]), Buffer.from('ftypheic'), Buffer.alloc(60)]);
+// A real, decodable 1×1 PNG (the buffers above only have the right first bytes).
+const realPng = () =>
+  Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+    'base64',
+  );
 const text = () => Buffer.from('esto no es una imagen, es texto plano con extension falsa');
 
-module.exports = { jpeg, png, webp, mp4, mov, heic, text };
+module.exports = { jpeg, png, webp, mp4, mov, heic, text, realPng };

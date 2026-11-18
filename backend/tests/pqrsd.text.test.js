@@ -1,0 +1,102 @@
+const { buildRequest, toPlainText, formatTime } = require('../src/modules/pqrsd/pqrsd.text');
+
+// 14:30 UTC = 9:30 a. m. in Colombia (UTC-5).
+const report = {
+  id: '3f2a9c1b-0000-4000-8000-000000000000',
+  vehicle_type: 'tractomula',
+  plate: 'XYZ12A',
+  smoke_color: 'negro',
+  description: 'Humo denso al subir la pendiente',
+  lat: 4.579,
+  lng: -74.217,
+  address: 'Carrera 3A, Ubaté, Soacha ciudad',
+  occurred_at: '2026-11-16T14:30:00Z',
+  created_at: '2026-11-16T14:45:00Z',
+  requester_name: 'José Peña Núñez',
+  requester_doc_type: 'CC',
+  requester_doc_number: 'TEST0001',
+  requester_email: 'jose@example.com',
+  requester_phone: '3000000000',
+};
+const media = [
+  { kind: 'photo', mime_type: 'image/jpeg', size_bytes: 1258291 },
+  { kind: 'video', mime_type: 'video/mp4', size_bytes: 3355443 },
+];
+const authority = { name: 'Corporación Autónoma Regional de Cundinamarca (CAR)' };
+
+describe('request text (US-12, Ley 1755 art. 16)', () => {
+  const text = toPlainText(buildRequest(report, media, authority));
+
+  it('1 · authority: addressed to the authority', () => {
+    expect(text).toContain('Señores\nCorporación Autónoma Regional de Cundinamarca (CAR)\nCiudad');
+  });
+
+  it('2 · requester: full name, document and electronic address for notifications', () => {
+    expect(text).toContain('José Peña Núñez\nCC TEST0001');
+    expect(text).toContain(
+      'Recibiré notificaciones en el correo jose@example.com y en el teléfono 3000000000.',
+    );
+  });
+
+  it('3 · object of the request (subject and PETICIÓN)', () => {
+    expect(text).toContain('Asunto: Denuncia ciudadana por presunta emisión anómala');
+    expect(text).toContain('vehículo de placa XYZ12A');
+    expect(text).toContain('PETICIÓN\nSolicito respetuosamente a la entidad:\n1. Verificar los hechos');
+  });
+
+  it('4 · reasons (HECHOS) with the real report data, in Colombia time', () => {
+    expect(text).toContain(
+      '1. El día 16 de noviembre de 2026 a las 9:30 a. m., en Carrera 3A, Ubaté, Soacha ciudad ' +
+        '(coordenadas 4.57900, -74.21700), observé un vehículo de tipo tractomula con placa XYZ12A ' +
+        'que emitía humo de color negro.',
+    );
+    expect(text).toContain('2. Descripción del peticionario: «Humo denso al subir la pendiente».');
+    expect(text).toContain('3. Como soporte se anexan 2 archivos de evidencia (fotografía y video)');
+  });
+
+  it('5 · list of documents (ANEXOS), one line per file', () => {
+    expect(text).toContain('ANEXOS\n1. Fotografía 1 (JPG, 1,2 MB).\n2. Video 1 (MP4, 3,2 MB).');
+  });
+
+  it('6 · signature: closing, name and document', () => {
+    expect(text).toContain('Atentamente,\n\nJosé Peña Núñez\nCC TEST0001');
+  });
+
+  it('header has only the generation date (no city)', () => {
+    expect(text.split('\n')[0]).toBe('16 de noviembre de 2026');
+  });
+
+  it('scope note and short report number', () => {
+    expect(text).toContain('no constituyen una medición técnica de emisiones. Reporte n.º 3F2A9C1B.');
+  });
+
+  it('factual tone: never says that the vehicle «incumple»', () => {
+    expect(text.toLowerCase()).not.toMatch(/incumpl|infractor|culpable/);
+  });
+
+  it('without description, phone or address the text stays correct', () => {
+    const minimal = toPlainText(
+      buildRequest(
+        { ...report, description: null, requester_phone: null, address: null },
+        [media[1]],
+        authority,
+      ),
+    );
+    expect(minimal).not.toContain('Descripción del peticionario');
+    expect(minimal).toContain('Recibiré notificaciones en el correo jose@example.com.');
+    expect(minimal).toContain('en el punto de coordenadas 4.57900, -74.21700');
+    expect(minimal).toContain('2. Como soporte se anexan 1 archivo de evidencia (video)');
+  });
+
+  it('times use normal spaces (the PDF font has no narrow no-break space)', () => {
+    expect(formatTime(new Date('2026-11-16T19:05:00Z'))).toBe('2:05 p. m.');
+    expect(text).not.toMatch(/[\u00a0\u202f]/);
+  });
+});
+
+describe('ANEXOS order', () => {
+  it('photos first, then videos, whatever the stored order', () => {
+    const text = toPlainText(buildRequest(report, [media[1], media[0]], authority));
+    expect(text).toContain('ANEXOS\n1. Fotografía 1 (JPG, 1,2 MB).\n2. Video 1 (MP4, 3,2 MB).');
+  });
+});

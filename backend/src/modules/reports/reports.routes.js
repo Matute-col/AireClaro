@@ -6,7 +6,9 @@ const { receiveEvidence, checkEvidence } = require('../../middleware/upload');
 const AppError = require('../../utils/AppError');
 const { removeFiles } = require('../../utils/storage');
 const { createReportSchema } = require('./reports.schema');
+const env = require('../../config/env');
 const reportsService = require('./reports.service');
+const pqrsdService = require('../pqrsd/pqrsd.service');
 
 const router = express.Router();
 
@@ -50,6 +52,21 @@ router.get('/', async (req, res) => {
 // GET /api/reports/:id → {report, media, authority}, only for the owner.
 router.get('/:id', requireUuidParams('id'), async (req, res) => {
   res.json(await reportsService.getById(req.user.id, req.params.id));
+});
+
+// GET /api/reports/:id/pqrsd → {authority, plate, status, text, mail_mode} (preview).
+router.get('/:id/pqrsd', requireUuidParams('id'), async (req, res) => {
+  const preview = await pqrsdService.getText(req.user.id, req.params.id);
+  res.json({ ...preview, mail_mode: env.MAIL_MODE });
+});
+
+// GET /api/reports/:id/pqrsd.pdf → the request as PDF (generated on the fly, not stored).
+router.get('/:id/pqrsd.pdf', requireUuidParams('id'), async (req, res) => {
+  const { buffer, fileName } = await pqrsdService.getPdf(req.user.id, req.params.id);
+  res.set('Content-Type', 'application/pdf');
+  res.set('Content-Disposition', `inline; filename="${fileName}"`);
+  res.set('Cache-Control', 'private, no-store');
+  res.send(buffer);
 });
 
 // GET /api/reports/:id/media/:mediaId → the file, only for the owner.
