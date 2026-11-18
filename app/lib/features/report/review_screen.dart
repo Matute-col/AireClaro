@@ -85,10 +85,10 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       // «Mis reportes» and the count on Inicio must include the new report.
       ref.invalidate(reportsListProvider);
       ref.invalidate(reportsCountProvider);
-      // Inicio, with the new report's detail on top («Atrás» returns to Inicio).
+      // Inicio, with the preview of the new request on top («Atrás» returns to Inicio).
       router.go(Routes.home);
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        router.push(Routes.reportDetail(reportId));
+        router.push(Routes.reportPreview(reportId, justCreated: true));
         draft.reset(); // the flow screens are gone: clear the draft (no drafts, docs/06)
       });
     } on ApiException catch (error) {

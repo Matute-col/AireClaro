@@ -4,6 +4,7 @@ import 'package:aireclaro/features/auth/auth_repository.dart';
 import 'package:aireclaro/features/auth/user.dart';
 import 'package:aireclaro/features/history/report_summary.dart';
 import 'package:aireclaro/features/report/reports_repository.dart';
+import 'package:aireclaro/shared/services/file_actions.dart';
 
 const testUser = User(
   id: '1',
@@ -101,4 +102,25 @@ class FakeReportsListRepository implements ReportsRepository {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Records what would be opened or shared instead of calling the phone.
+class FakeFileActions implements FileActions {
+  final opened = <String>[];
+  final shared = <(String, String, String?)>[];
+  String? openProblem;
+
+  @override
+  Future<String> tempPath(String fileName) async => '/tmp/$fileName';
+
+  @override
+  Future<String?> open(String path) async {
+    opened.add(path);
+    return openProblem;
+  }
+
+  @override
+  Future<void> share(String path, {required String mimeType, String? subject}) async {
+    shared.add((path, mimeType, subject));
+  }
 }

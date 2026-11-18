@@ -3,18 +3,34 @@ import '../report/report_draft.dart';
 
 /// One evidence file of a saved report (the file itself is read with the token).
 class ReportMedia {
-  const ReportMedia({required this.id, required this.kind, required this.sizeBytes});
+  const ReportMedia({
+    required this.id,
+    required this.kind,
+    required this.sizeBytes,
+    this.mimeType = '',
+  });
 
   final String id;
   final EvidenceKind kind;
   final int sizeBytes;
+  final String mimeType;
 
   bool get isVideo => kind == EvidenceKind.video;
+
+  /// File extension for the downloaded copy.
+  String get extension => switch (mimeType) {
+        'video/quicktime' => 'mov',
+        'video/mp4' => 'mp4',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+        _ => isVideo ? 'mp4' : 'jpg',
+      };
 
   factory ReportMedia.fromJson(Map<String, dynamic> json) => ReportMedia(
         id: json['id'] as String,
         kind: json['kind'] == 'video' ? EvidenceKind.video : EvidenceKind.photo,
         sizeBytes: json['size_bytes'] as int,
+        mimeType: json['mime_type'] as String? ?? '',
       );
 }
 

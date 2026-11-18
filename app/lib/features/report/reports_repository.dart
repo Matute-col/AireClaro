@@ -6,6 +6,8 @@ import '../../core/api_error.dart';
 import '../../core/validators.dart';
 import '../history/report_detail.dart';
 import '../history/report_summary.dart';
+import '../pqrsd/pqrsd_preview.dart';
+import '../../shared/services/file_actions.dart';
 import 'report_draft.dart';
 
 /// Text fields of POST /reports built from the draft (docs/05).
@@ -30,9 +32,12 @@ Map<String, String> reportFormFields(ReportDraft draft) {
 }
 
 class ReportsRepository {
-  ReportsRepository(this._dio);
+  ReportsRepository(this._dio, this._tempPath);
 
   final Dio _dio;
+
+  /// Where downloaded files are saved (the app's temporary folder).
+  final Future<String> Function(String fileName) _tempPath;
 
   /// Creates the report with its evidence (multipart). Returns the new report id.
   /// [onProgress] receives 0.0–1.0 while the files are uploaded.
@@ -71,6 +76,42 @@ class ReportsRepository {
     }
   }
 
+  /// Text of the request for the preview (US-13).
+  Future<PqrsdPreview> getPqrsd(String id) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>('/reports/$id/pqrsd');
+      return PqrsdPreview.fromJson(response.data!);
+    } catch (error) {
+      throw toApiException(error);
+    }
+  }
+
+  /// Downloads the PDF of the request (with the session) and returns its local path.
+  Future<String> downloadPdf(String id) async {
+    final path = await _tempPath('solicitud-${shortReportId(id)}.pdf');
+    await _download('/reports/$id/pqrsd.pdf', path);
+    return path;
+  }
+
+  /// Downloads one evidence file (e.g. a video, CP-07) and returns its local path.
+  Future<String> downloadMedia(String reportId, String mediaId, String extension) async {
+    final path = await _tempPath('evidencia-${shortReportId(mediaId)}.$extension');
+    await _download('/reports/$reportId/media/$mediaId', path);
+    return path;
+  }
+
+  Future<void> _download(String url, String path) async {
+    try {
+      await _dio.download(
+        url,
+        path,
+        options: Options(receiveTimeout: const Duration(minutes: 2)),
+      );
+    } catch (error) {
+      throw toApiException(error);
+    }
+  }
+
   /// «Mis reportes»: newest first, [limit] per page.
   Future<ReportsPage> list({int page = 1, int limit = 20}) async {
     try {
@@ -86,5 +127,8 @@ class ReportsRepository {
 }
 
 final reportsRepositoryProvider = Provider<ReportsRepository>(
-  (ref) => ReportsRepository(ref.watch(apiClientProvider)),
+  (ref) => ReportsRepository(
+    ref.watch(apiClientProvider),
+    ref.watch(fileActionsProvider).tempPath,
+  ),
 );

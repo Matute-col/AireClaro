@@ -80,6 +80,9 @@ paquete adicional.
 - `pdfkit` (API, US-12): genera el PDF de la solicitud en el servidor (D-07).
 - `pdf-parse` (API, solo desarrollo, US-12): las pruebas leen el texto del PDF generado para verificar el
   contenido del art. 16 y que tildes, eñ y signos («», ¿, n.º) salgan bien.
+- `path_provider` (app, US-13): carpeta temporal donde se guarda el PDF descargado.
+- `open_filex` (app, US-13): abre el PDF (y los videos de evidencia, CP-07) con la app del teléfono.
+- `share_plus` (app, US-13): menú «Compartir» del teléfono con el PDF.
 
 ## Estructura del backend
 

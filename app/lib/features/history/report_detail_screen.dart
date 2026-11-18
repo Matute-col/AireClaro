@@ -1,10 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/api_error.dart';
 import '../../core/theme.dart';
+import '../../core/router.dart';
+import '../../shared/services/file_actions.dart';
 import '../../shared/widgets/auth_image.dart';
+import '../../shared/widgets/buttons.dart';
 import '../../shared/widgets/report_mini_map.dart';
 import '../../shared/widgets/states.dart';
 import '../../shared/widgets/status_chip.dart';
@@ -12,6 +16,7 @@ import '../report/evidence_step_screen.dart';
 import '../report/location_step_screen.dart';
 import '../report/report_draft.dart';
 import '../report/reports_repository.dart';
+import '../pqrsd/pdf_actions.dart';
 import 'report_detail.dart';
 
 /// Detail of one of the user's reports.
@@ -72,6 +77,15 @@ class _DetailBody extends StatelessWidget {
             StatusChip(status: report.status),
           ],
         ),
+        const SizedBox(height: AppSpacing.md),
+        // US-13: the request of this report.
+        PrimaryButton(
+          label: 'Ver solicitud',
+          icon: Icons.description_outlined,
+          onPressed: () => context.push(Routes.reportPreview(report.id)),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        PdfActions(reportId: report.id, plate: report.plate),
         const SizedBox(height: AppSpacing.md),
         _Card(title: 'Vehículo', lines: [
           ('Tipo', vehicleTypeLabels[report.vehicleType] ?? report.vehicleType),
@@ -136,19 +150,7 @@ class _EvidenceCarouselState extends State<_EvidenceCarousel> {
               onPageChanged: (page) => setState(() => _page = page),
               itemBuilder: (context, index) {
                 final item = widget.media[index];
-                if (item.isVideo) {
-                  return ColoredBox(
-                    color: AppColors.primaryContainer,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.videocam, size: 56, color: AppColors.primary),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text('Video · ${formatMegabytes(item.sizeBytes)}'),
-                      ],
-                    ),
-                  );
-                }
+                if (item.isVideo) return _VideoCard(reportId: widget.reportId, media: item);
                 return ColoredBox(
                   color: Colors.black,
                   child: AuthNetworkImage(
@@ -166,6 +168,67 @@ class _EvidenceCarouselState extends State<_EvidenceCarousel> {
           Text('${_page + 1} de ${widget.media.length} · desliza para ver más'),
         ],
       ],
+    );
+  }
+}
+
+/// Video evidence: there is no player in the app, so it is downloaded with the
+/// session and opened with the phone's video app (CP-07).
+class _VideoCard extends ConsumerStatefulWidget {
+  const _VideoCard({required this.reportId, required this.media});
+
+  final String reportId;
+  final ReportMedia media;
+
+  @override
+  ConsumerState<_VideoCard> createState() => _VideoCardState();
+}
+
+class _VideoCardState extends ConsumerState<_VideoCard> {
+  bool _opening = false;
+
+  Future<void> _open() async {
+    setState(() => _opening = true);
+    String? problem;
+    try {
+      final path = await ref
+          .read(reportsRepositoryProvider)
+          .downloadMedia(widget.reportId, widget.media.id, widget.media.extension);
+      problem = await ref.read(fileActionsProvider).open(path);
+    } on ApiException catch (error) {
+      problem = error.message;
+    } finally {
+      if (mounted) setState(() => _opening = false);
+    }
+    if (problem != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(problem)));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: AppColors.primaryContainer,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.videocam, size: 56, color: AppColors.primary),
+          const SizedBox(height: AppSpacing.sm),
+          Text('Video · ${formatMegabytes(widget.media.sizeBytes)}'),
+          const SizedBox(height: AppSpacing.sm),
+          FilledButton.icon(
+            onPressed: _opening ? null : _open,
+            icon: _opening
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : const Icon(Icons.play_arrow),
+            label: const Text('Abrir video'),
+          ),
+        ],
+      ),
     );
   }
 }
