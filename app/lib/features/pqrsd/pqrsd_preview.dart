@@ -6,6 +6,7 @@ class PqrsdPreview {
     required this.authority,
     required this.plate,
     required this.status,
+    required this.requesterEmail,
     required this.text,
     required this.mailMode,
   });
@@ -13,6 +14,9 @@ class PqrsdPreview {
   final Authority authority;
   final String plate;
   final String status;
+
+  /// Where the citizen receives the copy and the answer (US-21 dialog).
+  final String requesterEmail;
   final String text;
 
   /// `test`, `live` or `off` (used by the email sending in US-21).
@@ -22,6 +26,7 @@ class PqrsdPreview {
         authority: Authority.fromJson(json['authority'] as Map<String, dynamic>),
         plate: json['plate'] as String,
         status: json['status'] as String,
+        requesterEmail: json['requester_email'] as String? ?? '',
         text: json['text'] as String,
         mailMode: json['mail_mode'] as String? ?? 'test',
       );

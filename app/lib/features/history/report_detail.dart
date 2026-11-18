@@ -74,6 +74,8 @@ class ReportDetail {
     this.address,
     this.requesterPhone,
     this.sentAt,
+    this.sentVia,
+    this.sendMode,
   });
 
   final String id;
@@ -87,6 +89,10 @@ class ReportDetail {
   final DateTime occurredAt;
   final String status;
   final DateTime? sentAt;
+
+  /// `email` or `manual` once sent; `test` or `live` when sent by email.
+  final String? sentVia;
+  final String? sendMode;
   final String requesterName;
   final String requesterDocType;
   final String requesterDocNumber;
@@ -109,6 +115,8 @@ class ReportDetail {
       address: r['address'] as String?,
       occurredAt: DateTime.parse(r['occurred_at'] as String).toLocal(),
       status: r['status'] as String,
+      sentVia: r['sent_via'] as String?,
+      sendMode: r['send_mode'] as String?,
       sentAt: sentAt == null ? null : DateTime.parse(sentAt).toLocal(),
       requesterName: r['requester_name'] as String,
       requesterDocType: r['requester_doc_type'] as String,

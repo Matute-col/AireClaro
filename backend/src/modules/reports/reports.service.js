@@ -144,7 +144,7 @@ async function list(userId, { page, limit, status }) {
   );
 
   const { rows } = await query(
-    `SELECT r.id, r.plate, r.vehicle_type, r.smoke_color, r.status, r.address,
+    `SELECT r.id, r.plate, r.vehicle_type, r.smoke_color, r.status, r.sent_via, r.address,
             r.occurred_at, r.created_at, a.code AS authority_code, a.name AS authority_name,
             (SELECT m.id FROM report_media m
               WHERE m.report_id = r.id AND m.kind = 'photo'

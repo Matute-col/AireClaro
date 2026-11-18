@@ -149,7 +149,7 @@ class ReportCard extends StatelessWidget {
                     Text(vehicleTypeLabels[report.vehicleType] ?? report.vehicleType),
                     Text(formatShortDate(report.occurredAt), style: textTheme.bodySmall),
                     const SizedBox(height: AppSpacing.xs),
-                    StatusChip(status: report.status),
+                    StatusChip(status: report.status, sentVia: report.sentVia),
                   ],
                 ),
               ),

@@ -2,11 +2,24 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../core/theme.dart';
 
-/// Report status «Generado» / «Enviado». Icon + text, not only color (accessibility).
+/// Report status «Generado» / «Enviado por correo» / «Enviado (manual)» (docs/06).
+/// Icon + text, not only color (accessibility).
 class StatusChip extends StatelessWidget {
-  const StatusChip({super.key, required this.status});
+  const StatusChip({super.key, required this.status, this.sentVia});
 
   final String status;
+
+  /// `email` or `manual` (only when sent).
+  final String? sentVia;
+
+  String get _label {
+    if (status != 'enviado') return 'Generado';
+    return switch (sentVia) {
+      'email' => 'Enviado por correo',
+      'manual' => 'Enviado (manual)',
+      _ => 'Enviado',
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +38,7 @@ class StatusChip extends StatelessWidget {
           Icon(sent ? Icons.check_circle : Icons.description_outlined, size: 16, color: color),
           const SizedBox(width: AppSpacing.xs),
           Text(
-            sent ? 'Enviado' : 'Generado',
+            _label,
             style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: color),
           ),
         ],

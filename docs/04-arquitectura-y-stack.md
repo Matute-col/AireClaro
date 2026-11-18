@@ -88,6 +88,9 @@ paquete adicional.
 - `video_player` (app, US-23): **solo para leer la duración** del video y calcular el 10 %, 35 %, 65 % y 90 %; la
   app sigue sin reproducir videos (revisa la decisión del 16-nov-2026: «sin `video_player`» era para mostrar la
   duración; ahora la exige US-23, aprobada por Mateo el 17-nov-2026).
+- `nodemailer` (API, US-21): envía la solicitud por SMTP (D-12). En las pruebas automáticas se reemplaza por un
+  transporte simulado: nunca sale un correo real desde `npm test`.
+- `url_launcher` (app, US-22): abre el portal oficial de la autoridad en el navegador del teléfono (D-14).
 
 ## Estructura del backend
 

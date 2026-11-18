@@ -9,6 +9,7 @@ const { createReportSchema } = require('./reports.schema');
 const env = require('../../config/env');
 const reportsService = require('./reports.service');
 const pqrsdService = require('../pqrsd/pqrsd.service');
+const sendService = require('../mail/send.service');
 
 const router = express.Router();
 
@@ -67,6 +68,14 @@ router.get('/:id/pqrsd.pdf', requireUuidParams('id'), async (req, res) => {
   res.set('Content-Disposition', `inline; filename="${fileName}"`);
   res.set('Cache-Control', 'private, no-store');
   res.send(buffer);
+});
+
+// POST /api/reports/:id/send {confirm: true} → email to the authority (US-21, RF-17).
+const sendBody = z.object({
+  confirm: z.literal(true, { error: 'Confirma el envío de la solicitud.' }),
+});
+router.post('/:id/send', requireUuidParams('id'), validate(sendBody), async (req, res) => {
+  res.json(await sendService.sendReport(req.user.id, req.params.id));
 });
 
 // GET /api/reports/:id/media/:mediaId → the file, only for the owner.

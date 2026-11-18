@@ -126,6 +126,23 @@ class ReportsRepository {
     }
   }
 
+  /// US-21 · Sends the request by email to the authority, after the user confirmed it.
+  /// Errors keep the API message: 409 already sent, 422 no verified email, 502 SMTP
+  /// failure, 503 email disabled or not configured.
+  Future<SendResult> sendReport(String id) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        '/reports/$id/send',
+        data: {'confirm': true},
+        // Building the PDF and talking to the mail server can take a while.
+        options: Options(receiveTimeout: const Duration(minutes: 1)),
+      );
+      return SendResult.fromJson(response.data!['delivery'] as Map<String, dynamic>);
+    } catch (error) {
+      throw toApiException(error);
+    }
+  }
+
   /// «Mis reportes»: newest first, [limit] per page.
   Future<ReportsPage> list({int page = 1, int limit = 20}) async {
     try {
@@ -138,6 +155,20 @@ class ReportsRepository {
       throw toApiException(error);
     }
   }
+}
+
+/// Result of POST /reports/:id/send.
+class SendResult {
+  const SendResult({required this.mode, required this.evidenceAttached});
+
+  /// `test` (went to the test inbox) or `live` (went to the authority).
+  final String mode;
+  final bool evidenceAttached;
+
+  factory SendResult.fromJson(Map<String, dynamic> json) => SendResult(
+        mode: json['mode'] as String,
+        evidenceAttached: json['evidence_attached'] as bool? ?? false,
+      );
 }
 
 final reportsRepositoryProvider = Provider<ReportsRepository>(

@@ -5,10 +5,13 @@ const reportsService = require('../reports/reports.service');
 const { buildRequest, toPlainText, shortId } = require('./pqrsd.text');
 const { renderPdf } = require('./pqrsd.pdf');
 
-/** Report data for the request. Only the owner: otherwise 404 (from getById). */
-async function load(userId, reportId) {
+/**
+ * Report data for the request. Only the owner: otherwise 404 (from getById).
+ * @param {object} [delivery] {channel: 'download'|'email', evidenceAttached} (ANEXOS labels)
+ */
+async function load(userId, reportId, delivery) {
   const detail = await reportsService.getById(userId, reportId);
-  const content = buildRequest(detail.report, detail.media, detail.authority);
+  const content = buildRequest(detail.report, detail.media, detail.authority, delivery);
   return { detail, content };
 }
 
@@ -19,6 +22,7 @@ async function getText(userId, reportId) {
     authority: detail.authority,
     plate: detail.report.plate,
     status: detail.report.status,
+    requester_email: detail.report.requester_email,
     text: toPlainText(content),
   };
 }
@@ -52,9 +56,12 @@ async function framePathsByVideo(reportId) {
   return byVideo;
 }
 
-/** GET /reports/:id/pqrsd.pdf → {buffer, fileName}. */
-async function getPdf(userId, reportId) {
-  const { detail, content } = await load(userId, reportId);
+/**
+ * GET /reports/:id/pqrsd.pdf → {buffer, fileName}. The email (US-21) asks for the
+ * variant {channel: 'email', evidenceAttached} so ANEXOS says what really goes attached.
+ */
+async function getPdf(userId, reportId, delivery) {
+  const { detail, content } = await load(userId, reportId, delivery);
   const framePaths = await framePathsByVideo(detail.report.id);
   const buffer = await renderPdf(content, {
     photoPath: await firstPhotoPath(detail.report.id),

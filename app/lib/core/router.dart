@@ -9,6 +9,7 @@ import '../features/auth/splash_screen.dart';
 import '../features/history/report_detail_screen.dart';
 import '../features/history/reports_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/pqrsd/done_screen.dart';
 import '../features/pqrsd/preview_screen.dart';
 import '../features/profile/edit_profile_screen.dart';
 import '../features/profile/profile_screen.dart';
@@ -37,6 +38,9 @@ class Routes {
   /// Preview of the request; [justCreated] shows «Continuar» (right after creating it).
   static String reportPreview(String id, {bool justCreated = false}) =>
       '/report/$id/preview${justCreated ? '?nuevo=1' : ''}';
+
+  /// Confirmation after sending or generating the request (screen 11).
+  static String reportDone(String id) => '/report/$id/done';
   static const info = '/info';
   static const profile = '/profile';
   static const editProfile = '/profile/edit';
@@ -125,6 +129,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/reports/:id',
         builder: (context, state) =>
             ReportDetailScreen(reportId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/report/:id/done',
+        builder: (context, state) => DoneScreen(reportId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/report/:id/preview',

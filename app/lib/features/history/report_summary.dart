@@ -5,6 +5,7 @@ class ReportSummary {
     required this.plate,
     required this.vehicleType,
     required this.status,
+    this.sentVia,
     required this.occurredAt,
     this.address,
     this.authorityName,
@@ -16,6 +17,7 @@ class ReportSummary {
   final String plate;
   final String vehicleType;
   final String status;
+  final String? sentVia;
   final DateTime occurredAt;
   final String? address;
   final String? authorityName;
@@ -29,6 +31,7 @@ class ReportSummary {
         plate: json['plate'] as String,
         vehicleType: json['vehicle_type'] as String,
         status: json['status'] as String,
+        sentVia: json['sent_via'] as String?,
         occurredAt: DateTime.parse(json['occurred_at'] as String).toLocal(),
         address: json['address'] as String?,
         authorityName: (json['authority'] as Map<String, dynamic>?)?['name'] as String?,

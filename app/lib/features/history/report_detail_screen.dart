@@ -74,14 +74,22 @@ class _DetailBody extends StatelessWidget {
         Row(
           children: [
             Expanded(child: Text(report.plate, style: textTheme.headlineSmall)),
-            StatusChip(status: report.status),
+            StatusChip(status: report.status, sentVia: report.sentVia),
           ],
         ),
         const SizedBox(height: AppSpacing.md),
+        // US-21: sending happens in the preview, where the full text is visible.
+        if (report.authority.canEmail && report.status == 'generado') ...[
+          PrimaryButton(
+            label: 'Enviar a la autoridad',
+            icon: Icons.send_outlined,
+            onPressed: () => context.push(Routes.reportPreview(report.id)),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+        ],
         // US-13: the request of this report.
-        PrimaryButton(
+        SecondaryButton(
           label: 'Ver solicitud',
-          icon: Icons.description_outlined,
           onPressed: () => context.push(Routes.reportPreview(report.id)),
         ),
         const SizedBox(height: AppSpacing.sm),

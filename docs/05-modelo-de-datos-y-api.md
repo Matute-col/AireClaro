@@ -176,7 +176,7 @@ se ofrece «Radicar en el portal oficial». No inventes direcciones; cualquier c
 | `GET /reports/:id/media/:mediaId` | Descargar un archivo de evidencia | — | archivo con su `Content-Type` · `404` si no es suyo, no existe o el id no es válido (misma respuesta en los tres casos) |
 | `GET /reports/:id/pqrsd` | Texto de la solicitud | — | `200 {authority, text}` |
 | `GET /reports/:id/pqrsd.pdf` | PDF de la solicitud | — | `200 application/pdf` |
-| `POST /reports/:id/send` | Enviar la solicitud por correo a la autoridad | `{confirm:true}` | `200 {report, delivery:{mode, sent_at}}` · `409` ya enviado · `422` autoridad sin correo verificado · `502` fallo del servidor de correo |
+| `POST /reports/:id/send` | Enviar la solicitud por correo a la autoridad | `{confirm:true}` | `200 {report, delivery:{mode, sent_at, evidence_attached}}` · `400` sin `confirm:true` · `404` no es suyo · `409` ya enviado (`ALREADY_SENT`) o envío en curso (`SEND_IN_PROGRESS`, doble toque) · `422` autoridad sin correo verificado (en cualquier modo) · `502` fallo del servidor de correo (no cambia nada) · `503` `MAIL_MODE=off` (`MAIL_DISABLED`) o SMTP sin configurar (`MAIL_NOT_CONFIGURED`) |
 | `GET /map/reports` | Reportes para el mapa | `vehicle_type?, from?, to?` | `200 [{id, lat, lng, vehicle_type, occurred_at}]` |
 
 Ejemplo de respuesta de `POST /reports` (resumen):
