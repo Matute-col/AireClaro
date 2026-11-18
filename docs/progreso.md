@@ -11,7 +11,7 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | Sprint 0 · Entorno | Pendiente | |
 | Sprint 1 · Backend base y autenticación | Hecho | Rama `sprint-1`. Probado en el celular el 16-nov-2026. Pendiente con aprobación de Mateo: push, merge a `main` y tag `v0.1-sprint1` |
 | Sprint 2 · Flujo de reporte | Hecho | Rama `sprint-2`, cerrado el 16-nov-2026: pruebas (a)–(d) aprobadas en el celular; merge a `main` y tag `v0.2-sprint2`. Revisión y retrospectiva en `docs/sprints/sprint-2.md` |
-| Sprint 3 · PDF, mapa, pruebas | En curso | Rama `sprint-3`. Pruebas CP y video desde el jueves 19-nov; entrega el domingo 22-nov |
+| Sprint 3 · PDF, mapa, pruebas | Hecho | Rama `sprint-3`, cerrado el 18-nov-2026: pruebas (e)–(h) aprobadas en el celular, correo real en modo de prueba verificado; merge a `main` y tag `v0.3-sprint3`. Revisión y retrospectiva en `docs/sprints/sprint-3.md`. Siguen las pruebas CP-01…CP-30 y el video desde el jueves 19-nov |
 | Validación TRL 5 y video | Pendiente | |
 
 ## Historias
@@ -34,10 +34,10 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | US-12 | Hecha | a7c2bef, a378120 | API: `GET /reports/:id/pqrsd` (texto, autoridad, placa, estado, modo de correo) y `.pdf` con `pdfkit` según `docs/05` y la Ley 1755 art. 16 (sección ANEXOS, encabezado solo con fecha, primera foto ≈ 6 cm). Solo el dueño (404). Pruebas leen el PDF real: tildes, eñ y signos. ANEXOS con etiqueta según el canal. Prueba (e) aprobada el 17-nov-2026 |
 | US-13 | Hecha | 3c2e941 | App: vista previa tras crear el reporte, «Descargar PDF» (abre el visor), «Compartir» (menú del teléfono), «Continuar» al detalle; en el detalle «Ver solicitud», PDF y «Abrir video» (CP-07). Prueba (e) aprobada el 17-nov-2026 |
 | US-14 | Hecha | 3d740e3, e875144 | Pantalla de confirmación («Solicitud enviada a…» / «Reporte generado» / «Reporte marcado como enviado») con «¿Cómo hacer seguimiento?»; «Marcar como enviado» con confirmación (`PATCH /reports/:id/status`, `sent_via=manual`). Prueba (g) parte 1 aprobada el 17-nov-2026 |
-| US-15 | Hecha (falta prueba en celular) | 31f5947 | API: `GET /map/reports` con solo id, coordenadas, tipo y fecha (RB-07), filtros por tipos y días de Colombia, máx. 500. App: pestaña Mapa con pines, chips de tipo y de periodo («Todo», «Hoy», «7 días», «30 días»), tarjeta del pin con tipo y fecha. Prueba (h) pendiente |
-| US-16 | Hecha (falta prueba en celular) | ef6ee1d | Pestaña Info «¿Cómo funciona?»: 4 pasos, autoridades desde el API con cómo reciben la solicitud, regla de sugerencia, aviso de alcance y política de datos |
-| US-17 | Hecha (falta prueba en celular) | 0ef60d0 | Revisión de estados pantalla por pantalla (tabla en `docs/08`); pruebas de mensajes para 429, 500 y tiempos de espera |
-| US-18 | Hecha (falta prueba en celular) | f31f727 | Mateo pidió hacerla el 17-nov-2026. API: `DELETE /reports/:id` solo para el dueño (404 para otros o inexistente; 409 si se está enviando un correo), borra evidencia y fotogramas en la base y la carpeta en disco; prueba de que no quedan archivos huérfanos. App: «Eliminar reporte» con confirmación en el detalle (aviso si ya se envió). CP-17 |
+| US-15 | Hecha | 31f5947 | API: `GET /map/reports` con solo id, coordenadas, tipo y fecha (RB-07), filtros por tipos y días de Colombia, máx. 500. App: pestaña Mapa con pines, chips de tipo y de periodo («Todo», «Hoy», «7 días», «30 días»), tarjeta del pin con tipo y fecha. Prueba (h) aprobada el 17-nov-2026 |
+| US-16 | Hecha | ef6ee1d | Pestaña Info «¿Cómo funciona?»: 4 pasos, autoridades desde el API con cómo reciben la solicitud, regla de sugerencia, aviso de alcance y política de datos |
+| US-17 | Hecha | 0ef60d0 | Revisión de estados pantalla por pantalla (tabla en `docs/08`); pruebas de mensajes para 429, 500 y tiempos de espera |
+| US-18 | Hecha (sin prueba manual; cubierta por pruebas automáticas) | f31f727 | Mateo pidió hacerla el 17-nov-2026. API: `DELETE /reports/:id` solo para el dueño (404 para otros o inexistente; 409 si se está enviando un correo), borra evidencia y fotogramas en la base y la carpeta en disco; prueba de que no quedan archivos huérfanos. App: «Eliminar reporte» con confirmación en el detalle (aviso si ya se envió). CP-17 |
 | US-19 | Hecha | ae942a1 | `docs/evidencias/`: tabla CP-01 a CP-30 lista para llenar (con las pruebas automáticas de cada caso) y salidas de `npm test` (184/184), `flutter test` (131/131) y `flutter analyze` (sin problemas) |
 | US-20 | Hecha | ff88465 | `README.md` en español: estructura, requisitos, API, app por USB, APK `--profile` con la IP del PC (compilado y verificado, 78,6 MB), correo y seguridad |
 | US-21 | Hecha | 3d740e3 | `POST /reports/:id/send`: PDF del correo con «Archivo adjunto al correo» solo si la evidencia viaja (≤ 15 MB), fotogramas dentro del PDF, `MAIL_MODE=test` → `MAIL_TEST_TO` con `[PRUEBA]`, ciudadano en Cc y Reply-To; 400/404/409/422/502/503. Pruebas con transporte simulado. App: botón y diálogo en la vista previa, aviso de modo de prueba. Prueba (g) completa aprobada el 17-nov-2026: parte 1 (diálogo, 503 sin SMTP, SDM sin botón) y parte 2 con SMTP real de Gmail en modo de prueba (CP-23 adjuntos correctos, CP-25 reenvío bloqueado, CP-26 fallo del SMTP) |
@@ -104,6 +104,20 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 
 - 17-nov-2026 · Filtro de fechas del mapa con periodos («Hoy», «7 días», «30 días») en lugar de un calendario · más cómodo en el celular y sin paquetes de localización.
 - 17-nov-2026 · Tiempo límite de Jest en 20 s · las pruebas que leen el PDF en otro proceso contra la base remota podían pasar de 5 s (falla intermitente vista una vez).
+
+## Sprint 3 · Revisión y retrospectiva (resumen; detalle en `docs/sprints/sprint-3.md`)
+- **Qué se hizo:** US-12…US-23 (PDF con la Ley 1755 art. 16, vista previa y compartir, envío por correo con
+  `MAIL_MODE=test`, portal oficial y «Marcar como enviado», mapa con filtros, «¿Cómo funciona?», revisión de
+  estados, eliminar, README y APK, evidencias) y US-23 (fotogramas del video, agregada por Mateo). 192 pruebas del
+  API y 135 de la app; pruebas (e)–(h) aprobadas en el celular y correo real verificado en modo de prueba.
+- **Qué salió bien:** las pruebas automáticas encontraron errores reales antes del celular (doble envío de
+  correo, desborde de la tarjeta de video, orden aleatorio de los anexos); transporte de correo simulado y host
+  `.invalid` en las pruebas; migración probada (subir, bajar, subir) en la rama `test` antes de la principal.
+- **Qué mejorar:** credencial de la rama `test` vencida a mitad del sprint; fechas escritas con un día de más y
+  corregidas; varios comandos largos de Bash fallaron por las comillas; finales de línea mezclados (falta
+  `.gitattributes`).
+- **Lo que sigue:** ejecutar CP-01…CP-30 con evidencia en `docs/evidencias/`, grabar el video y la entrega del
+  domingo 22-nov (tag `v1.0-trl5`).
 
 ## Problemas abiertos
 - Migración `1794970815342_add-video-frames` en la base principal · resuelto el 17-nov-2026 con autorización de Mateo: antes estaban aplicadas las 3 migraciones previas; después, `report_media` quedó idéntica a la rama `test` (columnas, CHECK e índices) y los 4 reportes existentes cargan detalle, texto y PDF.
