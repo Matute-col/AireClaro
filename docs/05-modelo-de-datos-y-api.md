@@ -58,6 +58,8 @@ erDiagram
     text file_path
     text mime_type
     int size_bytes
+    uuid source_media_id FK "solo fotogramas (US-23)"
+    smallint position "1..4, solo fotogramas"
   }
 ```
 
@@ -125,6 +127,12 @@ CREATE TABLE report_media (
 CREATE INDEX idx_media_report ON report_media (report_id);
 ```
 
+**Fotogramas del video (US-23, migración `1794970815342_add-video-frames`, 17-nov-2026):** `report_media.kind`
+admite `'frame'` (fotograma), con dos columnas nuevas que admiten nulos: `source_media_id` (el video de origen,
+`ON DELETE CASCADE`) y `position` (1 a 4). Un `CHECK` exige ambas en los fotogramas y ninguna en fotos y videos,
+y un índice único impide dos fotogramas en la misma posición del mismo video. Migración aditiva: el `CHECK` de
+`kind` se amplía y las filas existentes siguen siendo válidas.
+
 **Datos iniciales (`authorities`):**
 
 | code | name | email | portal_url | email_verified |
@@ -160,15 +168,16 @@ se ofrece «Radicar en el portal oficial». No inventes direcciones; cualquier c
 | `GET /authorities` | Lista de autoridades | — | `200 [{id, code, name, portal_url, can_email}]` (`can_email` = tiene correo verificado; el correo no se expone) |
 | `GET /geo/reverse` | Dirección desde coordenadas | `lat, lng` | `200 {address, municipality, state, suggested_authority_id}` |
 | `POST /reports` | Crear reporte | `multipart/form-data`: `vehicle_type, plate, smoke_color, description?, lat, lng, address?, occurred_at, authority_id?, requester_name, requester_doc_type, requester_doc_number, requester_email, requester_phone?` + `files[]` (1–3) | `201 {report}` con `status: generado`, `authority` y `media[]` · `400` validación, tipo de archivo (`INVALID_FILE_TYPE`), más de 3 archivos (`TOO_MANY_FILES`) o sin autoridad (`AUTHORITY_REQUIRED`) · `413` archivo grande. Reporte y archivos en una sola transacción; el dueño sale del token |
+| `POST /reports` (US-23) | Fotogramas del video | además de `files[]`: `frames_v<N>` = hasta 4 JPEG (≤ 300 KB) del video en la posición N de `files`, en orden (posición 1..4); no cuentan para los 3 archivos | `400 TOO_MANY_FRAMES / INVALID_FRAME_TYPE / INVALID_FRAME_SOURCE` · `413 FRAME_TOO_LARGE`; `GET /reports/:id` los devuelve dentro de su video (`media[].frames`) y `media_count` no los cuenta |
 | `GET /reports` | Mis reportes | `page=1, limit=20 (máx. 50), status?` | `200 {items, page, total}`, más reciente primero; cada item: `id, plate, vehicle_type, smoke_color, status, address, occurred_at, created_at, authority{code,name}, thumbnail_media_id` (una foto; `null` si solo hay videos), `media_count` |
 | `GET /reports/:id` | Detalle | — | `200 {report, media[], authority}` (`authority` con `can_email`, sin el correo; `media` sin rutas de archivo) · `404` si no es suyo, no existe o el id no es válido (misma respuesta) |
-| `DELETE /reports/:id` | Eliminar | — | `204` |
-| `PATCH /reports/:id/status` | Marcar como enviado a mano (portal, compartir) | `{status:"enviado"}` | `200 {report}` con `sent_via=manual` |
+| `DELETE /reports/:id` | Eliminar (US-18) | — | `204`: borra el reporte, su evidencia y sus fotogramas (base y disco, sin archivos huérfanos) · `404` si no es suyo, no existe o el id no es válido · `409` si un correo de ese reporte se está enviando |
+| `PATCH /reports/:id/status` | Marcar como enviado a mano (portal, compartir) | `{status:"enviado"}` | `200 {report}` con `sent_via=manual` · `400` otro valor · `404` no es suyo · `409` ya enviado (por correo o a mano) o envío por correo en curso |
 | `GET /reports/:id/media/:mediaId` | Descargar un archivo de evidencia | — | archivo con su `Content-Type` · `404` si no es suyo, no existe o el id no es válido (misma respuesta en los tres casos) |
 | `GET /reports/:id/pqrsd` | Texto de la solicitud | — | `200 {authority, text}` |
 | `GET /reports/:id/pqrsd.pdf` | PDF de la solicitud | — | `200 application/pdf` |
-| `POST /reports/:id/send` | Enviar la solicitud por correo a la autoridad | `{confirm:true}` | `200 {report, delivery:{mode, sent_at}}` · `409` ya enviado · `422` autoridad sin correo verificado · `502` fallo del servidor de correo |
-| `GET /map/reports` | Reportes para el mapa | `vehicle_type?, from?, to?` | `200 [{id, lat, lng, vehicle_type, occurred_at}]` |
+| `POST /reports/:id/send` | Enviar la solicitud por correo a la autoridad | `{confirm:true}` | `200 {report, delivery:{mode, sent_at, evidence_attached}}` · `400` sin `confirm:true` · `404` no es suyo · `409` ya enviado (`ALREADY_SENT`) o envío en curso (`SEND_IN_PROGRESS`, doble toque) · `422` autoridad sin correo verificado (en cualquier modo) · `502` fallo del servidor de correo (no cambia nada) · `503` `MAIL_MODE=off` (`MAIL_DISABLED`) o SMTP sin configurar (`MAIL_NOT_CONFIGURED`) |
+| `GET /map/reports` | Reportes para el mapa (de todos los usuarios, con sesión) | `vehicle_type?` (uno o varios separados por coma), `from?`, `to?` (`AAAA-MM-DD`, días de Colombia; `to` incluye el día completo) | `200 [{id, lat, lng, vehicle_type, occurred_at}]` (solo esos campos, RB-07), más reciente primero, máx. 500 · `400` filtros inválidos |
 
 Ejemplo de respuesta de `POST /reports` (resumen):
 ```json
@@ -206,10 +215,14 @@ Ejemplo de respuesta de `POST /reports` (resumen):
 ## Plantilla de la solicitud (texto y PDF)
 
 Tamaño carta, fuente legible (Helvetica de `pdfkit`), márgenes de 2,5 cm. La primera foto del reporte se
-incrusta reducida (≈ 6 cm de ancho) si existe; si solo hay video, se lista el nombre del archivo.
+incrusta reducida (≈ 6 cm de ancho) si existe (JPG o PNG); si solo hay video, se lista en los anexos.
+**Ley 1755 de 2015, art. 16 (contenido mínimo):** autoridad (encabezado) · nombres, documento y dirección
+electrónica de notificación (firma y NOTIFICACIONES) · objeto (asunto y PETICIÓN) · razones (HECHOS) · relación
+de documentos (ANEXOS) · firma (nombre y documento). Encabezado solo con la fecha, sin ciudad (17-nov-2026,
+aprobado por Mateo: el reporte no guarda el municipio y el art. 16 no la exige).
 
 ```
-{ciudad}, {fecha de generación en español}
+{fecha de generación en español}
 
 Señores
 {nombre de la autoridad}
@@ -237,6 +250,12 @@ Solicito respetuosamente a la entidad:
 2. Adelantar, si hay lugar a ello, las actuaciones administrativas correspondientes.
 3. Informarme sobre el trámite dado a esta solicitud. Si no es la entidad competente, remitirla a la
    autoridad que corresponda e informarme de ello.
+
+ANEXOS
+1. {Fotografía|Video} ({formato}, {tamaño}) – {disponibilidad}   ← una línea por archivo, fotos y luego videos
+   {disponibilidad}: PDF descargado, compartido o subido al portal → «Disponible a solicitud del peticionario»;
+   PDF que viaja en el correo (US-21) → «Archivo adjunto al correo» si la evidencia total es ≤ 15 MB, si no
+   «Disponible a solicitud del peticionario» (regla de Mateo, 17-nov-2026: nunca afirmar un adjunto que no existe).
 
 NOTIFICACIONES
 Recibiré notificaciones en el correo {correo}{ y en el teléfono {teléfono}}.
@@ -270,7 +289,8 @@ Tono: factual, sin acusar ni calificar. No afirmar que el vehículo «incumple»
 
   {nombre completo} · {tipo y número de documento}
   ```
-- **Adjuntos:** el PDF; la evidencia solo si el total ≤ 15 MB.
+- **Adjuntos:** el PDF; la evidencia solo si el total ≤ 15 MB. Los fotogramas del video (US-23) no se adjuntan
+  por separado: viajan dentro del PDF.
 - **Después de enviar:** `status = enviado`, `sent_via = email`, `sent_at = now()`, `send_mode = test|live`.
   Si el SMTP falla, no se cambia nada y se responde `502`. No se guardan cuerpos de correos en los logs.
 

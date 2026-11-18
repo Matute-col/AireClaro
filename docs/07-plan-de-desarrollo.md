@@ -54,6 +54,7 @@ Evidencia: capturas en `docs/evidencias/sprint0/`.
 | US-20 | README, APK y evidencias | RNF-07 | Media | 3 |
 | US-21 | Enviar la solicitud por correo a la autoridad (modo prueba/live, confirmación, adjuntos) | RF-17, RF-08 | Alta | 3 |
 | US-22 | Botón «Radicar en el portal oficial» | RF-18 | Media | 3 |
+| US-23 | Fotogramas del video (4 por video, en la evidencia y en el PDF) — **agregada por Mateo el 17-nov-2026** | RF-19 | Media | 3 |
 
 Criterios de aceptación: los de `docs/02` (RF) y los pasos de `docs/03` (UC).
 

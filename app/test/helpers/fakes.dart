@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:aireclaro/core/api_error.dart';
 import 'package:aireclaro/core/token_storage.dart';
 import 'package:aireclaro/features/auth/auth_repository.dart';
 import 'package:aireclaro/features/auth/user.dart';
 import 'package:aireclaro/features/history/report_summary.dart';
+import 'package:aireclaro/features/report/frame_extractor.dart';
 import 'package:aireclaro/features/report/reports_repository.dart';
+import 'package:aireclaro/shared/services/file_actions.dart';
+import 'package:aireclaro/shared/services/url_opener.dart';
 
 const testUser = User(
   id: '1',
@@ -101,4 +106,53 @@ class FakeReportsListRepository implements ReportsRepository {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Records what would be opened or shared instead of calling the phone.
+class FakeFileActions implements FileActions {
+  final opened = <String>[];
+  final shared = <(String, String, String?)>[];
+  String? openProblem;
+
+  @override
+  Future<String> tempPath(String fileName) async => '/tmp/$fileName';
+
+  @override
+  Future<String?> open(String path) async {
+    opened.add(path);
+    return openProblem;
+  }
+
+  @override
+  Future<void> share(String path, {required String mimeType, String? subject}) async {
+    shared.add((path, mimeType, subject));
+  }
+}
+
+/// US-23 · Frame extractor without native plugins. [gate] keeps the extraction
+/// «in progress» until it is completed; [fail] makes it throw.
+class FakeFrameExtractor implements FrameExtractor {
+  bool fail = false;
+  Completer<void>? gate;
+  final calls = <String>[];
+
+  @override
+  Future<List<String>> extract(String videoPath) async {
+    calls.add(videoPath);
+    if (gate != null) await gate!.future;
+    if (fail) throw const FrameExtractionException('prueba');
+    return [for (var i = 1; i <= 4; i++) '$videoPath-fotograma-$i.jpg'];
+  }
+}
+
+/// US-22 · Records the pages that would be opened in the browser.
+class FakeUrlOpener implements UrlOpener {
+  final opened = <String>[];
+  bool works = true;
+
+  @override
+  Future<bool> open(String url) async {
+    opened.add(url);
+    return works;
+  }
 }

@@ -4,6 +4,7 @@ import 'package:aireclaro/features/history/report_detail_screen.dart';
 import 'package:aireclaro/features/report/authorities_repository.dart';
 import 'package:aireclaro/features/report/report_draft.dart';
 import 'package:aireclaro/features/report/reports_repository.dart';
+import 'package:aireclaro/shared/services/file_actions.dart';
 import 'package:aireclaro/shared/widgets/auth_image.dart';
 import 'package:aireclaro/shared/widgets/osm_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,9 +29,15 @@ ReportDetail sampleDetail() => ReportDetail(
       requesterDocType: 'CC',
       requesterDocNumber: '0000000',
       requesterEmail: 'ana@ejemplo.test',
-      media: const [
-        ReportMedia(id: 'm1', kind: EvidenceKind.photo, sizeBytes: 300000),
-        ReportMedia(id: 'm2', kind: EvidenceKind.video, sizeBytes: 3355443),
+      media: [
+        const ReportMedia(id: 'm1', kind: EvidenceKind.photo, sizeBytes: 300000),
+        ReportMedia(
+          id: 'm2',
+          kind: EvidenceKind.video,
+          sizeBytes: 3355443,
+          mimeType: 'video/mp4',
+          frames: [for (var p = 1; p <= 4; p++) ReportFrame(id: 'f$p', position: p)],
+        ),
       ],
       authority: const Authority(
         id: 2,
@@ -44,10 +51,19 @@ class FakeDetailRepository extends FakeReportsListRepository {
   ReportDetail? detail;
   ApiException? detailError;
 
+  final mediaDownloads = <String>[];
+
   @override
   Future<ReportDetail> getById(String id) async {
     if (detailError != null) throw detailError!;
     return detail!;
+  }
+
+  @override
+  Future<String> downloadMedia(String reportId, String mediaId, String extension) async {
+    final path = '/tmp/evidencia-$mediaId.$extension';
+    mediaDownloads.add(path);
+    return path;
   }
 }
 
@@ -55,6 +71,7 @@ void main() {
   setUpAll(() => initializeDateFormatting('es_CO'));
 
   late FakeDetailRepository repository;
+  late FakeFileActions files;
 
   Future<void> pumpDetail(WidgetTester tester) async {
     tester.view.physicalSize = const Size(1080, 3000);
@@ -65,6 +82,7 @@ void main() {
       reportsRepositoryProvider.overrideWithValue(repository),
       authTokenProvider.overrideWith((ref) async => null),
       mapTilesEnabledProvider.overrideWithValue(false),
+      fileActionsProvider.overrideWithValue(files),
     ]);
     addTearDown(container.dispose);
     await tester.pumpWidget(UncontrolledProviderScope(
@@ -74,7 +92,10 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  setUp(() => repository = FakeDetailRepository());
+  setUp(() {
+    repository = FakeDetailRepository();
+    files = FakeFileActions();
+  });
 
   testWidgets('shows evidence, data, map, authority and status', (tester) async {
     repository.detail = sampleDetail();
@@ -101,6 +122,27 @@ void main() {
     expect(find.text('2 de 2 · desliza para ver más'), findsOneWidget);
   });
 
+  testWidgets('offers the request: «Ver solicitud», «Descargar PDF» and «Compartir»', (tester) async {
+    repository.detail = sampleDetail();
+    await pumpDetail(tester);
+
+    expect(find.text('Ver solicitud'), findsOneWidget);
+    expect(find.text('Descargar PDF'), findsOneWidget);
+    expect(find.text('Compartir'), findsOneWidget);
+  });
+
+  testWidgets('«Abrir video» downloads the video and opens it in the phone (CP-07)', (tester) async {
+    repository.detail = sampleDetail();
+    await pumpDetail(tester);
+    await tester.fling(find.byType(PageView), const Offset(-800, 0), 1500);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Abrir video'));
+    await tester.pumpAndSettle();
+
+    expect(repository.mediaDownloads, ['/tmp/evidencia-m2.mp4']);
+    expect(files.opened, ['/tmp/evidencia-m2.mp4']);
+  });
+
   testWidgets('404 (not found or not yours): clear message, no retry', (tester) async {
     repository.detailError = const ApiException(
       code: 'NOT_FOUND',
@@ -124,5 +166,18 @@ void main() {
     await tester.tap(find.text('Reintentar'));
     await tester.pumpAndSettle();
     expect(find.text('XYZ789'), findsOneWidget);
+  });
+
+  testWidgets('US-23: the frames appear under the video card, in a row of 4', (tester) async {
+    repository.detail = sampleDetail();
+    await pumpDetail(tester);
+    expect(find.textContaining('Fotogramas del video'), findsNothing); // photo page
+
+    await tester.fling(find.byType(PageView), const Offset(-800, 0), 1500);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Fotogramas del video (4)'), findsOneWidget);
+    for (var p = 1; p <= 4; p++) {
+      expect(find.byKey(ValueKey('f$p')), findsOneWidget);
+    }
   });
 }

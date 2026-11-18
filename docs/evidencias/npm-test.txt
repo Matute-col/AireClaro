@@ -1,0 +1,219 @@
+# cd backend; npm test — 2026-11-17 23:55
+
+PASS tests/C:\proyectos\AireClaro\backend\tests\authorityRule.test.js
+  ✓ authority rule (RF-07) › Soacha → CAR
+  ✓ authority rule (RF-07) › Bogotá → SDA (with or without accent)
+  ✓ authority rule (RF-07) › a neighbourhood named «UPZs de Bogotá» does not count, only the city does
+  ✓ authority rule (RF-07) › Soacha only in «subregion» is still CAR
+  ✓ authority rule (RF-07) › another Cundinamarca municipality → CAR
+  ✓ authority rule (RF-07) › a street called «Bogotá» in Soacha is not taken as Bogotá
+  ✓ authority rule (RF-07) › outside the corridor → no suggestion
+  ✓ authority rule (RF-07) › ambiguous (Bogotá and Cundinamarca at the same time) → no suggestion
+PASS tests/C:\proyectos\AireClaro\backend\tests\delete.test.js
+  ✓ DELETE /api/reports/:id (US-18, test database) › 204: the owner deletes the report, its evidence and its frames (database and disk)
+  ✓ DELETE /api/reports/:id (US-18, test database) › it disappears from the detail, the evidence, the list and the map (CP-17)
+  ✓ DELETE /api/reports/:id (US-18, test database) › no orphan files: what stays on disk is exactly what the database still points to
+  ✓ DELETE /api/reports/:id (US-18, test database) › 404 (RB-01): another user cannot delete it, and nothing is touched
+  ✓ DELETE /api/reports/:id (US-18, test database) › 404 for a report that does not exist, or was already deleted
+  ✓ DELETE /api/reports/:id (US-18, test database) › 404 for a malformed id and 401 without a token
+  ✓ DELETE /api/reports/:id (US-18, test database) › a report already sent can be deleted from AireClaro
+  ✓ DELETE /api/reports/:id (US-18, test database) › 409 while an email of that report is being sent (its files are being attached)
+PASS tests/C:\proyectos\AireClaro\backend\tests\errorHandler.test.js
+  ✓ errorHandler with unexpected errors › responds 500 without exposing the internal message
+  ✓ errorHandler with unexpected errors › by default logs only method, path and error code (no personal data)
+  ✓ errorHandler with unexpected errors › logs the full message only when LOG_ERROR_DETAILS=true
+PASS tests/C:\proyectos\AireClaro\backend\tests\fileType.test.js
+  ✓ detectFileType (by content, not by name) › accepts jpeg
+  ✓ detectFileType (by content, not by name) › accepts png
+  ✓ detectFileType (by content, not by name) › accepts webp
+  ✓ detectFileType (by content, not by name) › accepts mp4
+  ✓ detectFileType (by content, not by name) › accepts mov
+  ✓ detectFileType (by content, not by name) › rejects HEIC even though it looks like MP4
+  ✓ detectFileType (by content, not by name) › rejects text and too-short files
+PASS tests/C:\proyectos\AireClaro\backend\tests\frames.test.js
+  ✓ US-23 · video frames (test database) › creation and order › stores 4 frames linked to the video, positions 1..4 in the order sent
+  ✓ US-23 · video frames (test database) › creation and order › frames do not count as evidence: the list still says 2 files
+  ✓ US-23 · video frames (test database) › creation and order › the detail shows the frames inside their video, in order
+  ✓ US-23 · video frames (test database) › creation and order › a frame is served only to the owner (404 for another user)
+  ✓ US-23 · video frames (test database) › creation and order › PDF lists «Fotogramas del video 1 (4)», says they were extracted and draws them
+  ✓ US-23 · video frames (test database) › 3 evidence files + 4 frames are accepted (frames do not count toward the 3)
+  ✓ US-23 · video frames (test database) › a video without frames (extraction failed on the phone) is still accepted
+  ✓ US-23 · video frames (test database) › more than 4 frames for a video → 400 TOO_MANY_FRAMES, nothing stored
+  ✓ US-23 · video frames (test database) › a frame that is not a real JPEG → 400 (PNG or a renamed text)
+  ✓ US-23 · video frames (test database) › a frame of more than 300 KB → 413 FRAME_TOO_LARGE
+  ✓ US-23 · video frames (test database) › frames must belong to a video of the report
+  ✓ US-23 · video frames (test database) › the database refuses a frame without its video or with a position outside 1..4
+PASS tests/C:\proyectos\AireClaro\backend\tests\geo.test.js
+  ✓ GET /api/geo/reverse (no database needed) › 401 without a token
+  ✓ GET /api/geo/reverse (no database needed) › 400 with invalid coordinates
+  ✓ GET /api/geo/reverse (no database needed) › 502 with a clear message when Nominatim fails
+  ✓ GET /api/geo/reverse (no database needed) › point without address → all null, no suggestion
+  ✓ GET /api/geo/reverse and /api/authorities (test database) › Soacha → CAR suggested, with a short address
+  ✓ GET /api/geo/reverse and /api/authorities (test database) › Bogotá → SDA suggested
+  ✓ GET /api/geo/reverse and /api/authorities (test database) › GET /api/authorities lists the 3 authorities without exposing emails
+  ✓ GET /api/geo/reverse and /api/authorities (test database) › GET /api/authorities requires a token
+PASS tests/C:\proyectos\AireClaro\backend\tests\health.test.js
+  ✓ GET /api/health › responds 200 with status ok
+  ✓ GET /api/health › sets security headers (helmet)
+  ✓ GET /api/health › sends rate limit headers
+  ✓ error format › returns 404 with the standard error body
+  ✓ error format › returns 400 for malformed JSON
+PASS tests/C:\proyectos\AireClaro\backend\tests\login.test.js
+  ✓ POST /api/auth/login validation (no database) › returns 400 when fields are missing
+  ✓ POST /api/auth/login (database) › logs in with valid credentials (email trimmed, any case)
+  ✓ POST /api/auth/login (database) › wrong password and unknown email give the same generic error
+PASS tests/C:\proyectos\AireClaro\backend\tests\map.test.js
+  ✓ GET /api/map/reports (US-15, test database) › shows the reports of every user, newest first
+  ✓ GET /api/map/reports (US-15, test database) › PRIVACY (RB-07, CP-18): only id, lat, lng, vehicle_type and occurred_at
+  ✓ GET /api/map/reports (US-15, test database) › filters by one or more vehicle types
+  ✓ GET /api/map/reports (US-15, test database) › filters by dates in Colombia time (the whole «to» day is included)
+  ✓ GET /api/map/reports (US-15, test database) › combines type and dates
+  ✓ GET /api/map/reports (US-15, test database) › 400 with invalid filters
+  ✓ GET /api/map/reports (US-15, test database) › 401 without a token
+  ✓ GET /api/map/reports (US-15, test database) › never more than 500 pins
+PASS tests/C:\proyectos\AireClaro\backend\tests\me.test.js
+  ✓ GET /api/me token checks (CP-20) › 401 without a token
+  ✓ GET /api/me token checks (CP-20) › 401 with an expired token and a "session expired" message
+  ✓ GET /api/me token checks (CP-20) › 401 with a token signed with another secret
+  ✓ GET /api/me token checks (CP-20) › 401 with an unsigned token (alg "none")
+  ✓ GET /api/me token checks (CP-20) › 401 with a malformed header
+  ✓ update profile schema › drops the email field (email cannot be edited)
+  ✓ GET and PUT /api/me (database) › GET returns the profile without password_hash
+  ✓ GET and PUT /api/me (database) › PUT updates name, document and phone, trims them, and ignores email
+  ✓ GET and PUT /api/me (database) › PUT applies the same rules as registration (400 in Spanish)
+  ✓ GET and PUT /api/me (database) › 401 when the token belongs to a user that no longer exists
+PASS tests/C:\proyectos\AireClaro\backend\tests\nominatim.test.js
+  ✓ Nominatim client › sends the identifiable User-Agent and the documented parameters
+  ✓ Nominatim client › caches by coordinates rounded to 4 decimals (no second request)
+  ✓ Nominatim client › cache entries expire after 24 h
+  ✓ Nominatim client › never sends more than 1 request per second
+  ✓ Nominatim client › the same point asked twice at once makes a single request
+  ✓ Nominatim client › returns null when Nominatim cannot geocode the point
+  ✓ Nominatim client › a failed request rejects but does not block the queue
+PASS tests/C:\proyectos\AireClaro\backend\tests\pool.test.js
+  ✓ pool idle-client error log › by default logs only the error code
+  ✓ pool idle-client error log › logs the full message only when LOG_ERROR_DETAILS=true
+PASS tests/C:\proyectos\AireClaro\backend\tests\pqrsd.test.js
+  ✓ GET /api/reports/:id/pqrsd and .pdf (US-12, test database) › text for the preview, with the authority and the mail mode
+  ✓ GET /api/reports/:id/pqrsd and .pdf (US-12, test database) › PDF: valid file, inline, with a server-generated name
+  ✓ GET /api/reports/:id/pqrsd and .pdf (US-12, test database) › PDF keeps tildes, ñ, ü and Spanish signs (read back from the file)
+  ✓ GET /api/reports/:id/pqrsd and .pdf (US-12, test database) › PDF contains the art. 16 sections and the scope note
+  ✓ GET /api/reports/:id/pqrsd and .pdf (US-12, test database) › the first photo is embedded in the PDF
+  ✓ GET /api/reports/:id/pqrsd and .pdf (US-12, test database) › a report with only a video also gets its PDF (no image)
+  ✓ GET /api/reports/:id/pqrsd and .pdf (US-12, test database) › PROPERTY (RB-01): another user gets 404 for the text and the PDF
+  ✓ GET /api/reports/:id/pqrsd and .pdf (US-12, test database) › requires a token
+PASS tests/C:\proyectos\AireClaro\backend\tests\pqrsd.text.test.js
+  ✓ request text (US-12, Ley 1755 art. 16) › 1 · authority: addressed to the authority
+  ✓ request text (US-12, Ley 1755 art. 16) › 2 · requester: full name, document and electronic address for notifications
+  ✓ request text (US-12, Ley 1755 art. 16) › 3 · object of the request (subject and PETICIÓN)
+  ✓ request text (US-12, Ley 1755 art. 16) › 4 · reasons (HECHOS) with the real report data, in Colombia time
+  ✓ request text (US-12, Ley 1755 art. 16) › 5 · list of documents (ANEXOS), one line per file
+  ✓ request text (US-12, Ley 1755 art. 16) › 6 · signature: closing, name and document
+  ✓ request text (US-12, Ley 1755 art. 16) › header has only the generation date (no city)
+  ✓ request text (US-12, Ley 1755 art. 16) › scope note and short report number
+  ✓ request text (US-12, Ley 1755 art. 16) › factual tone: never says that the vehicle «incumple»
+  ✓ request text (US-12, Ley 1755 art. 16) › without description, phone or address the text stays correct
+  ✓ request text (US-12, Ley 1755 art. 16) › times use normal spaces (the PDF font has no narrow no-break space)
+  ✓ ANEXOS order › photos first, then videos, whatever the stored order
+  ✓ ANEXOS label by delivery channel (Mateo, 17-nov-2026) › downloaded, shared or portal PDF: «Disponible a solicitud del peticionario»
+  ✓ ANEXOS label by delivery channel (Mateo, 17-nov-2026) › PDF sent by email with the evidence attached (≤ 15 MB): «Archivo adjunto al correo»
+  ✓ ANEXOS label by delivery channel (Mateo, 17-nov-2026) › PDF sent by email without the evidence (> 15 MB): never claims it is attached
+  ✓ ANEXOS label by delivery channel (Mateo, 17-nov-2026) › a download never says «adjunto al correo», even if evidenceAttached is passed
+  ✓ US-23 · video frames in ANEXOS › adds «Fotogramas del video 1 (4)» right after the video, inside this document
+  ✓ US-23 · video frames in ANEXOS › reports which video each group of frames belongs to (for the PDF grid)
+PASS tests/C:\proyectos\AireClaro\backend\tests\rateLimit.test.js
+  ✓ rate limiter › returns 429 with a Spanish message after the limit
+PASS tests/C:\proyectos\AireClaro\backend\tests\register.test.js
+  ✓ register schema › trims full_name, doc_number and email, and lowercases the email
+  ✓ register schema › rejects a name that is only spaces (trim before validating)
+  ✓ register schema › accepts a missing or empty phone and stores null
+  ✓ register schema › rejects passwords longer than 72 bytes
+  ✓ POST /api/auth/register validation (no database) › returns 400 with Spanish field errors
+  ✓ POST /api/auth/register validation (no database) › requires accepting the data policy (RF-11)
+  ✓ POST /api/auth/register validation (no database) › returns 400 when the body is missing
+  ✓ POST /api/auth/register (database) › creates the account, saves consent_at and opens the session (CP-01)
+  ✓ POST /api/auth/register (database) › rejects a duplicate email, ignoring case (CP-02)
+  ✓ POST /api/auth/register (database) › stores the password as a bcrypt hash
+PASS tests/C:\proyectos\AireClaro\backend\tests\reports.create.test.js
+  ✓ POST /api/reports without a token › 401 and nothing is stored
+  ✓ POST /api/reports (US-09, test database) › 201: creates the report «generado» with its files, in the report folder
+  ✓ POST /api/reports (US-09, test database) › ignores user_id and status sent in the body
+  ✓ POST /api/reports (US-09, test database) › without authority_id the server applies the rule (Soacha → CAR)
+  ✓ POST /api/reports (US-09, test database) › without authority_id and no suggestion → 400 «Elige la autoridad»
+  ✓ POST /api/reports (US-09, test database) › rejects an authority that does not exist
+  ✓ POST /api/reports (US-09, test database) › rejects a fake file type (text named .jpg)
+  ✓ POST /api/reports (US-09, test database) › rejects more than 3 files
+  ✓ POST /api/reports (US-09, test database) › rejects a photo of more than 8 MB with 413
+  ✓ POST /api/reports (US-09, test database) › requires at least one file
+  ✓ POST /api/reports (US-09, test database) › rejects an invalid plate and deletes the uploads
+  ✓ POST /api/reports (US-09, test database) › rejects a date in the future
+  ✓ POST /api/reports (US-09, test database) › rejects missing coordinates and requester data
+  ✓ POST /api/reports (US-09, test database) › if saving a file fails, nothing is stored (transaction rolled back)
+PASS tests/C:\proyectos\AireClaro\backend\tests\reports.detail.test.js
+  ✓ GET /api/reports/:id (US-11, test database) › the owner gets the report, its media and the authority
+  ✓ GET /api/reports/:id (US-11, test database) › never exposes the authority email or the stored file paths
+  ✓ GET /api/reports/:id (US-11, test database) › PROPERTY (RB-01): another user gets 404, the same answer as a report that does not exist
+  ✓ GET /api/reports/:id (US-11, test database) › another user cannot read the evidence either
+  ✓ GET /api/reports/:id (US-11, test database) › a malformed id gets 404
+  ✓ GET /api/reports/:id (US-11, test database) › requires a token
+PASS tests/C:\proyectos\AireClaro\backend\tests\reports.list.test.js
+  ✓ GET /api/reports without a token › 401
+  ✓ GET /api/reports and evidence files (US-10, test database) › lists only my reports, newest first, with total and page
+  ✓ GET /api/reports and evidence files (US-10, test database) › thumbnail is a photo; null when the report only has videos
+  ✓ GET /api/reports and evidence files (US-10, test database) › paginates with page and limit
+  ✓ GET /api/reports and evidence files (US-10, test database) › filters by status
+  ✓ GET /api/reports and evidence files (US-10, test database) › rejects invalid query values
+  ✓ GET /api/reports and evidence files (US-10, test database) › a new user sees an empty list
+  ✓ GET /api/reports and evidence files (US-10, test database) › GET /api/reports/:id/media/:mediaId › the owner gets the file with its type
+  ✓ GET /api/reports and evidence files (US-10, test database) › GET /api/reports/:id/media/:mediaId › another user gets 404, the same as for a file that does not exist (RB-01)
+  ✓ GET /api/reports and evidence files (US-10, test database) › GET /api/reports/:id/media/:mediaId › a media id of another report gets 404
+  ✓ GET /api/reports and evidence files (US-10, test database) › GET /api/reports/:id/media/:mediaId › malformed ids get 404 (not 500)
+  ✓ GET /api/reports and evidence files (US-10, test database) › GET /api/reports/:id/media/:mediaId › requires a token
+PASS tests/C:\proyectos\AireClaro\backend\tests\reports.schema.test.js
+  ✓ report vehicle fields (US-06) › accepts car plates (ABC123) and motorcycle plates (ABC12D)
+  ✓ report vehicle fields (US-06) › normalizes the plate: uppercase, no spaces or dashes
+  ✓ report vehicle fields (US-06) › rejects plate "AB123"
+  ✓ report vehicle fields (US-06) › rejects plate "ABCD12"
+  ✓ report vehicle fields (US-06) › rejects plate "123ABC"
+  ✓ report vehicle fields (US-06) › rejects plate "ABC1234"
+  ✓ report vehicle fields (US-06) › rejects plate "ABC1D2"
+  ✓ report vehicle fields (US-06) › rejects plate ""
+  ✓ report vehicle fields (US-06) › requires a valid vehicle type and smoke color
+  ✓ report vehicle fields (US-06) › description is optional, trimmed and up to 500 characters
+  ✓ report requester fields (US-08) › accepts the profile data and normalizes email and phone
+  ✓ report requester fields (US-08) › phone is optional (empty → null)
+  ✓ report requester fields (US-08) › there is no anonymous option: name, document and email are required
+  ✓ report requester fields (US-08) › uses the same rules as the profile
+PASS tests/C:\proyectos\AireClaro\backend\tests\send.test.js
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › 200 (CP-23): test mode → test inbox, [PRUEBA], copy and reply-to the citizen, PDF and evidence
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › evidence over 15 MB: only the PDF, which says «Disponible a solicitud del peticionario»
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › video frames travel inside the PDF, never as separate attachments (US-23)
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › 409 (CP-25): a report can be sent only once
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › 409: a double tap sends one email (the second one is refused while sending)
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › 422 (CP-24): authority without a verified email (SDM) → nothing is sent
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › 422 (CP-28): live mode with an unverified authority never sends
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › live mode (fake SMTP): goes to the verified authority email, without [PRUEBA]
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › 502 (CP-26): SMTP failure → message, status unchanged, and it can be retried
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › 503: MAIL_MODE=off → nothing is sent
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › 503: SMTP not configured on the server
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › 400: the sending must be confirmed explicitly ({confirm: true})
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › 404 (CP-29): another user cannot send someone else’s report
+  ✓ POST /api/reports/:id/send (US-21, test database, fake SMTP) › 401 without a token
+PASS tests/C:\proyectos\AireClaro\backend\tests\status.test.js
+  ✓ PATCH /api/reports/:id/status (test database) › 200: after the portal (SDM, no email) the report is «enviado» by hand
+  ✓ PATCH /api/reports/:id/status (test database) › 409: it cannot be marked twice
+  ✓ PATCH /api/reports/:id/status (test database) › 409: a report already sent by email cannot be marked by hand
+  ✓ PATCH /api/reports/:id/status (test database) › after marking it by hand, it cannot be sent by email (409)
+  ✓ PATCH /api/reports/:id/status (test database) › 400: only «enviado» is accepted
+  ✓ PATCH /api/reports/:id/status (test database) › 404: another user cannot mark someone else’s report
+  ✓ PATCH /api/reports/:id/status (test database) › 401 without a token
+PASS tests/C:\proyectos\AireClaro\backend\tests\upload.test.js
+  ✓ evidence upload › accepts up to 3 valid files and ignores the original name
+  ✓ evidence upload › rejects a file whose content is not an image or video, and deletes the uploads
+  ✓ evidence upload › rejects HEIC photos
+  ✓ evidence upload › rejects more than 3 files
+  ✓ evidence upload › requires at least one file
+  ✓ evidence upload › size limits (tiny limits for the test) › rejects a photo above MAX_PHOTO_MB with 413
+  ✓ evidence upload › size limits (tiny limits for the test) › rejects a video above MAX_VIDEO_MB with 413
+
+Suites: 23/23 · Pruebas: 192/192 · Fallidas: 0

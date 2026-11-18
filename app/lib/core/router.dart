@@ -9,6 +9,10 @@ import '../features/auth/splash_screen.dart';
 import '../features/history/report_detail_screen.dart';
 import '../features/history/reports_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/info/info_screen.dart';
+import '../features/map/map_screen.dart';
+import '../features/pqrsd/done_screen.dart';
+import '../features/pqrsd/preview_screen.dart';
 import '../features/profile/edit_profile_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/report/evidence_step_screen.dart';
@@ -17,7 +21,6 @@ import '../features/report/requester_step_screen.dart';
 import '../features/report/review_screen.dart';
 import '../features/report/vehicle_step_screen.dart';
 import '../features/welcome/welcome_screen.dart';
-import '../shared/widgets/coming_soon_screen.dart';
 import '../shared/widgets/main_shell.dart';
 
 /// Route paths from docs/06 (plus /splash, shown while the session is checked).
@@ -32,6 +35,13 @@ class Routes {
   static const map = '/map';
   static const reports = '/reports';
   static String reportDetail(String id) => '/reports/$id';
+
+  /// Preview of the request; [justCreated] shows «Continuar» (right after creating it).
+  static String reportPreview(String id, {bool justCreated = false}) =>
+      '/report/$id/preview${justCreated ? '?nuevo=1' : ''}';
+
+  /// Confirmation after sending or generating the request (screen 11).
+  static String reportDone(String id) => '/report/$id/done';
   static const info = '/info';
   static const profile = '/profile';
   static const editProfile = '/profile/edit';
@@ -95,8 +105,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: Routes.map,
-              builder: (context, state) =>
-                  const ComingSoonScreen(title: 'Mapa de reportes', icon: Icons.map_outlined),
+              builder: (context, state) => const MapScreen(),
             ),
           ]),
           StatefulShellBranch(routes: [
@@ -108,8 +117,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: Routes.info,
-              builder: (context, state) =>
-                  const ComingSoonScreen(title: '¿Cómo funciona?', icon: Icons.help_outline),
+              builder: (context, state) => const InfoScreen(),
             ),
           ]),
         ],
@@ -120,6 +128,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/reports/:id',
         builder: (context, state) =>
             ReportDetailScreen(reportId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/report/:id/done',
+        builder: (context, state) => DoneScreen(reportId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/report/:id/preview',
+        builder: (context, state) => PreviewScreen(
+          reportId: state.pathParameters['id']!,
+          justCreated: state.uri.queryParameters['nuevo'] == '1',
+        ),
       ),
       GoRoute(
         path: Routes.reportEvidence,

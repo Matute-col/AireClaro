@@ -69,7 +69,8 @@ void main() {
   late FakeReportsRepository reports;
   late ProviderContainer container;
 
-  Future<void> pumpReview(WidgetTester tester, ReportDraft draft) async {
+  /// [settle] false: for screens with endless animations (e.g. extracting frames).
+  Future<void> pumpReview(WidgetTester tester, ReportDraft draft, {bool settle = true}) async {
     tester.view.physicalSize = const Size(1080, 3200);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -89,8 +90,10 @@ void main() {
         GoRoute(path: Routes.home, builder: (_, _) => const Scaffold(body: Text('Pantalla de inicio'))),
         GoRoute(path: Routes.reportReview, builder: (_, _) => const ReviewScreen()),
         GoRoute(
-          path: '/reports/:id',
-          builder: (_, state) => Scaffold(body: Text('Detalle ${state.pathParameters['id']}')),
+          path: '/report/:id/preview',
+          builder: (_, state) => Scaffold(
+            body: Text('Vista previa ${state.pathParameters['id']} ${state.uri.query}'),
+          ),
         ),
       ],
     );
@@ -99,7 +102,12 @@ void main() {
       container: container,
       child: MaterialApp.router(routerConfig: router),
     ));
-    await tester.pumpAndSettle();
+    if (settle) {
+      await tester.pumpAndSettle();
+    } else {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+    }
   }
 
   FilledButton generate(WidgetTester tester) =>
@@ -153,14 +161,14 @@ void main() {
     expect(generate(tester).onPressed, isNotNull);
   });
 
-  testWidgets('«Generar solicitud» creates the report, opens its detail and clears the draft',
+  testWidgets('«Generar solicitud» creates the report, opens its preview and clears the draft',
       (tester) async {
     await pumpReview(tester, completeDraft());
     await tester.tap(find.text('Generar solicitud'));
     await tester.pumpAndSettle();
 
     expect(reports.sent?.authorityId, 1);
-    expect(find.text('Detalle new-report-id'), findsOneWidget);
+    expect(find.text('Vista previa new-report-id nuevo=1'), findsOneWidget);
     expect(find.text('Reporte creado.'), findsOneWidget);
     expect(container.read(reportDraftProvider).isEmpty, isTrue);
   });
@@ -178,7 +186,7 @@ void main() {
     reports.error = null;
     await tester.tap(find.text('Reintentar'));
     await tester.pumpAndSettle();
-    expect(find.text('Detalle new-report-id'), findsOneWidget);
+    expect(find.text('Vista previa new-report-id nuevo=1'), findsOneWidget);
   });
 
   testWidgets('server validation errors are listed', (tester) async {
@@ -193,5 +201,24 @@ void main() {
 
     expect(find.text('Cada foto puede pesar máximo 8 MB.'), findsOneWidget);
     expect(find.text('Reintentar'), findsNothing);
+  });
+
+  testWidgets('US-23: «Generar solicitud» waits while the video frames are extracted', (tester) async {
+    final draft = completeDraft();
+    await pumpReview(
+      tester,
+      draft.copyWith(evidence: const [
+        EvidenceFile(
+          path: '/tmp/v.mp4',
+          kind: EvidenceKind.video,
+          sizeBytes: 5000,
+          framesStatus: FramesStatus.extracting,
+        ),
+      ]),
+      settle: false,
+    );
+
+    expect(find.textContaining('Extrayendo los fotogramas del video'), findsOneWidget);
+    expect(generate(tester).onPressed, isNull);
   });
 }

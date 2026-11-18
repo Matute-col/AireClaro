@@ -11,7 +11,7 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | Sprint 0 · Entorno | Pendiente | |
 | Sprint 1 · Backend base y autenticación | Hecho | Rama `sprint-1`. Probado en el celular el 16-nov-2026. Pendiente con aprobación de Mateo: push, merge a `main` y tag `v0.1-sprint1` |
 | Sprint 2 · Flujo de reporte | Hecho | Rama `sprint-2`, cerrado el 16-nov-2026: pruebas (a)–(d) aprobadas en el celular; merge a `main` y tag `v0.2-sprint2`. Revisión y retrospectiva en `docs/sprints/sprint-2.md` |
-| Sprint 3 · PDF, mapa, pruebas | Pendiente | |
+| Sprint 3 · PDF, mapa, pruebas | Hecho | Rama `sprint-3`, cerrado el 18-nov-2026: pruebas (e)–(h) aprobadas en el celular, correo real en modo de prueba verificado; merge a `main` y tag `v0.3-sprint3`. Revisión y retrospectiva en `docs/sprints/sprint-3.md`. Siguen las pruebas CP-01…CP-30 y el video desde el jueves 19-nov |
 | Validación TRL 5 y video | Pendiente | |
 
 ## Historias
@@ -31,7 +31,18 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | US-09 | Hecha | f246904 | API: `POST /reports` multipart en una transacción (archivos a `reports/<id>/`, limpieza ante cualquier error, dueño desde el token, autoridad elegida o regla de `docs/05`). App: revisión con mapa pequeño, autoridad sugerida y «Cambiar», progreso de subida, «Reporte creado» en Inicio. Prueba (c) aprobada el 16-nov-2026 (evidencia en `backend/uploads/reports/<id>/`) |
 | US-10 | Hecha | 3d34ebd | API: `GET /reports` (solo los del usuario, más reciente primero, `page/limit/status`, miniatura) y `GET /reports/:id/media/:mediaId` solo para el dueño (404 si no). App: «Mis reportes» con miniaturas autenticadas, chips de estado, paginación al desplazar, recarga, vacío y error; número en Inicio. Prueba (d) aprobada el 16-nov-2026 |
 | US-11 | Hecha | c40a929 | API: `GET /reports/:id` con prueba de propiedad (otro usuario → 404 igual que inexistente; sin correo de la autoridad ni rutas de archivo). App: detalle con carrusel, datos, mapa pequeño, autoridad, estado y peticionario; tras crear un reporte se abre su detalle. Prueba (d) aprobada el 16-nov-2026 |
-| US-12…US-22 | Pendiente | | |
+| US-12 | Hecha | a7c2bef, a378120 | API: `GET /reports/:id/pqrsd` (texto, autoridad, placa, estado, modo de correo) y `.pdf` con `pdfkit` según `docs/05` y la Ley 1755 art. 16 (sección ANEXOS, encabezado solo con fecha, primera foto ≈ 6 cm). Solo el dueño (404). Pruebas leen el PDF real: tildes, eñ y signos. ANEXOS con etiqueta según el canal. Prueba (e) aprobada el 17-nov-2026 |
+| US-13 | Hecha | 3c2e941 | App: vista previa tras crear el reporte, «Descargar PDF» (abre el visor), «Compartir» (menú del teléfono), «Continuar» al detalle; en el detalle «Ver solicitud», PDF y «Abrir video» (CP-07). Prueba (e) aprobada el 17-nov-2026 |
+| US-14 | Hecha | 3d740e3, e875144 | Pantalla de confirmación («Solicitud enviada a…» / «Reporte generado» / «Reporte marcado como enviado») con «¿Cómo hacer seguimiento?»; «Marcar como enviado» con confirmación (`PATCH /reports/:id/status`, `sent_via=manual`). Prueba (g) parte 1 aprobada el 17-nov-2026 |
+| US-15 | Hecha | 31f5947 | API: `GET /map/reports` con solo id, coordenadas, tipo y fecha (RB-07), filtros por tipos y días de Colombia, máx. 500. App: pestaña Mapa con pines, chips de tipo y de periodo («Todo», «Hoy», «7 días», «30 días»), tarjeta del pin con tipo y fecha. Prueba (h) aprobada el 17-nov-2026 |
+| US-16 | Hecha | ef6ee1d | Pestaña Info «¿Cómo funciona?»: 4 pasos, autoridades desde el API con cómo reciben la solicitud, regla de sugerencia, aviso de alcance y política de datos |
+| US-17 | Hecha | 0ef60d0 | Revisión de estados pantalla por pantalla (tabla en `docs/08`); pruebas de mensajes para 429, 500 y tiempos de espera |
+| US-18 | Hecha (sin prueba manual; cubierta por pruebas automáticas) | f31f727 | Mateo pidió hacerla el 17-nov-2026. API: `DELETE /reports/:id` solo para el dueño (404 para otros o inexistente; 409 si se está enviando un correo), borra evidencia y fotogramas en la base y la carpeta en disco; prueba de que no quedan archivos huérfanos. App: «Eliminar reporte» con confirmación en el detalle (aviso si ya se envió). CP-17 |
+| US-19 | Hecha | ae942a1 | `docs/evidencias/`: tabla CP-01 a CP-30 lista para llenar (con las pruebas automáticas de cada caso) y salidas de `npm test` (184/184), `flutter test` (131/131) y `flutter analyze` (sin problemas) |
+| US-20 | Hecha | ff88465 | `README.md` en español: estructura, requisitos, API, app por USB, APK `--profile` con la IP del PC (compilado y verificado, 78,6 MB), correo y seguridad |
+| US-21 | Hecha | 3d740e3 | `POST /reports/:id/send`: PDF del correo con «Archivo adjunto al correo» solo si la evidencia viaja (≤ 15 MB), fotogramas dentro del PDF, `MAIL_MODE=test` → `MAIL_TEST_TO` con `[PRUEBA]`, ciudadano en Cc y Reply-To; 400/404/409/422/502/503. Pruebas con transporte simulado. App: botón y diálogo en la vista previa, aviso de modo de prueba. Prueba (g) completa aprobada el 17-nov-2026: parte 1 (diálogo, 503 sin SMTP, SDM sin botón) y parte 2 con SMTP real de Gmail en modo de prueba (CP-23 adjuntos correctos, CP-25 reenvío bloqueado, CP-26 fallo del SMTP) |
+| US-22 | Hecha | e875144 | «Radicar en el portal oficial» (url_launcher) para toda autoridad con `portal_url`, en vista previa, confirmación y detalle. Prueba (g) parte 1 aprobada el 17-nov-2026 (CP-24, CP-27) |
+| US-23 | Hecha | aa7f81f | Agregada por Mateo el 17-nov-2026 (RF-19, CP-30). App: 4 fotogramas JPEG por video (10/35/65/90 %, ≤ 300 KB) enviados en `frames_v<N>`; si falla, sigue sin ellos y avisa. API: validación por bytes y tamaño, máx. 4 por video, fuera del límite de 3; guardados como evidencia derivada con posición; PDF con «Fotogramas del video N (4)» en cuadrícula; detalle con la fila de fotogramas. Migración aplicada en `test` y, con autorización de Mateo, en la base principal el 17-nov-2026 (estructura idéntica; los 4 reportes existentes cargan detalle, texto y PDF). Prueba (f) aprobada en el celular el 17-nov-2026 |
 
 ## Decisiones tomadas durante el desarrollo
 (Fecha · decisión · motivo)
@@ -78,7 +89,39 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
   «marcar como enviado»), **US-21 (envío por correo, siempre `MAIL_MODE=test`)**, US-22 (portal oficial), US-15
   (mapa), US-16, US-17, US-19, US-20 y, si hay tiempo, US-18. Tras crear un reporte se irá a la vista previa.
 
+- 17-nov-2026 · Decisiones del Sprint 3 registradas en `docs/02`–`06` y `CLAUDE.md` (24171d2): fechas, encabezado del PDF solo con fecha, ANEXOS, mapa con tipo y fecha (RB-07), portal para toda autoridad con `portal_url`, SMTP con Gmail y contraseña de aplicación.
+- 17-nov-2026 · ANEXOS del PDF en orden fijo: fotos y luego videos · los nombres guardados son UUID aleatorios y el orden cambiaba entre ejecuciones.
+- 17-nov-2026 · Las pruebas leen el PDF con `pdf-parse` en un proceso de Node aparte (`tests/helpers/pdfText.js`) · Jest no permite el `import()` dinámico que usa `pdfjs`.
+- 17-nov-2026 · Mateo recreó la rama `test` de Neon (conexión directa, sin pooler) y actualizó `TEST_DATABASE_URL`; la credencial anterior daba `28P01`.
+
+- 17-nov-2026 · ANEXOS según el canal: PDF descargado/compartido/portal → «Disponible a solicitud del peticionario»; PDF del correo → «Archivo adjunto al correo» solo si la evidencia viaja adjunta (≤ 15 MB) · nunca afirmar un adjunto que no existe.
+
+- 17-nov-2026 · US-23 usa `video_player` solo para leer la duración del video (revisa la decisión «sin `video_player`» del 16-nov) y `fc_native_video_thumbnail` para extraer los fotogramas (`docs/04`).
+- 17-nov-2026 · Los fotogramas viajan en campos `frames_v<N>` (N = posición del video en `files`); su orden en el campo es su posición · sin leer nombres de archivo.
+
+- 17-nov-2026 · Doble envío corregido antes del commit: el candado por reporte se toma antes de leer el estado; una prueba de doble toque lo detectó (a veces salían dos correos). Un reporte marcado a mano ya no se puede enviar por correo, y viceversa (409).
+- 17-nov-2026 · En `MAIL_MODE=test` el ciudadano va en copia (CP-23); el destinatario principal es siempre `MAIL_TEST_TO`.
+
+- 17-nov-2026 · Filtro de fechas del mapa con periodos («Hoy», «7 días», «30 días») en lugar de un calendario · más cómodo en el celular y sin paquetes de localización.
+- 17-nov-2026 · Tiempo límite de Jest en 20 s · las pruebas que leen el PDF en otro proceso contra la base remota podían pasar de 5 s (falla intermitente vista una vez).
+
+## Sprint 3 · Revisión y retrospectiva (resumen; detalle en `docs/sprints/sprint-3.md`)
+- **Qué se hizo:** US-12…US-23 (PDF con la Ley 1755 art. 16, vista previa y compartir, envío por correo con
+  `MAIL_MODE=test`, portal oficial y «Marcar como enviado», mapa con filtros, «¿Cómo funciona?», revisión de
+  estados, eliminar, README y APK, evidencias) y US-23 (fotogramas del video, agregada por Mateo). 192 pruebas del
+  API y 135 de la app; pruebas (e)–(h) aprobadas en el celular y correo real verificado en modo de prueba.
+- **Qué salió bien:** las pruebas automáticas encontraron errores reales antes del celular (doble envío de
+  correo, desborde de la tarjeta de video, orden aleatorio de los anexos); transporte de correo simulado y host
+  `.invalid` en las pruebas; migración probada (subir, bajar, subir) en la rama `test` antes de la principal.
+- **Qué mejorar:** credencial de la rama `test` vencida a mitad del sprint; fechas escritas con un día de más y
+  corregidas; varios comandos largos de Bash fallaron por las comillas; finales de línea mezclados (falta
+  `.gitattributes`).
+- **Lo que sigue:** ejecutar CP-01…CP-30 con evidencia en `docs/evidencias/`, grabar el video y la entrega del
+  domingo 22-nov (tag `v1.0-trl5`).
+
 ## Problemas abiertos
+- Migración `1794970815342_add-video-frames` en la base principal · resuelto el 17-nov-2026 con autorización de Mateo: antes estaban aplicadas las 3 migraciones previas; después, `report_media` quedó idéntica a la rama `test` (columnas, CHECK e índices) y los 4 reportes existentes cargan detalle, texto y PDF.
+- SMTP sin configurar en `backend/.env` · Mateo lo llena el martes 17 por la mañana (Gmail con contraseña de aplicación; `MAIL_TEST_TO` = su buzón). Bloquea la prueba (f) de US-21, no su desarrollo.
 - `.vscode/extensions.json` aparece como «sin seguimiento» porque `.gitignore` lo excluye a propósito de la regla `.vscode/*` · Mateo decidió no subirlo; opcional: agregarlo a `.git/info/exclude` (local).
 - La miniatura de «Mis reportes» es una foto cualquiera (siempre la misma) del reporte: `report_media` no guarda el orden de subida · aceptable para el prototipo.
 - `backend/src/db/pool.js` registraba `err.message` sin pasar por `LOG_ERROR_DETAILS` · resuelto el 16-nov-2026 (ece1a24).

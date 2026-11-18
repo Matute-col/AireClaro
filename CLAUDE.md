@@ -14,7 +14,8 @@ Mateo Alejandro Bernal Cardona (UNAD). Mateo es desarrollador junior: **explica 
 cuando tomes decisiones, sin sermonear.
 
 ## Plazo y prioridad
-- Video del prototipo: martes 17 / miércoles 18 de noviembre de 2026. Entrega final: domingo 22 de noviembre.
+- Pruebas CP-01…CP-29 y video del prototipo: desde el jueves 19 de noviembre de 2026. Entrega final: domingo 22
+  de noviembre.
 - **Prioridad absoluta: un flujo que funcione de punta a punta en un celular Android real** (registrarse →
   crear reporte → generar PDF → ver historial) antes que funcionalidades extra.
 - Si vas atrasado, recorta en el orden de `docs/07-plan-de-desarrollo.md`. **Nunca se recorta** el flujo de

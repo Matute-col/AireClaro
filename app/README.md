@@ -27,3 +27,8 @@ En VS Code también se puede usar **F5** con la configuración «AireClaro (celu
 flutter analyze
 flutter test
 ```
+
+## APK sin cable
+
+Se compila con `--profile` y la IP del PC en la red Wi-Fi: ver la sección «APK para instalar sin cable» del
+`README.md` de la raíz del repositorio.

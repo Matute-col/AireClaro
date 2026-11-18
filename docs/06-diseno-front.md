@@ -80,6 +80,9 @@ Tarjetas: «Mis reportes» (con el número de reportes), «Mapa de reportes», �
 «Elegir de la galería». Miniaturas con botón para quitar (los videos muestran una tarjeta «Video» con ícono y
 tamaño; sin duración, ver cambio del 16-nov-2026 en `docs/02`).
 Ayuda: «Procura que se vea la placa y el humo». Máximo 3 archivos. «Siguiente» activo con ≥ 1 archivo.
+**US-23:** al agregar un video se extraen 4 fotogramas; la tarjeta del video muestra «Fotogramas…», «4 fotogramas»
+o «Sin fotogramas». Si falla: aviso «No pudimos extraer los fotogramas del video. El reporte seguirá sin ellos.»
+En la revisión, «Generar solicitud» espera mientras se extraen.
 Fotos: `imageQuality ≈ 80`, `maxWidth ≈ 1600`. La cámara se abre con la app de cámara del sistema (no se declara
 el permiso `CAMERA`, ver `docs/04`).
 
@@ -112,7 +115,7 @@ Botones, en este orden:
    PDF y la evidencia a {autoridad}. Recibirás una copia en {correo} y la respuesta llegará a ese correo.»
    Botones «Cancelar» / «Enviar». En modo de prueba se muestra un aviso: «Modo de prueba: el correo va a un
    buzón de prueba, no a la autoridad».
-2. **«Radicar en el portal oficial»** (secundario; solo si hay `portal_url`): abre el navegador.
+2. **«Radicar en el portal oficial»** (secundario; para toda autoridad con `portal_url`): abre el navegador.
 3. «Descargar PDF» (descarga y abre) y «Compartir» (menú del teléfono).
 4. «Continuar».
 No hay edición aquí: para cambiar algo se vuelve a la revisión antes de guardar. Si el envío falla: mensaje y
@@ -132,13 +135,15 @@ Lista de `ReportCard` (miniatura, placa, tipo, fecha, chip de estado «Generado�
 primero, con paginación al desplazar. Estado vacío: «Aún no tienes reportes» y botón «Nuevo reporte».
 
 ### 13 · Detalle del reporte
-Carrusel de evidencia, datos completos, mapa pequeño, autoridad, estado. Botones: «Descargar solicitud»,
+Carrusel de evidencia (bajo la tarjeta de un video, sus fotogramas en una fila, US-23), datos completos, mapa
+pequeño, autoridad, estado. Botones: «Descargar solicitud»,
 «Compartir», «Enviar a la autoridad» (si no se ha enviado y `can_email`), «Radicar en el portal oficial»,
 «Marcar como enviado» y «Eliminar» (con confirmación; prioridad Could). El chip de estado indica «Enviado por correo» o «Enviado (manual)».
 
 ### 14 · Mapa de reportes
-Mapa con pines (`GET /map/reports`), filtros por tipo de vehículo y rango de fechas (chips o diálogo). Al tocar
-un pin: tarjeta inferior con tipo de vehículo, fecha y lugar. **Sin placa ni foto.** Atribución de OSM.
+Mapa con pines (`GET /map/reports`), filtros por tipo de vehículo (chips, varios a la vez) y por fecha con periodos
+«Todo», «Hoy», «7 días» y «30 días» (chips; sin calendario, 17-nov-2026), «Limpiar filtros» y «Actualizar». Al tocar
+un pin: tarjeta inferior con tipo de vehículo y fecha (sin dirección, RB-07). **Sin placa ni foto.** Atribución de OSM.
 
 ### 15 · Información: ¿Cómo funciona?
 Pasos (1. Captura la evidencia · 2. Completa los datos · 3. Genera la solicitud · 4. Preséntala a la autoridad),

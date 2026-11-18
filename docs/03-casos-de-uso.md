@@ -120,8 +120,8 @@ sequenceDiagram
 - **Flujo:** en el detalle, «Eliminar» → confirmación → el reporte y sus archivos se borran. **Req.:** RF-16.
 
 ### UC-11 Ver mapa de reportes
-- **Flujo:** pestaña «Mapa» → pines de reportes; filtros por tipo y fechas; al tocar un pin, tarjeta con tipo,
-  fecha y lugar. No se muestran placa ni fotos. **Req.:** RF-10.
+- **Flujo:** pestaña «Mapa» → pines de reportes; filtros por tipo y fechas; al tocar un pin, tarjeta con tipo y
+  fecha (sin dirección, RB-07). No se muestran placa ni fotos. **Req.:** RF-10.
 
 ### UC-12 Consultar información
 - **Flujo:** pestaña «Info» → pasos, autoridades y alcance. **Req.:** RF-14.

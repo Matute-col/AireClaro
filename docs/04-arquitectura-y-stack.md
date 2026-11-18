@@ -76,6 +76,22 @@ paquete adicional.
   «© OpenStreetMap contributors» siempre visible y `userAgentPackageName = com.aireclaro.app`.
 - `intl` (app, US-07): fecha y hora en formato de Colombia (`es_CO`).
 
+**Agregados en el Sprint 3:**
+- `pdfkit` (API, US-12): genera el PDF de la solicitud en el servidor (D-07).
+- `pdf-parse` (API, solo desarrollo, US-12): las pruebas leen el texto del PDF generado para verificar el
+  contenido del art. 16 y que tildes, eñ y signos («», ¿, n.º) salgan bien.
+- `path_provider` (app, US-13): carpeta temporal donde se guarda el PDF descargado.
+- `open_filex` (app, US-13): abre el PDF (y los videos de evidencia, CP-07) con la app del teléfono.
+- `share_plus` (app, US-13): menú «Compartir» del teléfono con el PDF.
+- `fc_native_video_thumbnail` (app, US-23): extrae fotogramas JPEG de un video en un instante dado (API nativa de
+  Android). Se descartó `video_thumbnail` (no es compatible con Dart 3).
+- `video_player` (app, US-23): **solo para leer la duración** del video y calcular el 10 %, 35 %, 65 % y 90 %; la
+  app sigue sin reproducir videos (revisa la decisión del 16-nov-2026: «sin `video_player`» era para mostrar la
+  duración; ahora la exige US-23, aprobada por Mateo el 17-nov-2026).
+- `nodemailer` (API, US-21): envía la solicitud por SMTP (D-12). En las pruebas automáticas se reemplaza por un
+  transporte simulado: nunca sale un correo real desde `npm test`.
+- `url_launcher` (app, US-22): abre el portal oficial de la autoridad en el navegador del teléfono (D-14).
+
 ## Estructura del backend
 
 ```
@@ -161,6 +177,8 @@ guardar la cadena de conexión **solo** en `backend/.env`.
 - El API envía con `nodemailer` por SMTP. **Proveedor:** elegir uno con plan gratuito verificando sus condiciones
   vigentes el mismo día (límites diarios, verificación del remitente, tarjeta no obligatoria). Plan B: SMTP de una
   cuenta de correo propia con contraseña de aplicación. Registrar aquí el elegido, sin credenciales.
+  **Elegido (17-nov-2026):** Gmail con contraseña de aplicación (plan B). Mateo llena `SMTP_*`, `MAIL_FROM` y
+  `MAIL_TEST_TO` (su propio buzón) en `backend/.env`; nunca se escriben en el repositorio.
 - Remitente `MAIL_FROM`; `Reply-To` y `Cc` = correo del ciudadano; asunto y cuerpo según `docs/05`.
 - Adjuntos: el PDF siempre; la evidencia (fotos/video) solo si el total ≤ 15 MB; si no, solo el PDF y el cuerpo
   indica que la evidencia está disponible a solicitud.

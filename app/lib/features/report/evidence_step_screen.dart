@@ -56,8 +56,21 @@ class _EvidenceStepScreenState extends ConsumerState<EvidenceStepScreen> {
         kind: media.isVideo ? EvidenceKind.video : EvidenceKind.photo,
         sizeBytes: media.sizeBytes,
       ));
+      if (media.isVideo) _startFrames(media.path);
     }
     if (problems.isNotEmpty) _showMessage(problems.join('\n'));
+  }
+
+  /// US-23 · Extracts 4 frames of the video in the background. If it fails, the report
+  /// continues without them and the user is told (the messenger outlives this screen).
+  void _startFrames(String videoPath) {
+    final messenger = ScaffoldMessenger.of(context);
+    _draft.extractFrames(videoPath).then((ok) {
+      if (ok) return;
+      messenger.showSnackBar(const SnackBar(
+        content: Text('No pudimos extraer los fotogramas del video. El reporte seguirá sin ellos.'),
+      ));
+    });
   }
 
   Future<void> _pick(Future<List<PickedMedia>> Function(EvidencePicker picker) action) async {
@@ -183,6 +196,34 @@ String formatMegabytes(int bytes) {
   return '${mb.toStringAsFixed(1).replaceAll('.', ',')} MB';
 }
 
+/// US-23 · Status of the frames of a video, under its thumbnail.
+class _FramesStatusLabel extends StatelessWidget {
+  const _FramesStatusLabel({required this.file});
+
+  final EvidenceFile file;
+
+  @override
+  Widget build(BuildContext context) {
+    const style = TextStyle(fontSize: 11);
+    return switch (file.framesStatus) {
+      FramesStatus.extracting => const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(width: 10, height: 10, child: CircularProgressIndicator(strokeWidth: 1.5)),
+            SizedBox(width: 4),
+            Text('Fotogramas…', style: style),
+          ],
+        ),
+      FramesStatus.ready => Text('${file.frames.length} fotogramas', style: style),
+      FramesStatus.failed => const Text(
+          'Sin fotogramas',
+          style: TextStyle(fontSize: 11, color: AppColors.warning),
+        ),
+      FramesStatus.none => const SizedBox.shrink(),
+    };
+  }
+}
+
 /// Square thumbnail: the photo itself, or a «Video» card with icon and size.
 class EvidenceThumbnail extends StatelessWidget {
   const EvidenceThumbnail({super.key, required this.file, this.onRemove});
@@ -197,13 +238,19 @@ class EvidenceThumbnail extends StatelessWidget {
     final content = file.isVideo
         ? Container(
             color: AppColors.primaryContainer,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.videocam, size: 36, color: AppColors.primary),
-                const Text('Video'),
-                Text(formatMegabytes(file.sizeBytes), style: const TextStyle(fontSize: 12)),
-              ],
+            padding: const EdgeInsets.all(AppSpacing.xs),
+            // Scales down if the text does not fit the square (large system font sizes).
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.videocam, size: 28, color: AppColors.primary),
+                  const Text('Video'),
+                  Text(formatMegabytes(file.sizeBytes), style: const TextStyle(fontSize: 12)),
+                  _FramesStatusLabel(file: file),
+                ],
+              ),
             ),
           )
         : Image.file(

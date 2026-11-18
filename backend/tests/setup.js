@@ -42,3 +42,10 @@ process.env.MAIL_MODE = 'test';
 process.env.LOG_ERROR_DETAILS = 'false';
 // Evidence uploads go to a temporary folder, never to backend/uploads/.
 process.env.UPLOAD_DIR = path.join(os.tmpdir(), 'aireclaro-test-uploads');
+// Email (US-21): fake values so the sending can be tested. Tests replace the SMTP
+// transport with a fake: no real email is ever sent from jest.
+process.env.MAIL_TEST_TO = 'buzon-prueba@example.com';
+process.env.MAIL_FROM = 'AireClaro <no-responder@example.com>';
+process.env.SMTP_HOST = 'smtp.example.invalid';
+process.env.SMTP_USER = '';
+process.env.SMTP_PASS = '';

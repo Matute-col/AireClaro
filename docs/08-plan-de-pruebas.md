@@ -29,7 +29,7 @@
 | CP-14 | Compartir | Pulsar «Compartir» | Se abre el menú del teléfono con el PDF | RF-08 |
 | CP-15 | Historial | Crear 2 reportes | Aparecen ordenados, solo los míos | RF-09 |
 | CP-16 | Detalle | Abrir un reporte | Evidencia, datos, mapa y autoridad | RF-15 |
-| CP-17 | Eliminar | Eliminar con confirmación | Desaparece del historial y del mapa | RF-16 |
+| CP-17 | Eliminar | En el detalle, «Eliminar reporte» y confirmar | Pide confirmación; desaparece del historial y del mapa; su evidencia y fotogramas se borran del servidor; otro usuario recibe 404 | RF-16 |
 | CP-18 | Mapa sin datos sensibles | Tocar un pin | Sin placa ni foto | RF-10 |
 | CP-19 | Sin conexión | Apagar datos al guardar | Mensaje y «Reintentar» | RNF-01 |
 | CP-20 | Sesión expirada | Token inválido | Vuelve a login con aviso | RNF-03 |
@@ -42,6 +42,27 @@
 | CP-27 | Portal oficial | Pulsar «Radicar en el portal oficial» | Abre la URL oficial en el navegador | RF-18 |
 | CP-28 | Modo live protegido | `MAIL_MODE=live` con autoridad `email_verified=false` | Rechaza el envío (422); nunca sale correo real | RB-08, RB-09 |
 | CP-29 | Dueño del reporte | Intentar enviar el reporte de otro usuario | 404 | RB-01 |
+| CP-30 | Fotogramas del video (US-23) | Crear un reporte con un video | 4 fotogramas en el detalle bajo el video y en ANEXOS del PDF («Fotogramas del video 1 (4)»), en cuadrícula; si la extracción falla, el reporte se crea sin ellos y la app lo avisa | RF-19 |
+
+## Revisión de estados (US-17, 17-nov-2026)
+Cada pantalla que habla con el API tiene estado de carga con texto, estado vacío cuando aplica y error con
+mensaje en español y «Reintentar». Los errores de red y del servidor pasan por `toApiException` (con prueba).
+
+| Pantalla | Cargando | Vacío | Error / sin conexión | Otros |
+|---|---|---|---|---|
+| Arranque (sesión) | «Verificando tu sesión…» | — | `ErrorState` + Reintentar | 401 → Bienvenida |
+| Login / Registro | botón con indicador | — | aviso + Reintentar | correo duplicado y credenciales en el campo |
+| Inicio | «Cargando…» en la tarjeta | «0 reportes» | texto por defecto | — |
+| Paso 1 Evidencia | indicador al abrir cámara/galería | «0 de 3 archivos» | aviso al fallar cámara o galería | HEIC y tamaño; fotogramas: «Sin fotogramas» + aviso |
+| Paso 3 Ubicación | indicador sobre el mapa | «Marca en el mapa…» | dirección no disponible → se puede seguir | permiso denegado / GPS apagado → «Activar ubicación» |
+| Revisión | progreso de subida en % | — | aviso + Reintentar | autoridades: carga y Reintentar |
+| Mis reportes | «Cargando tus reportes…» | «Aún no tienes reportes» + Nuevo reporte | `ErrorState` + Reintentar; error al paginar al final | recarga deslizando |
+| Detalle | «Cargando el reporte…» | — | Reintentar; 404 «No encontramos este reporte» | — |
+| Vista previa | «Generando la solicitud…» | — | Reintentar; 404 | descarga, envío (409/422/502/503) |
+| Confirmación | «Cargando…» | — | Reintentar | — |
+| Mapa | «Cargando reportes…» | «No hay reportes con estos filtros.» | aviso + Reintentar | — |
+| ¿Cómo funciona? | «Cargando autoridades…» | — | aviso + Reintentar (el resto funciona) | — |
+| Cualquier pantalla | — | — | 401 con sesión → Login «Tu sesión expiró» (CP-20) | 429 y 500 con mensaje claro |
 
 ## Registro de evidencias
 Carpeta `docs/evidencias/`: capturas por caso (`CP-06.png`), resultados de `npm test` y `flutter analyze`,

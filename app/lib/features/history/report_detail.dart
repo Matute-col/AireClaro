@@ -3,19 +3,54 @@ import '../report/report_draft.dart';
 
 /// One evidence file of a saved report (the file itself is read with the token).
 class ReportMedia {
-  const ReportMedia({required this.id, required this.kind, required this.sizeBytes});
+  const ReportMedia({
+    required this.id,
+    required this.kind,
+    required this.sizeBytes,
+    this.mimeType = '',
+    this.frames = const [],
+  });
 
   final String id;
   final EvidenceKind kind;
   final int sizeBytes;
+  final String mimeType;
+
+  /// US-23 · Frames extracted from this video, in order (position 1..4).
+  final List<ReportFrame> frames;
 
   bool get isVideo => kind == EvidenceKind.video;
+
+  /// File extension for the downloaded copy.
+  String get extension => switch (mimeType) {
+        'video/quicktime' => 'mov',
+        'video/mp4' => 'mp4',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+        _ => isVideo ? 'mp4' : 'jpg',
+      };
 
   factory ReportMedia.fromJson(Map<String, dynamic> json) => ReportMedia(
         id: json['id'] as String,
         kind: json['kind'] == 'video' ? EvidenceKind.video : EvidenceKind.photo,
         sizeBytes: json['size_bytes'] as int,
+        mimeType: json['mime_type'] as String? ?? '',
+        frames: ((json['frames'] as List<dynamic>?) ?? const [])
+            .map((f) => ReportFrame.fromJson(f as Map<String, dynamic>))
+            .toList()
+          ..sort((a, b) => a.position.compareTo(b.position)),
       );
+}
+
+/// US-23 · One frame of a video (derived evidence, read with the session like any file).
+class ReportFrame {
+  const ReportFrame({required this.id, required this.position});
+
+  final String id;
+  final int position;
+
+  factory ReportFrame.fromJson(Map<String, dynamic> json) =>
+      ReportFrame(id: json['id'] as String, position: json['position'] as int);
 }
 
 /// GET /reports/:id → {report, media, authority}.
@@ -39,6 +74,8 @@ class ReportDetail {
     this.address,
     this.requesterPhone,
     this.sentAt,
+    this.sentVia,
+    this.sendMode,
   });
 
   final String id;
@@ -52,6 +89,10 @@ class ReportDetail {
   final DateTime occurredAt;
   final String status;
   final DateTime? sentAt;
+
+  /// `email` or `manual` once sent; `test` or `live` when sent by email.
+  final String? sentVia;
+  final String? sendMode;
   final String requesterName;
   final String requesterDocType;
   final String requesterDocNumber;
@@ -74,6 +115,8 @@ class ReportDetail {
       address: r['address'] as String?,
       occurredAt: DateTime.parse(r['occurred_at'] as String).toLocal(),
       status: r['status'] as String,
+      sentVia: r['sent_via'] as String?,
+      sendMode: r['send_mode'] as String?,
       sentAt: sentAt == null ? null : DateTime.parse(sentAt).toLocal(),
       requesterName: r['requester_name'] as String,
       requesterDocType: r['requester_doc_type'] as String,

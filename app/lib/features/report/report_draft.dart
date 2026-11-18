@@ -1,18 +1,40 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../auth/user.dart';
+import 'frame_extractor.dart';
 
 enum EvidenceKind { photo, video }
 
+/// US-23 · Frames of a video: being extracted, ready (4 JPEG) or failed (none).
+enum FramesStatus { none, extracting, ready, failed }
+
 /// A photo or video chosen for the report (still only on the phone).
 class EvidenceFile {
-  const EvidenceFile({required this.path, required this.kind, required this.sizeBytes});
+  const EvidenceFile({
+    required this.path,
+    required this.kind,
+    required this.sizeBytes,
+    this.frames = const [],
+    this.framesStatus = FramesStatus.none,
+  });
 
   final String path;
   final EvidenceKind kind;
   final int sizeBytes;
 
+  /// Videos only: paths of the extracted frames, in order (position 1..4).
+  final List<String> frames;
+  final FramesStatus framesStatus;
+
   bool get isVideo => kind == EvidenceKind.video;
+
+  EvidenceFile withFrames(FramesStatus status, [List<String> frames = const []]) => EvidenceFile(
+        path: path,
+        kind: kind,
+        sizeBytes: sizeBytes,
+        frames: frames,
+        framesStatus: status,
+      );
 }
 
 /// Limits from docs/05 (the API checks them again).
@@ -179,7 +201,35 @@ class ReportDraftController extends Notifier<ReportDraft> {
   }
 
   void removeEvidence(EvidenceFile file) {
-    state = state.copyWith(evidence: state.evidence.where((f) => f != file).toList());
+    state = state.copyWith(evidence: state.evidence.where((f) => f.path != file.path).toList());
+  }
+
+  /// True while a video of the report is still extracting its frames.
+  bool get isExtractingFrames =>
+      state.evidence.any((f) => f.framesStatus == FramesStatus.extracting);
+
+  /// US-23 · Extracts the 4 frames of the video at [videoPath]. Returns false only if
+  /// it failed and the video is still in the report: the report continues without
+  /// frames and the screen tells the user.
+  Future<bool> extractFrames(String videoPath) async {
+    _updateVideo(videoPath, (f) => f.withFrames(FramesStatus.extracting));
+    try {
+      final frames = await ref.read(frameExtractorProvider).extract(videoPath);
+      _updateVideo(videoPath, (f) => f.withFrames(FramesStatus.ready, frames));
+      return true;
+    } catch (_) {
+      final stillThere = state.evidence.any((f) => f.path == videoPath);
+      _updateVideo(videoPath, (f) => f.withFrames(FramesStatus.failed));
+      return !stillThere;
+    }
+  }
+
+  /// Replaces one evidence file; does nothing if the user already removed it.
+  void _updateVideo(String path, EvidenceFile Function(EvidenceFile) change) {
+    if (!state.evidence.any((f) => f.path == path)) return;
+    state = state.copyWith(
+      evidence: [for (final f in state.evidence) f.path == path ? change(f) : f],
+    );
   }
 
   /// Step 2 saves each change, so going back and forth keeps the data.

@@ -20,6 +20,14 @@ const schema = z.object({
   NOMINATIM_USER_AGENT: z.string().default('AireClaro-UNAD/1.0'),
   CORS_ORIGIN: z.string().default('*'),
   MAIL_MODE: z.enum(['test', 'live', 'off']).default('test'),
+  // Outgoing email (US-21). Optional: without SMTP_HOST the API answers 503 when sending.
+  // With MAIL_MODE=test every email goes to MAIL_TEST_TO, never to an authority.
+  MAIL_TEST_TO: z.string().default(''),
+  MAIL_FROM: z.string().default(''),
+  SMTP_HOST: z.string().default(''),
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  SMTP_USER: z.string().default(''),
+  SMTP_PASS: z.string().default(''),
   // Full error messages in logs may contain personal data: off unless set on purpose.
   LOG_ERROR_DETAILS: z
     .enum(['true', 'false'])
