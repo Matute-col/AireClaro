@@ -55,7 +55,10 @@ describe('request text (US-12, Ley 1755 art. 16)', () => {
   });
 
   it('5 · list of documents (ANEXOS), one line per file', () => {
-    expect(text).toContain('ANEXOS\n1. Fotografía 1 (JPG, 1,2 MB).\n2. Video 1 (MP4, 3,2 MB).');
+    expect(text).toContain(
+      'ANEXOS\n1. Fotografía 1 (JPG, 1,2 MB) – Disponible a solicitud del peticionario.\n' +
+        '2. Video 1 (MP4, 3,2 MB) – Disponible a solicitud del peticionario.',
+    );
   });
 
   it('6 · signature: closing, name and document', () => {
@@ -97,6 +100,37 @@ describe('request text (US-12, Ley 1755 art. 16)', () => {
 describe('ANEXOS order', () => {
   it('photos first, then videos, whatever the stored order', () => {
     const text = toPlainText(buildRequest(report, [media[1], media[0]], authority));
-    expect(text).toContain('ANEXOS\n1. Fotografía 1 (JPG, 1,2 MB).\n2. Video 1 (MP4, 3,2 MB).');
+    expect(text).toMatch(/ANEXOS\n1\. Fotografía 1 \(JPG[^\n]*\n2\. Video 1 \(MP4/);
+  });
+});
+
+describe('ANEXOS label by delivery channel (Mateo, 17-nov-2026)', () => {
+  const annexLines = (delivery) =>
+    toPlainText(buildRequest(report, media, authority, delivery))
+      .split('ANEXOS\n')[1]
+      .split('\n\n')[0]
+      .split('\n');
+
+  it('downloaded, shared or portal PDF: «Disponible a solicitud del peticionario»', () => {
+    for (const line of annexLines()) {
+      expect(line).toMatch(/– Disponible a solicitud del peticionario\.$/);
+    }
+  });
+
+  it('PDF sent by email with the evidence attached (≤ 15 MB): «Archivo adjunto al correo»', () => {
+    for (const line of annexLines({ channel: 'email', evidenceAttached: true })) {
+      expect(line).toMatch(/– Archivo adjunto al correo\.$/);
+    }
+  });
+
+  it('PDF sent by email without the evidence (> 15 MB): never claims it is attached', () => {
+    for (const line of annexLines({ channel: 'email', evidenceAttached: false })) {
+      expect(line).toMatch(/– Disponible a solicitud del peticionario\.$/);
+    }
+  });
+
+  it('a download never says «adjunto al correo», even if evidenceAttached is passed', () => {
+    const lines = annexLines({ channel: 'download', evidenceAttached: true });
+    expect(lines.join('\n')).not.toContain('adjunto');
   });
 });

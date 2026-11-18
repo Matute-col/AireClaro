@@ -68,7 +68,10 @@ describeDb('GET /api/reports/:id/pqrsd and .pdf (US-12, test database)', () => {
     expect(res.body.authority).toMatchObject({ code: 'SDA', can_email: true });
     expect(res.body.authority).not.toHaveProperty('email');
     expect(res.body.text).toContain('Secretaría Distrital de Ambiente de Bogotá');
-    expect(res.body.text).toContain('ANEXOS\n1. Fotografía 1 (PNG, 1 KB).\n2. Video 1 (MP4, 1 KB).');
+    expect(res.body.text).toContain(
+      'ANEXOS\n1. Fotografía 1 (PNG, 1 KB) – Disponible a solicitud del peticionario.\n' +
+        '2. Video 1 (MP4, 1 KB) – Disponible a solicitud del peticionario.',
+    );
   });
 
   it('PDF: valid file, inline, with a server-generated name', async () => {

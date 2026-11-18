@@ -243,7 +243,10 @@ Solicito respetuosamente a la entidad:
    autoridad que corresponda e informarme de ello.
 
 ANEXOS
-1. {Fotografía|Video} ({formato}, {tamaño})   ← una línea por archivo de evidencia
+1. {Fotografía|Video} ({formato}, {tamaño}) – {disponibilidad}   ← una línea por archivo, fotos y luego videos
+   {disponibilidad}: PDF descargado, compartido o subido al portal → «Disponible a solicitud del peticionario»;
+   PDF que viaja en el correo (US-21) → «Archivo adjunto al correo» si la evidencia total es ≤ 15 MB, si no
+   «Disponible a solicitud del peticionario» (regla de Mateo, 17-nov-2026: nunca afirmar un adjunto que no existe).
 
 NOTIFICACIONES
 Recibiré notificaciones en el correo {correo}{ y en el teléfono {teléfono}}.

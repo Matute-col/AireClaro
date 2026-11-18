@@ -64,6 +64,14 @@ function shortId(id) {
   return String(id).replace(/-/g, '').slice(0, 8).toUpperCase();
 }
 
+// ANEXOS label of each evidence file, by delivery channel (decided by Mateo, 17-nov-2026):
+// - 'download' (PDF downloaded, shared or uploaded to a portal): «Disponible a solicitud…»;
+// - 'email' (PDF sent with the email, US-21): «Archivo adjunto al correo» only when the
+//   evidence really goes attached (total ≤ 15 MB, docs/04); otherwise «Disponible a solicitud…».
+// The PDF never says that a file is attached when it is not.
+const ATTACHED = 'Archivo adjunto al correo';
+const ON_REQUEST = 'Disponible a solicitud del peticionario';
+
 function evidenceKinds(media) {
   const photos = media.filter((m) => m.kind === 'photo').length;
   const videos = media.length - photos;
@@ -76,9 +84,13 @@ function evidenceKinds(media) {
  * @param {object} report    report row (snapshot of the requester data, RB-05)
  * @param {Array}  media     [{kind, mime_type, size_bytes}]
  * @param {object} authority {name}
+ * @param {object} [delivery]
+ * @param {'download'|'email'} [delivery.channel='download']
+ * @param {boolean} [delivery.evidenceAttached=false] email only: the evidence goes attached
  * @returns structured content of the request
  */
-function buildRequest(report, media, authority) {
+function buildRequest(report, media, authority, { channel = 'download', evidenceAttached = false } = {}) {
+  const availability = channel === 'email' && evidenceAttached ? ATTACHED : ON_REQUEST;
   const occurred = new Date(report.occurred_at);
   const lat = Number(report.lat).toFixed(5);
   const lng = Number(report.lng).toFixed(5);
@@ -107,7 +119,8 @@ function buildRequest(report, media, authority) {
   let videoNumber = 0;
   const annexes = ordered.map((m) => {
     const label = m.kind === 'photo' ? `Fotografía ${++photoNumber}` : `Video ${++videoNumber}`;
-    return `${label} (${FORMATS[m.mime_type] || m.mime_type}, ${formatSize(m.size_bytes)}).`;
+    const format = FORMATS[m.mime_type] || m.mime_type;
+    return `${label} (${format}, ${formatSize(m.size_bytes)}) – ${availability}.`;
   });
 
   const phone = report.requester_phone ? ` y en el teléfono ${report.requester_phone}` : '';
