@@ -31,8 +31,8 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | US-09 | Hecha | f246904 | API: `POST /reports` multipart en una transacción (archivos a `reports/<id>/`, limpieza ante cualquier error, dueño desde el token, autoridad elegida o regla de `docs/05`). App: revisión con mapa pequeño, autoridad sugerida y «Cambiar», progreso de subida, «Reporte creado» en Inicio. Prueba (c) aprobada el 16-nov-2026 (evidencia en `backend/uploads/reports/<id>/`) |
 | US-10 | Hecha | 3d34ebd | API: `GET /reports` (solo los del usuario, más reciente primero, `page/limit/status`, miniatura) y `GET /reports/:id/media/:mediaId` solo para el dueño (404 si no). App: «Mis reportes» con miniaturas autenticadas, chips de estado, paginación al desplazar, recarga, vacío y error; número en Inicio. Prueba (d) aprobada el 16-nov-2026 |
 | US-11 | Hecha | c40a929 | API: `GET /reports/:id` con prueba de propiedad (otro usuario → 404 igual que inexistente; sin correo de la autoridad ni rutas de archivo). App: detalle con carrusel, datos, mapa pequeño, autoridad, estado y peticionario; tras crear un reporte se abre su detalle. Prueba (d) aprobada el 16-nov-2026 |
-| US-12 | Hecha (falta prueba en celular) | a7c2bef | API: `GET /reports/:id/pqrsd` (texto, autoridad, placa, estado, modo de correo) y `.pdf` con `pdfkit` según `docs/05` y la Ley 1755 art. 16 (sección ANEXOS, encabezado solo con fecha, primera foto ≈ 6 cm). Solo el dueño (404). Pruebas leen el PDF real: tildes, eñ y signos. Prueba (e) pendiente |
-| US-13 | Hecha (falta prueba en celular) | 3c2e941 | App: vista previa tras crear el reporte, «Descargar PDF» (abre el visor), «Compartir» (menú del teléfono), «Continuar» al detalle; en el detalle «Ver solicitud», PDF y «Abrir video» (CP-07). Prueba (e) pendiente |
+| US-12 | Hecha | a7c2bef, a378120 | API: `GET /reports/:id/pqrsd` (texto, autoridad, placa, estado, modo de correo) y `.pdf` con `pdfkit` según `docs/05` y la Ley 1755 art. 16 (sección ANEXOS, encabezado solo con fecha, primera foto ≈ 6 cm). Solo el dueño (404). Pruebas leen el PDF real: tildes, eñ y signos. ANEXOS con etiqueta según el canal. Prueba (e) aprobada el 17-nov-2026 |
+| US-13 | Hecha | 3c2e941 | App: vista previa tras crear el reporte, «Descargar PDF» (abre el visor), «Compartir» (menú del teléfono), «Continuar» al detalle; en el detalle «Ver solicitud», PDF y «Abrir video» (CP-07). Prueba (e) aprobada el 17-nov-2026 |
 | US-14…US-22 | Pendiente | | |
 
 ## Decisiones tomadas durante el desarrollo
@@ -84,6 +84,8 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 - 17-nov-2026 · ANEXOS del PDF en orden fijo: fotos y luego videos · los nombres guardados son UUID aleatorios y el orden cambiaba entre ejecuciones.
 - 17-nov-2026 · Las pruebas leen el PDF con `pdf-parse` en un proceso de Node aparte (`tests/helpers/pdfText.js`) · Jest no permite el `import()` dinámico que usa `pdfjs`.
 - 17-nov-2026 · Mateo recreó la rama `test` de Neon (conexión directa, sin pooler) y actualizó `TEST_DATABASE_URL`; la credencial anterior daba `28P01`.
+
+- 17-nov-2026 · ANEXOS según el canal: PDF descargado/compartido/portal → «Disponible a solicitud del peticionario»; PDF del correo → «Archivo adjunto al correo» solo si la evidencia viaja adjunta (≤ 15 MB) · nunca afirmar un adjunto que no existe.
 
 ## Problemas abiertos
 - SMTP sin configurar en `backend/.env` · Mateo lo llena el martes 17 por la mañana (Gmail con contraseña de aplicación; `MAIL_TEST_TO` = su buzón). Bloquea la prueba (f) de US-21, no su desarrollo.
