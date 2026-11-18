@@ -44,7 +44,7 @@
 | CP-29 | Dueño del reporte | Intentar enviar el reporte de otro usuario | 404 | RB-01 |
 | CP-30 | Fotogramas del video (US-23) | Crear un reporte con un video | 4 fotogramas en el detalle bajo el video y en ANEXOS del PDF («Fotogramas del video 1 (4)»), en cuadrícula; si la extracción falla, el reporte se crea sin ellos y la app lo avisa | RF-19 |
 
-## Revisión de estados (US-17, 18-nov-2026)
+## Revisión de estados (US-17, 17-nov-2026)
 Cada pantalla que habla con el API tiene estado de carga con texto, estado vacío cuando aplica y error con
 mensaje en español y «Reintentar». Los errores de red y del servidor pasan por `toApiException` (con prueba).
 
