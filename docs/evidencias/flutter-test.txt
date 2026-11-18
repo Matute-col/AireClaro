@@ -1,0 +1,140 @@
+# cd app; flutter test — 2026-11-17 23:37
+00:00 +0: loading C:/proyectos/AireClaro/app/test/core/api_client_test.dart
+00:00 +0: C:/proyectos/AireClaro/app/test/core/api_error_test.dart: US-17 · error messages too many requests (429) keeps the API message
+00:00 +1: C:/proyectos/AireClaro/app/test/core/api_error_test.dart: US-17 · error messages server error (500) keeps the generic API message
+00:00 +2: C:/proyectos/AireClaro/app/test/core/api_error_test.dart: US-17 · error messages slow server (timeout) is treated as no connection
+00:00 +3: C:/proyectos/AireClaro/app/test/core/api_error_test.dart: US-17 · error messages a cancelled or unknown failure never shows technical text
+00:00 +4: C:/proyectos/AireClaro/app/test/core/api_error_test.dart: US-17 · error messages anything that is not an HTTP error gets the generic message
+00:00 +5: C:/proyectos/AireClaro/app/test/core/api_error_test.dart: reads code, message and field errors from the API format
+00:00 +6: C:/proyectos/AireClaro/app/test/core/api_error_test.dart: connection problems become a network error in Spanish
+00:00 +7: C:/proyectos/AireClaro/app/test/core/api_error_test.dart: unexpected bodies give a generic message
+00:01 +8: C:/proyectos/AireClaro/app/test/core/router_redirect_test.dart: while checking, everything goes to /splash
+00:01 +9: C:/proyectos/AireClaro/app/test/core/router_redirect_test.dart: without session only public screens are allowed
+00:01 +10: C:/proyectos/AireClaro/app/test/core/router_redirect_test.dart: expired session goes to the login
+00:01 +11: C:/proyectos/AireClaro/app/test/core/router_redirect_test.dart: with session, public screens go to /home
+00:02 +12: C:/proyectos/AireClaro/app/test/core/validators_test.dart: Validators email
+00:02 +13: C:/proyectos/AireClaro/app/test/core/api_client_test.dart: adds the Bearer token when there is a session
+00:02 +14: C:/proyectos/AireClaro/app/test/core/api_client_test.dart: adds the Bearer token when there is a session
+00:02 +15: C:/proyectos/AireClaro/app/test/core/api_client_test.dart: adds the Bearer token when there is a session
+00:02 +16: C:/proyectos/AireClaro/app/test/core/api_client_test.dart: adds the Bearer token when there is a session
+00:02 +17: C:/proyectos/AireClaro/app/test/core/api_client_test.dart: adds the Bearer token when there is a session
+00:02 +18: C:/proyectos/AireClaro/app/test/core/api_client_test.dart: adds the Bearer token when there is a session
+00:02 +19: C:/proyectos/AireClaro/app/test/core/api_client_test.dart: 401 with a token closes the session
+00:02 +20: C:/proyectos/AireClaro/app/test/core/api_client_test.dart: 401 without a token (wrong login) does not
+00:03 +21: C:/proyectos/AireClaro/app/test/features/auth_controller_test.dart: starts checking the session
+00:03 +22: C:/proyectos/AireClaro/app/test/features/auth_controller_test.dart: without a saved token the user is signed out (no API call)
+00:03 +23: C:/proyectos/AireClaro/app/test/features/auth_controller_test.dart: a saved valid token restores the session
+00:03 +24: C:/proyectos/AireClaro/app/test/features/auth_controller_test.dart: a rejected token (401) is deleted
+00:03 +25: C:/proyectos/AireClaro/app/test/features/auth_controller_test.dart: without connection the token is kept and retry is offered
+00:03 +26: C:/proyectos/AireClaro/app/test/features/auth_controller_test.dart: login saves the token and logout deletes it
+00:03 +27: C:/proyectos/AireClaro/app/test/features/auth_controller_test.dart: a 401 while signed in closes the session as expired
+00:05 +28: C:/proyectos/AireClaro/app/test/features/done_screen_test.dart: sent by email in test mode: title with the authority and the test-mode notice
+00:07 +29: C:/proyectos/AireClaro/app/test/features/done_screen_test.dart: only generated: «Reporte generado» and the other ways to present it
+00:07 +30: C:/proyectos/AireClaro/app/test/features/done_screen_test.dart: always shows how to follow up (Ley 1755) and the way back
+00:07 +31: C:/proyectos/AireClaro/app/test/features/done_screen_test.dart: StatusChip «Generado», «Enviado por correo» and «Enviado (manual)»
+00:07 +32: C:/proyectos/AireClaro/app/test/features/evidence_step_test.dart: «Siguiente» is enabled only with at least one file
+00:08 +33: C:/proyectos/AireClaro/app/test/features/evidence_step_test.dart: videos show a «Video» card with the size
+00:08 +34: C:/proyectos/AireClaro/app/test/features/evidence_step_test.dart: maximum 3 files: buttons are disabled when full
+00:09 +35: C:/proyectos/AireClaro/app/test/features/evidence_step_test.dart: a file can be removed
+00:09 +36: C:/proyectos/AireClaro/app/test/features/evidence_step_test.dart: too large or HEIC files are rejected with a message
+00:09 +37: C:/proyectos/AireClaro/app/test/features/evidence_step_test.dart: US-23 · video frames adding a video extracts 4 frames, in order
+00:09 +38: C:/proyectos/AireClaro/app/test/features/evidence_step_test.dart: US-23 · video frames shows that the frames are being extracted
+00:09 +39: C:/proyectos/AireClaro/app/test/features/evidence_step_test.dart: US-23 · video frames if extraction fails the report continues without frames and says so
+00:09 +40: C:/proyectos/AireClaro/app/test/features/evidence_step_test.dart: US-23 · video frames if extraction fails the report continues without frames and says so
+00:09 +41: C:/proyectos/AireClaro/app/test/features/evidence_step_test.dart: US-23 · video frames if extraction fails the report continues without frames and says so
+00:09 +42: C:/proyectos/AireClaro/app/test/features/evidence_step_test.dart: US-23 · video frames if extraction fails the report continues without frames and says so
+00:09 +43: C:/proyectos/AireClaro/app/test/features/evidence_step_test.dart: US-23 · video frames removing the video while extracting: no warning
+00:09 +44: C:/proyectos/AireClaro/app/test/features/evidence_step_test.dart: US-23 · video frames photos do not extract frames
+00:10 +45: C:/proyectos/AireClaro/app/test/features/info_screen_test.dart: shows the 4 steps of docs/06
+00:11 +46: C:/proyectos/AireClaro/app/test/features/info_screen_test.dart: lists the authorities and how each one receives the request
+00:11 +47: C:/proyectos/AireClaro/app/test/features/info_screen_test.dart: scope notice (RNF-08) and the data policy
+00:11 +48: C:/proyectos/AireClaro/app/test/features/info_screen_test.dart: authorities error: «Reintentar» loads them again
+00:12 +49: C:/proyectos/AireClaro/app/test/features/location_step_test.dart: GPS position: pin, address, suggested authority and fixed date
+00:13 +50: C:/proyectos/AireClaro/app/test/features/location_step_test.dart: the OpenStreetMap attribution is always visible
+00:14 +51: C:/proyectos/AireClaro/app/test/features/location_step_test.dart: permission denied: notice and «Activar ubicación» asks again
+00:14 +52: C:/proyectos/AireClaro/app/test/features/location_step_test.dart: permission denied forever: «Activar ubicación» opens the settings
+00:14 +53: C:/proyectos/AireClaro/app/test/features/location_step_test.dart: if the address fails the user can still continue
+00:14 +54: C:/proyectos/AireClaro/app/test/features/location_step_test.dart: the date is taken only the first time the step opens
+00:14 +55: C:/proyectos/AireClaro/app/test/features/location_step_test.dart: (tearDownAll)
+00:14 +55: C:/proyectos/AireClaro/app/test/features/login_screen_test.dart: login button is disabled with empty fields or an invalid email
+00:15 +56: C:/proyectos/AireClaro/app/test/features/login_screen_test.dart: wrong credentials show the generic message
+00:16 +57: C:/proyectos/AireClaro/app/test/features/login_screen_test.dart: valid credentials open the session
+00:16 +58: C:/proyectos/AireClaro/app/test/features/login_screen_test.dart: shows the expired-session message after a 401
+00:16 +59: C:/proyectos/AireClaro/app/test/features/map_screen_test.dart: (setUpAll)
+00:16 +59: C:/proyectos/AireClaro/app/test/features/map_screen_test.dart: shows one pin per report, the count and the OSM attribution
+00:17 +60: C:/proyectos/AireClaro/app/test/features/map_screen_test.dart: tapping a pin shows only the vehicle type and the date (CP-18)
+00:18 +61: C:/proyectos/AireClaro/app/test/features/map_screen_test.dart: vehicle type chips filter the pins
+00:18 +62: C:/proyectos/AireClaro/app/test/features/map_screen_test.dart: date chips ask for the right days (Colombia calendar)
+00:18 +63: C:/proyectos/AireClaro/app/test/features/map_screen_test.dart: no reports with the filters: clear message
+00:18 +64: C:/proyectos/AireClaro/app/test/features/map_screen_test.dart: error: message with «Reintentar»
+00:19 +65: C:/proyectos/AireClaro/app/test/features/navigation_test.dart: without a session the app opens on Bienvenida
+00:19 +66: C:/proyectos/AireClaro/app/test/features/navigation_test.dart: with a saved session the app opens on Inicio with the bottom bar
+00:20 +67: C:/proyectos/AireClaro/app/test/features/navigation_test.dart: bottom bar and shortcut cards switch tabs
+00:20 +68: C:/proyectos/AireClaro/app/test/features/navigation_test.dart: profile opens without the bottom bar and logout goes to Bienvenida
+00:21 +69: C:/proyectos/AireClaro/app/test/features/portal_and_manual_test.dart: (setUpAll)
+00:21 +69: C:/proyectos/AireClaro/app/test/features/portal_and_manual_test.dart: US-22 · Radicar en el portal oficial SDM (no verified email): portal yes, email no (CP-24)
+00:22 +70: C:/proyectos/AireClaro/app/test/features/portal_and_manual_test.dart: US-22 · Radicar en el portal oficial opens the official URL in the browser and explains the next step (CP-27)
+00:22 +71: C:/proyectos/AireClaro/app/test/features/portal_and_manual_test.dart: US-22 · Radicar en el portal oficial if the browser cannot open: clear message
+00:22 +72: C:/proyectos/AireClaro/app/test/features/portal_and_manual_test.dart: US-22 · Radicar en el portal oficial the detail also offers the portal
+00:22 +73: C:/proyectos/AireClaro/app/test/features/portal_and_manual_test.dart: US-14 · Marcar como enviado confirmation «Reporte generado»: asks first, then becomes «Enviado (manual)»
+00:23 +74: C:/proyectos/AireClaro/app/test/features/portal_and_manual_test.dart: US-14 · Marcar como enviado «Cancelar» changes nothing
+00:23 +75: C:/proyectos/AireClaro/app/test/features/portal_and_manual_test.dart: US-14 · Marcar como enviado detail: the chip changes to «Enviado (manual)»
+00:23 +76: C:/proyectos/AireClaro/app/test/features/preview_screen_test.dart: shows the authority and the text of the request
+00:23 +77: C:/proyectos/AireClaro/app/test/features/preview_screen_test.dart: shows the authority and the text of the request
+00:24 +78: C:/proyectos/AireClaro/app/test/features/preview_screen_test.dart: «Descargar PDF» downloads it with the session and opens it
+00:24 +79: C:/proyectos/AireClaro/app/test/features/profile_test.dart: profile shows the user data
+00:24 +80: C:/proyectos/AireClaro/app/test/features/profile_test.dart: profile shows the user data
+00:25 +81: C:/proyectos/AireClaro/app/test/features/profile_test.dart: profile shows the user data
+00:25 +82: C:/proyectos/AireClaro/app/test/features/profile_test.dart: profile shows the user data
+00:25 +83: C:/proyectos/AireClaro/app/test/features/profile_test.dart: profile shows the user data
+00:25 +84: C:/proyectos/AireClaro/app/test/features/profile_test.dart: profile shows the user data
+00:25 +85: C:/proyectos/AireClaro/app/test/features/preview_screen_test.dart: preview error: «Reintentar» loads it again
+00:25 +86: C:/proyectos/AireClaro/app/test/features/preview_screen_test.dart: preview error: «Reintentar» loads it again
+00:26 +87: C:/proyectos/AireClaro/app/test/features/preview_screen_test.dart: preview error: «Reintentar» loads it again
+00:26 +88: C:/proyectos/AireClaro/app/test/features/profile_test.dart: saving updates the user in the session
+00:26 +89: C:/proyectos/AireClaro/app/test/features/profile_test.dart: saving updates the user in the session
+00:26 +90: C:/proyectos/AireClaro/app/test/features/profile_test.dart: saving updates the user in the session
+00:26 +91: C:/proyectos/AireClaro/app/test/features/profile_test.dart: saving updates the user in the session
+00:26 +92: C:/proyectos/AireClaro/app/test/features/profile_test.dart: saving updates the user in the session
+00:26 +93: C:/proyectos/AireClaro/app/test/features/preview_screen_test.dart: US-21 · «Enviar a la autoridad» dialog: authority, copy and test mode; «Cancelar» sends nothing
+00:26 +94: C:/proyectos/AireClaro/app/test/features/profile_test.dart: API field errors are shown under the field
+00:26 +95: C:/proyectos/AireClaro/app/test/features/register_screen_test.dart: button stays disabled until the consent box is checked
+00:27 +96: C:/proyectos/AireClaro/app/test/features/register_screen_test.dart: button stays disabled until the consent box is checked
+00:27 +97: C:/proyectos/AireClaro/app/test/features/register_screen_test.dart: button stays disabled until the consent box is checked
+00:27 +98: C:/proyectos/AireClaro/app/test/features/register_screen_test.dart: button stays disabled until the consent box is checked
+00:28 +99: C:/proyectos/AireClaro/app/test/features/reports_screen_test.dart: empty list: message and «Nuevo reporte»
+00:29 +100: C:/proyectos/AireClaro/app/test/features/reports_screen_test.dart: empty list: message and «Nuevo reporte»
+00:29 +101: C:/proyectos/AireClaro/app/test/features/register_screen_test.dart: successful registration opens the session and saves the token
+00:29 +102: C:/proyectos/AireClaro/app/test/features/register_screen_test.dart: successful registration opens the session and saves the token
+00:30 +103: C:/proyectos/AireClaro/app/test/features/reports_screen_test.dart: loads the next page when scrolling to the end
+00:30 +104: C:/proyectos/AireClaro/app/test/features/register_screen_test.dart: duplicated email is shown under the email field
+00:30 +105: C:/proyectos/AireClaro/app/test/features/register_screen_test.dart: duplicated email is shown under the email field
+00:31 +106: C:/proyectos/AireClaro/app/test/features/report_detail_screen_test.dart: (setUpAll)
+00:31 +106: C:/proyectos/AireClaro/app/test/features/report_detail_screen_test.dart: shows evidence, data, map, authority and status
+00:32 +107: C:/proyectos/AireClaro/app/test/features/report_detail_screen_test.dart: swiping shows the video card with its size
+00:32 +108: C:/proyectos/AireClaro/app/test/features/report_detail_screen_test.dart: offers the request: «Ver solicitud», «Descargar PDF» and «Compartir»
+00:32 +109: C:/proyectos/AireClaro/app/test/features/report_detail_screen_test.dart: «Abrir video» downloads the video and opens it in the phone (CP-07)
+00:32 +110: C:/proyectos/AireClaro/app/test/features/report_detail_screen_test.dart: 404 (not found or not yours): clear message, no retry
+00:33 +111: C:/proyectos/AireClaro/app/test/features/requester_step_test.dart: fields are prefilled from the profile
+00:34 +112: C:/proyectos/AireClaro/app/test/features/requester_step_test.dart: fields are prefilled from the profile
+00:34 +113: C:/proyectos/AireClaro/app/test/features/report_detail_screen_test.dart: US-23: the frames appear under the video card, in a row of 4
+00:34 +114: C:/proyectos/AireClaro/app/test/features/requester_step_test.dart: edits are kept in the draft, not in the profile
+00:34 +115: C:/proyectos/AireClaro/app/test/features/requester_step_test.dart: invalid data disables «Revisar reporte»
+00:35 +116: C:/proyectos/AireClaro/app/test/features/requester_step_test.dart: coming back keeps the edited data (no new prefill)
+00:36 +117: C:/proyectos/AireClaro/app/test/features/review_screen_test.dart: (setUpAll)
+00:36 +117: C:/proyectos/AireClaro/app/test/features/review_screen_test.dart: reportFormFields maps the draft to the API fields
+00:36 +118: C:/proyectos/AireClaro/app/test/features/review_screen_test.dart: shows the summary and the suggested authority
+00:37 +119: C:/proyectos/AireClaro/app/test/features/review_screen_test.dart: «Cambiar» lets the user pick another authority
+00:37 +120: C:/proyectos/AireClaro/app/test/features/review_screen_test.dart: without a suggestion the user must choose before generating
+00:37 +121: C:/proyectos/AireClaro/app/test/features/review_screen_test.dart: «Generar solicitud» creates the report, opens its preview and clears the draft
+00:37 +122: C:/proyectos/AireClaro/app/test/features/review_screen_test.dart: «Generar solicitud» creates the report, opens its preview and clears the draft
+00:38 +123: C:/proyectos/AireClaro/app/test/features/vehicle_step_test.dart: plate is uppercased and limited to letters and digits
+00:38 +124: C:/proyectos/AireClaro/app/test/features/vehicle_step_test.dart: plate is uppercased and limited to letters and digits
+00:38 +125: C:/proyectos/AireClaro/app/test/features/vehicle_step_test.dart: plate is uppercased and limited to letters and digits
+00:38 +126: C:/proyectos/AireClaro/app/test/features/vehicle_step_test.dart: plate is uppercased and limited to letters and digits
+00:39 +127: C:/proyectos/AireClaro/app/test/features/vehicle_step_test.dart: invalid plate shows the error and keeps «Siguiente» disabled
+00:39 +128: C:/proyectos/AireClaro/app/test/features/vehicle_step_test.dart: type, valid plate and smoke color enable «Siguiente» and fill the draft
+00:39 +129: C:/proyectos/AireClaro/app/test/features/vehicle_step_test.dart: description has a 500-character counter
+00:40 +130: C:/proyectos/AireClaro/app/test/features/vehicle_step_test.dart: the screen starts with the values already in the draft
+00:40 +131: All tests passed!
+
