@@ -18,7 +18,9 @@ import '../report/report_draft.dart';
 import '../report/reports_repository.dart';
 import '../pqrsd/delivery_actions.dart';
 import '../pqrsd/pdf_actions.dart';
+import '../map/map_reports.dart';
 import 'report_detail.dart';
+import 'reports_list_controller.dart';
 
 /// Detail of one of the user's reports.
 final reportDetailProvider = FutureProvider.family<ReportDetail, String>(
@@ -55,6 +57,71 @@ class ReportDetailScreen extends ConsumerWidget {
         },
         data: (report) => _DetailBody(report: report),
       ),
+    );
+  }
+}
+
+/// US-18 · «Eliminar reporte» with confirmation (RF-16). Removes the report, its evidence
+/// and its frames; then goes back and refreshes the list, the count and the map.
+class _DeleteButton extends ConsumerStatefulWidget {
+  const _DeleteButton({required this.report});
+
+  final ReportDetail report;
+
+  @override
+  ConsumerState<_DeleteButton> createState() => _DeleteButtonState();
+}
+
+class _DeleteButtonState extends ConsumerState<_DeleteButton> {
+  bool _busy = false;
+
+  Future<void> _delete() async {
+    final sent = widget.report.status == 'enviado';
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Eliminar este reporte?'),
+        content: Text(
+          'Se borrarán la evidencia, los fotogramas y la solicitud de AireClaro. No se puede deshacer.'
+          '${sent ? '\n\nLa solicitud que ya se presentó a la autoridad no se retira.' : ''}',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancelar')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    setState(() => _busy = true);
+    try {
+      await ref.read(reportsRepositoryProvider).deleteReport(widget.report.id);
+      ref.invalidate(reportsListProvider);
+      ref.invalidate(reportsCountProvider);
+      ref.invalidate(mapReportsProvider);
+      messenger.showSnackBar(const SnackBar(content: Text('Reporte eliminado.')));
+      router.canPop() ? router.pop() : router.go(Routes.reports);
+    } on ApiException catch (error) {
+      messenger.showSnackBar(SnackBar(content: Text(error.message)));
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      style: TextButton.styleFrom(foregroundColor: AppColors.error),
+      onPressed: _busy ? null : _delete,
+      icon: _busy
+          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+          : const Icon(Icons.delete_outline),
+      label: const Text('Eliminar reporte'),
     );
   }
 }
@@ -134,6 +201,8 @@ class _DetailBody extends StatelessWidget {
           'evidencia que tú aportas.',
           style: TextStyle(fontSize: 14),
         ),
+        const SizedBox(height: AppSpacing.lg),
+        _DeleteButton(report: report),
         const SizedBox(height: AppSpacing.lg),
       ],
     );

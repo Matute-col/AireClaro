@@ -82,6 +82,15 @@ router.post('/:id/send', requireUuidParams('id'), validate(sendBody), async (req
 const statusBody = z.object({
   status: z.literal('enviado', { error: 'Solo se puede marcar la solicitud como «enviado».' }),
 });
+// DELETE /api/reports/:id → 204. Only the owner (404 otherwise), with its files (US-18).
+router.delete('/:id', requireUuidParams('id'), async (req, res) => {
+  if (sendService.isSending(req.params.id)) {
+    throw new AppError(409, 'SEND_IN_PROGRESS', 'El envío de esta solicitud por correo está en curso.');
+  }
+  await reportsService.deleteReport(req.user.id, req.params.id);
+  res.status(204).end();
+});
+
 router.patch('/:id/status', requireUuidParams('id'), validate(statusBody), async (req, res) => {
   if (sendService.isSending(req.params.id)) {
     throw new AppError(409, 'SEND_IN_PROGRESS', 'El envío de esta solicitud por correo está en curso.');

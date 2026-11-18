@@ -243,6 +243,22 @@ async function getById(userId, reportId) {
  * (official portal, shared PDF). status = enviado, sent_via = manual (RB-06).
  * 404 if it is not the user's report; 409 if it was already sent.
  */
+/**
+ * US-18 · Deletes one of the user's reports (RF-16, RB-01): the row, and by cascade its
+ * evidence and video frames, then its whole folder on disk (reports/<id>/), so no
+ * orphan files are left. 404 if it does not exist or is not the user's.
+ * A request already sent to an authority is not withdrawn: it is only removed from AireClaro.
+ */
+async function deleteReport(userId, reportId) {
+  const { rowCount } = await query('DELETE FROM reports WHERE id = $1 AND user_id = $2', [
+    reportId,
+    userId,
+  ]);
+  if (rowCount === 0) throw new AppError(404, 'NOT_FOUND', NOT_FOUND_MESSAGE);
+  // Files after the database: if this failed, a retry of the folder removal is harmless.
+  await storage.removeReportFolder(reportId);
+}
+
 async function markAsSent(userId, reportId) {
   const { rows } = await query(
     `UPDATE reports SET status = 'enviado', sent_via = 'manual', sent_at = now(), send_mode = NULL
@@ -262,5 +278,6 @@ module.exports = {
   getById,
   getMediaFile,
   markAsSent,
+  deleteReport,
   NOT_FOUND_MESSAGE,
 };

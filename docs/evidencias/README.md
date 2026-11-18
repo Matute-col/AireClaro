@@ -32,7 +32,7 @@ Registro de la ejecución de los casos CP-01 a CP-30 de `docs/08-plan-de-pruebas
 | CP-14 | Compartir | RF-08 | preview_screen_test | | | |  |
 | CP-15 | Historial | RF-09 | reports.list.test.js · reports_screen_test | | | |  |
 | CP-16 | Detalle | RF-15 | reports.detail.test.js · report_detail_screen_test | | | |  |
-| CP-17 | Eliminar | RF-16 | — (US-18 no implementada) | | | | Depende de US-18 (eliminar), que no se implementó: marcar «No aplica» si se mantiene recortada. |
+| CP-17 | Eliminar | RF-16 | delete.test.js · delete_report_test | | | | |
 | CP-18 | Mapa sin datos sensibles | RF-10 | map.test.js · map_screen_test | | | |  |
 | CP-19 | Sin conexión | RNF-01 | review_screen_test · api_error_test | | | |  |
 | CP-20 | Sesión expirada | RNF-03 | me.test.js · api_client_test · login_screen_test | | | |  |
@@ -53,6 +53,6 @@ Salidas guardadas el 17-nov-2026 (se pueden regenerar con los mismos comandos):
 
 | Archivo | Comando | Resultado |
 |---|---|---|
-| `npm-test.txt` | `cd backend; npm test` | 22 archivos, 184/184 pruebas |
-| `flutter-test.txt` | `cd app; flutter test` | 131/131 pruebas |
+| `npm-test.txt` | `cd backend; npm test` | 23 archivos, 192/192 pruebas |
+| `flutter-test.txt` | `cd app; flutter test` | 135/135 pruebas |
 | `flutter-analyze.txt` | `cd app; flutter analyze` | «No issues found!» |

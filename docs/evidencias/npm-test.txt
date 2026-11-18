@@ -1,4 +1,4 @@
-# cd backend; npm test — 2026-11-17 23:41
+# cd backend; npm test — 2026-11-17 23:55
 
 PASS tests/C:\proyectos\AireClaro\backend\tests\authorityRule.test.js
   ✓ authority rule (RF-07) › Soacha → CAR
@@ -9,6 +9,15 @@ PASS tests/C:\proyectos\AireClaro\backend\tests\authorityRule.test.js
   ✓ authority rule (RF-07) › a street called «Bogotá» in Soacha is not taken as Bogotá
   ✓ authority rule (RF-07) › outside the corridor → no suggestion
   ✓ authority rule (RF-07) › ambiguous (Bogotá and Cundinamarca at the same time) → no suggestion
+PASS tests/C:\proyectos\AireClaro\backend\tests\delete.test.js
+  ✓ DELETE /api/reports/:id (US-18, test database) › 204: the owner deletes the report, its evidence and its frames (database and disk)
+  ✓ DELETE /api/reports/:id (US-18, test database) › it disappears from the detail, the evidence, the list and the map (CP-17)
+  ✓ DELETE /api/reports/:id (US-18, test database) › no orphan files: what stays on disk is exactly what the database still points to
+  ✓ DELETE /api/reports/:id (US-18, test database) › 404 (RB-01): another user cannot delete it, and nothing is touched
+  ✓ DELETE /api/reports/:id (US-18, test database) › 404 for a report that does not exist, or was already deleted
+  ✓ DELETE /api/reports/:id (US-18, test database) › 404 for a malformed id and 401 without a token
+  ✓ DELETE /api/reports/:id (US-18, test database) › a report already sent can be deleted from AireClaro
+  ✓ DELETE /api/reports/:id (US-18, test database) › 409 while an email of that report is being sent (its files are being attached)
 PASS tests/C:\proyectos\AireClaro\backend\tests\errorHandler.test.js
   ✓ errorHandler with unexpected errors › responds 500 without exposing the internal message
   ✓ errorHandler with unexpected errors › by default logs only method, path and error code (no personal data)
@@ -207,4 +216,4 @@ PASS tests/C:\proyectos\AireClaro\backend\tests\upload.test.js
   ✓ evidence upload › size limits (tiny limits for the test) › rejects a photo above MAX_PHOTO_MB with 413
   ✓ evidence upload › size limits (tiny limits for the test) › rejects a video above MAX_VIDEO_MB with 413
 
-Suites: 22/22 · Pruebas: 184/184 · Fallidas: 0
+Suites: 23/23 · Pruebas: 192/192 · Fallidas: 0

@@ -29,7 +29,7 @@
 | CP-14 | Compartir | Pulsar «Compartir» | Se abre el menú del teléfono con el PDF | RF-08 |
 | CP-15 | Historial | Crear 2 reportes | Aparecen ordenados, solo los míos | RF-09 |
 | CP-16 | Detalle | Abrir un reporte | Evidencia, datos, mapa y autoridad | RF-15 |
-| CP-17 | Eliminar | Eliminar con confirmación | Desaparece del historial y del mapa | RF-16 |
+| CP-17 | Eliminar | En el detalle, «Eliminar reporte» y confirmar | Pide confirmación; desaparece del historial y del mapa; su evidencia y fotogramas se borran del servidor; otro usuario recibe 404 | RF-16 |
 | CP-18 | Mapa sin datos sensibles | Tocar un pin | Sin placa ni foto | RF-10 |
 | CP-19 | Sin conexión | Apagar datos al guardar | Mensaje y «Reintentar» | RNF-01 |
 | CP-20 | Sesión expirada | Token inválido | Vuelve a login con aviso | RNF-03 |

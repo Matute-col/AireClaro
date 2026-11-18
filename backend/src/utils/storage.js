@@ -35,9 +35,21 @@ function resolveStored(relativePath) {
   return absolute;
 }
 
+/** US-18 · Deletes the whole folder of a report (evidence and frames). */
+async function removeReportFolder(reportId) {
+  await fs.rm(resolveStored(path.join('reports', String(reportId))), { recursive: true, force: true });
+}
+
 /** Deletes files, ignoring the ones that no longer exist. */
 async function removeFiles(paths) {
   await Promise.all(paths.filter(Boolean).map((p) => fs.rm(p, { force: true })));
 }
 
-module.exports = { uploadRoot, ensureTmpDir, moveToReport, resolveStored, removeFiles };
+module.exports = {
+  uploadRoot,
+  ensureTmpDir,
+  moveToReport,
+  resolveStored,
+  removeFiles,
+  removeReportFolder,
+};

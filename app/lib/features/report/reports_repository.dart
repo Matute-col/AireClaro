@@ -152,6 +152,15 @@ class ReportsRepository {
     }
   }
 
+  /// US-18 · Deletes the report with its evidence (404 if it is not the user's).
+  Future<void> deleteReport(String id) async {
+    try {
+      await _dio.delete<void>('/reports/$id');
+    } catch (error) {
+      throw toApiException(error);
+    }
+  }
+
   /// «Mis reportes»: newest first, [limit] per page.
   Future<ReportsPage> list({int page = 1, int limit = 20}) async {
     try {
