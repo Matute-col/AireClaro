@@ -238,4 +238,29 @@ async function getById(userId, reportId) {
   };
 }
 
-module.exports = { create, resolveAuthority, list, getById, getMediaFile, NOT_FOUND_MESSAGE };
+/**
+ * US-14 / US-22 · «Marcar como enviado»: the citizen presented the request by other means
+ * (official portal, shared PDF). status = enviado, sent_via = manual (RB-06).
+ * 404 if it is not the user's report; 409 if it was already sent.
+ */
+async function markAsSent(userId, reportId) {
+  const { rows } = await query(
+    `UPDATE reports SET status = 'enviado', sent_via = 'manual', sent_at = now(), send_mode = NULL
+      WHERE id = $1 AND user_id = $2 AND status = 'generado'
+      RETURNING id, status, sent_via, send_mode, sent_at`,
+    [reportId, userId],
+  );
+  if (rows[0]) return rows[0];
+  await getById(userId, reportId); // 404 when it does not exist or is not the user's
+  throw new AppError(409, 'ALREADY_SENT', 'Esta solicitud ya fue enviada.');
+}
+
+module.exports = {
+  create,
+  resolveAuthority,
+  list,
+  getById,
+  getMediaFile,
+  markAsSent,
+  NOT_FOUND_MESSAGE,
+};

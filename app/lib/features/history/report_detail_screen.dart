@@ -16,6 +16,7 @@ import '../report/evidence_step_screen.dart';
 import '../report/location_step_screen.dart';
 import '../report/report_draft.dart';
 import '../report/reports_repository.dart';
+import '../pqrsd/delivery_actions.dart';
 import '../pqrsd/pdf_actions.dart';
 import 'report_detail.dart';
 
@@ -94,6 +95,15 @@ class _DetailBody extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.sm),
         PdfActions(reportId: report.id, plate: report.plate),
+        // US-22 / US-14: official portal and «Marcar como enviado» (docs/06, screen 13).
+        if (report.authority.portalUrl != null) ...[
+          const SizedBox(height: AppSpacing.sm),
+          PortalButton(portalUrl: report.authority.portalUrl!),
+        ],
+        if (report.status == 'generado') ...[
+          const SizedBox(height: AppSpacing.sm),
+          MarkAsSentButton(reportId: report.id),
+        ],
         const SizedBox(height: AppSpacing.md),
         _Card(title: 'Vehículo', lines: [
           ('Tipo', vehicleTypeLabels[report.vehicleType] ?? report.vehicleType),

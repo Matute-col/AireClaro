@@ -78,6 +78,17 @@ router.post('/:id/send', requireUuidParams('id'), validate(sendBody), async (req
   res.json(await sendService.sendReport(req.user.id, req.params.id));
 });
 
+// PATCH /api/reports/:id/status {status: 'enviado'} → «Marcar como enviado» (US-14, US-22).
+const statusBody = z.object({
+  status: z.literal('enviado', { error: 'Solo se puede marcar la solicitud como «enviado».' }),
+});
+router.patch('/:id/status', requireUuidParams('id'), validate(statusBody), async (req, res) => {
+  if (sendService.isSending(req.params.id)) {
+    throw new AppError(409, 'SEND_IN_PROGRESS', 'El envío de esta solicitud por correo está en curso.');
+  }
+  res.json({ report: await reportsService.markAsSent(req.user.id, req.params.id) });
+});
+
 // GET /api/reports/:id/media/:mediaId → the file, only for the owner.
 router.get('/:id/media/:mediaId', requireUuidParams('id', 'mediaId'), async (req, res, next) => {
   const file = await reportsService.getMediaFile(req.user.id, req.params.id, req.params.mediaId);

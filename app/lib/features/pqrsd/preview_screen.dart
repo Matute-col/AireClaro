@@ -10,6 +10,7 @@ import '../../shared/widgets/states.dart';
 import '../history/report_detail_screen.dart';
 import '../history/reports_list_controller.dart';
 import '../report/reports_repository.dart';
+import 'delivery_actions.dart';
 import 'pdf_actions.dart';
 import 'pqrsd_preview.dart';
 
@@ -149,6 +150,10 @@ class _PreviewScreenState extends ConsumerState<PreviewScreen> {
             icon: Icons.send_outlined,
             onPressed: _sending ? null : () => _send(data),
           ),
+          const SizedBox(height: AppSpacing.sm),
+        ],
+        if (data.authority.portalUrl != null) ...[
+          PortalButton(portalUrl: data.authority.portalUrl!),
           const SizedBox(height: AppSpacing.sm),
         ],
         PdfActions(reportId: _id, plate: data.plate),

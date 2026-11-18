@@ -172,7 +172,7 @@ se ofrece «Radicar en el portal oficial». No inventes direcciones; cualquier c
 | `GET /reports` | Mis reportes | `page=1, limit=20 (máx. 50), status?` | `200 {items, page, total}`, más reciente primero; cada item: `id, plate, vehicle_type, smoke_color, status, address, occurred_at, created_at, authority{code,name}, thumbnail_media_id` (una foto; `null` si solo hay videos), `media_count` |
 | `GET /reports/:id` | Detalle | — | `200 {report, media[], authority}` (`authority` con `can_email`, sin el correo; `media` sin rutas de archivo) · `404` si no es suyo, no existe o el id no es válido (misma respuesta) |
 | `DELETE /reports/:id` | Eliminar | — | `204` |
-| `PATCH /reports/:id/status` | Marcar como enviado a mano (portal, compartir) | `{status:"enviado"}` | `200 {report}` con `sent_via=manual` |
+| `PATCH /reports/:id/status` | Marcar como enviado a mano (portal, compartir) | `{status:"enviado"}` | `200 {report}` con `sent_via=manual` · `400` otro valor · `404` no es suyo · `409` ya enviado (por correo o a mano) o envío por correo en curso |
 | `GET /reports/:id/media/:mediaId` | Descargar un archivo de evidencia | — | archivo con su `Content-Type` · `404` si no es suyo, no existe o el id no es válido (misma respuesta en los tres casos) |
 | `GET /reports/:id/pqrsd` | Texto de la solicitud | — | `200 {authority, text}` |
 | `GET /reports/:id/pqrsd.pdf` | PDF de la solicitud | — | `200 application/pdf` |

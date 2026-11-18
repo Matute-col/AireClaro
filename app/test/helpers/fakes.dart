@@ -8,6 +8,7 @@ import 'package:aireclaro/features/history/report_summary.dart';
 import 'package:aireclaro/features/report/frame_extractor.dart';
 import 'package:aireclaro/features/report/reports_repository.dart';
 import 'package:aireclaro/shared/services/file_actions.dart';
+import 'package:aireclaro/shared/services/url_opener.dart';
 
 const testUser = User(
   id: '1',
@@ -141,5 +142,17 @@ class FakeFrameExtractor implements FrameExtractor {
     if (gate != null) await gate!.future;
     if (fail) throw const FrameExtractionException('prueba');
     return [for (var i = 1; i <= 4; i++) '$videoPath-fotograma-$i.jpg'];
+  }
+}
+
+/// US-22 · Records the pages that would be opened in the browser.
+class FakeUrlOpener implements UrlOpener {
+  final opened = <String>[];
+  bool works = true;
+
+  @override
+  Future<bool> open(String url) async {
+    opened.add(url);
+    return works;
   }
 }

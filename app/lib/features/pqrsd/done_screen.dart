@@ -9,6 +9,7 @@ import '../../shared/widgets/buttons.dart';
 import '../../shared/widgets/states.dart';
 import '../history/report_detail.dart';
 import '../history/report_detail_screen.dart';
+import 'delivery_actions.dart';
 import 'pqrsd_preview.dart';
 
 /// Screen 11 · Confirmación (US-14 / US-21). The title depends on the case:
@@ -33,6 +34,15 @@ class DoneScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.md),
           children: [
             _Header(report: report),
+            // «Solo generado» (docs/06): option to record that it was presented by hand.
+            if (report.status == 'generado') ...[
+              const SizedBox(height: AppSpacing.md),
+              if (report.authority.portalUrl != null) ...[
+                PortalButton(portalUrl: report.authority.portalUrl!),
+                const SizedBox(height: AppSpacing.sm),
+              ],
+              MarkAsSentButton(reportId: report.id),
+            ],
             const SizedBox(height: AppSpacing.lg),
             const _FollowUp(),
             const SizedBox(height: AppSpacing.lg),

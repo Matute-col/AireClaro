@@ -170,4 +170,9 @@ async function sendLocked(userId, reportId) {
   };
 }
 
-module.exports = { sendReport, MAX_ATTACHED_EVIDENCE_BYTES };
+/** True while an email of this report is being sent (used by «Marcar como enviado»). */
+function isSending(reportId) {
+  return sending.has(String(reportId).toLowerCase());
+}
+
+module.exports = { sendReport, isSending, MAX_ATTACHED_EVIDENCE_BYTES };

@@ -143,6 +143,15 @@ class ReportsRepository {
     }
   }
 
+  /// US-14 / US-22 · «Marcar como enviado» (presented through the portal or the shared PDF).
+  Future<void> markAsSent(String id) async {
+    try {
+      await _dio.patch<Map<String, dynamic>>('/reports/$id/status', data: {'status': 'enviado'});
+    } catch (error) {
+      throw toApiException(error);
+    }
+  }
+
   /// «Mis reportes»: newest first, [limit] per page.
   Future<ReportsPage> list({int page = 1, int limit = 20}) async {
     try {
