@@ -112,7 +112,7 @@ Botones, en este orden:
    PDF y la evidencia a {autoridad}. Recibirás una copia en {correo} y la respuesta llegará a ese correo.»
    Botones «Cancelar» / «Enviar». En modo de prueba se muestra un aviso: «Modo de prueba: el correo va a un
    buzón de prueba, no a la autoridad».
-2. **«Radicar en el portal oficial»** (secundario; solo si hay `portal_url`): abre el navegador.
+2. **«Radicar en el portal oficial»** (secundario; para toda autoridad con `portal_url`): abre el navegador.
 3. «Descargar PDF» (descarga y abre) y «Compartir» (menú del teléfono).
 4. «Continuar».
 No hay edición aquí: para cambiar algo se vuelve a la revisión antes de guardar. Si el envío falla: mensaje y
@@ -138,7 +138,7 @@ Carrusel de evidencia, datos completos, mapa pequeño, autoridad, estado. Botone
 
 ### 14 · Mapa de reportes
 Mapa con pines (`GET /map/reports`), filtros por tipo de vehículo y rango de fechas (chips o diálogo). Al tocar
-un pin: tarjeta inferior con tipo de vehículo, fecha y lugar. **Sin placa ni foto.** Atribución de OSM.
+un pin: tarjeta inferior con tipo de vehículo y fecha (sin dirección, RB-07). **Sin placa ni foto.** Atribución de OSM.
 
 ### 15 · Información: ¿Cómo funciona?
 Pasos (1. Captura la evidencia · 2. Completa los datos · 3. Genera la solicitud · 4. Preséntala a la autoridad),

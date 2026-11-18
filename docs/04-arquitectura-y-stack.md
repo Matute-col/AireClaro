@@ -161,6 +161,8 @@ guardar la cadena de conexión **solo** en `backend/.env`.
 - El API envía con `nodemailer` por SMTP. **Proveedor:** elegir uno con plan gratuito verificando sus condiciones
   vigentes el mismo día (límites diarios, verificación del remitente, tarjeta no obligatoria). Plan B: SMTP de una
   cuenta de correo propia con contraseña de aplicación. Registrar aquí el elegido, sin credenciales.
+  **Elegido (17-nov-2026):** Gmail con contraseña de aplicación (plan B). Mateo llena `SMTP_*`, `MAIL_FROM` y
+  `MAIL_TEST_TO` (su propio buzón) en `backend/.env`; nunca se escriben en el repositorio.
 - Remitente `MAIL_FROM`; `Reply-To` y `Cc` = correo del ciudadano; asunto y cuerpo según `docs/05`.
 - Adjuntos: el PDF siempre; la evidencia (fotos/video) solo si el total ≤ 15 MB; si no, solo el PDF y el cuerpo
   indica que la evidencia está disponible a solicitud.

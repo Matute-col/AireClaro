@@ -206,10 +206,14 @@ Ejemplo de respuesta de `POST /reports` (resumen):
 ## Plantilla de la solicitud (texto y PDF)
 
 Tamaño carta, fuente legible (Helvetica de `pdfkit`), márgenes de 2,5 cm. La primera foto del reporte se
-incrusta reducida (≈ 6 cm de ancho) si existe; si solo hay video, se lista el nombre del archivo.
+incrusta reducida (≈ 6 cm de ancho) si existe (JPG o PNG); si solo hay video, se lista en los anexos.
+**Ley 1755 de 2015, art. 16 (contenido mínimo):** autoridad (encabezado) · nombres, documento y dirección
+electrónica de notificación (firma y NOTIFICACIONES) · objeto (asunto y PETICIÓN) · razones (HECHOS) · relación
+de documentos (ANEXOS) · firma (nombre y documento). Encabezado solo con la fecha, sin ciudad (17-nov-2026,
+aprobado por Mateo: el reporte no guarda el municipio y el art. 16 no la exige).
 
 ```
-{ciudad}, {fecha de generación en español}
+{fecha de generación en español}
 
 Señores
 {nombre de la autoridad}
@@ -237,6 +241,9 @@ Solicito respetuosamente a la entidad:
 2. Adelantar, si hay lugar a ello, las actuaciones administrativas correspondientes.
 3. Informarme sobre el trámite dado a esta solicitud. Si no es la entidad competente, remitirla a la
    autoridad que corresponda e informarme de ello.
+
+ANEXOS
+1. {Fotografía|Video} ({formato}, {tamaño})   ← una línea por archivo de evidencia
 
 NOTIFICACIONES
 Recibiré notificaciones en el correo {correo}{ y en el teléfono {teléfono}}.
