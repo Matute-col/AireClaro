@@ -34,6 +34,7 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | US-12 | Hecha | a7c2bef, a378120 | API: `GET /reports/:id/pqrsd` (texto, autoridad, placa, estado, modo de correo) y `.pdf` con `pdfkit` según `docs/05` y la Ley 1755 art. 16 (sección ANEXOS, encabezado solo con fecha, primera foto ≈ 6 cm). Solo el dueño (404). Pruebas leen el PDF real: tildes, eñ y signos. ANEXOS con etiqueta según el canal. Prueba (e) aprobada el 17-nov-2026 |
 | US-13 | Hecha | 3c2e941 | App: vista previa tras crear el reporte, «Descargar PDF» (abre el visor), «Compartir» (menú del teléfono), «Continuar» al detalle; en el detalle «Ver solicitud», PDF y «Abrir video» (CP-07). Prueba (e) aprobada el 17-nov-2026 |
 | US-14…US-22 | Pendiente | | |
+| US-23 | Hecha (falta prueba en celular) | aa7f81f | Agregada por Mateo el 17-nov-2026 (RF-19, CP-30). App: 4 fotogramas JPEG por video (10/35/65/90 %, ≤ 300 KB) enviados en `frames_v<N>`; si falla, sigue sin ellos y avisa. API: validación por bytes y tamaño, máx. 4 por video, fuera del límite de 3; guardados como evidencia derivada con posición; PDF con «Fotogramas del video N (4)» en cuadrícula; detalle con la fila de fotogramas. **Migración aplicada solo en la rama `test`; falta en la base principal (espera la autorización de Mateo).** Prueba (f) pendiente |
 
 ## Decisiones tomadas durante el desarrollo
 (Fecha · decisión · motivo)
@@ -87,7 +88,11 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 
 - 17-nov-2026 · ANEXOS según el canal: PDF descargado/compartido/portal → «Disponible a solicitud del peticionario»; PDF del correo → «Archivo adjunto al correo» solo si la evidencia viaja adjunta (≤ 15 MB) · nunca afirmar un adjunto que no existe.
 
+- 17-nov-2026 · US-23 usa `video_player` solo para leer la duración del video (revisa la decisión «sin `video_player`» del 16-nov) y `fc_native_video_thumbnail` para extraer los fotogramas (`docs/04`).
+- 17-nov-2026 · Los fotogramas viajan en campos `frames_v<N>` (N = posición del video en `files`); su orden en el campo es su posición · sin leer nombres de archivo.
+
 ## Problemas abiertos
+- Migración `1794970815342_add-video-frames` pendiente en la base principal · sin ella el API (US-23) falla al leer el detalle y el PDF de cualquier reporte. Se aplica solo con autorización de Mateo, antes de la prueba (f).
 - SMTP sin configurar en `backend/.env` · Mateo lo llena el martes 17 por la mañana (Gmail con contraseña de aplicación; `MAIL_TEST_TO` = su buzón). Bloquea la prueba (f) de US-21, no su desarrollo.
 - `.vscode/extensions.json` aparece como «sin seguimiento» porque `.gitignore` lo excluye a propósito de la regla `.vscode/*` · Mateo decidió no subirlo; opcional: agregarlo a `.git/info/exclude` (local).
 - La miniatura de «Mis reportes» es una foto cualquiera (siempre la misma) del reporte: `report_media` no guarda el orden de subida · aceptable para el prototipo.
