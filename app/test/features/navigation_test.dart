@@ -2,6 +2,7 @@ import 'package:aireclaro/app.dart';
 import 'package:aireclaro/core/token_storage.dart';
 import 'package:aireclaro/features/auth/auth_repository.dart';
 import 'package:aireclaro/features/map/map_reports.dart';
+import 'package:aireclaro/features/report/authorities_repository.dart';
 import 'package:aireclaro/features/report/reports_repository.dart';
 import 'package:aireclaro/shared/widgets/auth_image.dart';
 import 'package:aireclaro/shared/widgets/osm_map.dart';
@@ -21,6 +22,7 @@ Future<void> pumpApp(WidgetTester tester, {String? savedToken}) async {
       authTokenProvider.overrideWith((ref) async => null),
       mapReportsProvider.overrideWith((ref) async => const <MapReport>[]),
       mapTilesEnabledProvider.overrideWithValue(false),
+      authoritiesProvider.overrideWith((ref) async => const <Authority>[]),
     ],
     child: const AireClaroApp(),
   ));
@@ -66,7 +68,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('¿Cómo funciona?'));
     await tester.pumpAndSettle();
-    expect(find.text('Muy pronto'), findsOneWidget);
+    expect(find.text('1. Captura la evidencia'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
   });
 

@@ -9,6 +9,7 @@ import '../features/auth/splash_screen.dart';
 import '../features/history/report_detail_screen.dart';
 import '../features/history/reports_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/info/info_screen.dart';
 import '../features/map/map_screen.dart';
 import '../features/pqrsd/done_screen.dart';
 import '../features/pqrsd/preview_screen.dart';
@@ -20,7 +21,6 @@ import '../features/report/requester_step_screen.dart';
 import '../features/report/review_screen.dart';
 import '../features/report/vehicle_step_screen.dart';
 import '../features/welcome/welcome_screen.dart';
-import '../shared/widgets/coming_soon_screen.dart';
 import '../shared/widgets/main_shell.dart';
 
 /// Route paths from docs/06 (plus /splash, shown while the session is checked).
@@ -117,8 +117,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: Routes.info,
-              builder: (context, state) =>
-                  const ComingSoonScreen(title: '¿Cómo funciona?', icon: Icons.help_outline),
+              builder: (context, state) => const InfoScreen(),
             ),
           ]),
         ],
