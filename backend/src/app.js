@@ -9,6 +9,7 @@ const usersRoutes = require('./modules/users/users.routes');
 const authoritiesRoutes = require('./modules/authorities/authorities.routes');
 const geoRoutes = require('./modules/geo/geo.routes');
 const reportsRoutes = require('./modules/reports/reports.routes');
+const mapRoutes = require('./modules/map/map.routes');
 
 const app = express();
 
@@ -29,6 +30,7 @@ api.use('/me', usersRoutes);
 api.use('/authorities', authoritiesRoutes);
 api.use('/geo', geoRoutes);
 api.use('/reports', reportsRoutes);
+api.use('/map', mapRoutes);
 
 app.use('/api', api);
 

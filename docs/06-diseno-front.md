@@ -141,7 +141,8 @@ pequeño, autoridad, estado. Botones: «Descargar solicitud»,
 «Marcar como enviado» y «Eliminar» (con confirmación; prioridad Could). El chip de estado indica «Enviado por correo» o «Enviado (manual)».
 
 ### 14 · Mapa de reportes
-Mapa con pines (`GET /map/reports`), filtros por tipo de vehículo y rango de fechas (chips o diálogo). Al tocar
+Mapa con pines (`GET /map/reports`), filtros por tipo de vehículo (chips, varios a la vez) y por fecha con periodos
+«Todo», «Hoy», «7 días» y «30 días» (chips; sin calendario, 18-nov-2026), «Limpiar filtros» y «Actualizar». Al tocar
 un pin: tarjeta inferior con tipo de vehículo y fecha (sin dirección, RB-07). **Sin placa ni foto.** Atribución de OSM.
 
 ### 15 · Información: ¿Cómo funciona?
