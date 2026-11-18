@@ -8,12 +8,16 @@ class ReportMedia {
     required this.kind,
     required this.sizeBytes,
     this.mimeType = '',
+    this.frames = const [],
   });
 
   final String id;
   final EvidenceKind kind;
   final int sizeBytes;
   final String mimeType;
+
+  /// US-23 · Frames extracted from this video, in order (position 1..4).
+  final List<ReportFrame> frames;
 
   bool get isVideo => kind == EvidenceKind.video;
 
@@ -31,7 +35,22 @@ class ReportMedia {
         kind: json['kind'] == 'video' ? EvidenceKind.video : EvidenceKind.photo,
         sizeBytes: json['size_bytes'] as int,
         mimeType: json['mime_type'] as String? ?? '',
+        frames: ((json['frames'] as List<dynamic>?) ?? const [])
+            .map((f) => ReportFrame.fromJson(f as Map<String, dynamic>))
+            .toList()
+          ..sort((a, b) => a.position.compareTo(b.position)),
       );
+}
+
+/// US-23 · One frame of a video (derived evidence, read with the session like any file).
+class ReportFrame {
+  const ReportFrame({required this.id, required this.position});
+
+  final String id;
+  final int position;
+
+  factory ReportFrame.fromJson(Map<String, dynamic> json) =>
+      ReportFrame(id: json['id'] as String, position: json['position'] as int);
 }
 
 /// GET /reports/:id → {report, media, authority}.

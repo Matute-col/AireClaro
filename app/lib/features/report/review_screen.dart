@@ -110,6 +110,8 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   @override
   Widget build(BuildContext context) {
     final draft = ref.watch(reportDraftProvider);
+    // US-23: wait for the frames so they travel with the video.
+    final extractingFrames = draft.evidence.any((f) => f.framesStatus == FramesStatus.extracting);
     final authorities = ref.watch(authoritiesProvider);
     final percent = (_progress * 100).round();
 
@@ -195,10 +197,18 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   style: TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: AppSpacing.lg),
+                if (extractingFrames) ...[
+                  const MessageBanner(
+                    message: 'Extrayendo los fotogramas del video… En unos segundos podrás '
+                        'generar la solicitud.',
+                    isError: false,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                ],
                 PrimaryButton(
                   label: 'Generar solicitud',
                   icon: Icons.description_outlined,
-                  onPressed: draft.authorityId == null || _sending ? null : _submit,
+                  onPressed: draft.authorityId == null || _sending || extractingFrames ? null : _submit,
                 ),
               ],
             ),

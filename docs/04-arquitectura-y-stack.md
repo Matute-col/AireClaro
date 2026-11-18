@@ -83,6 +83,11 @@ paquete adicional.
 - `path_provider` (app, US-13): carpeta temporal donde se guarda el PDF descargado.
 - `open_filex` (app, US-13): abre el PDF (y los videos de evidencia, CP-07) con la app del teléfono.
 - `share_plus` (app, US-13): menú «Compartir» del teléfono con el PDF.
+- `fc_native_video_thumbnail` (app, US-23): extrae fotogramas JPEG de un video en un instante dado (API nativa de
+  Android). Se descartó `video_thumbnail` (no es compatible con Dart 3).
+- `video_player` (app, US-23): **solo para leer la duración** del video y calcular el 10 %, 35 %, 65 % y 90 %; la
+  app sigue sin reproducir videos (revisa la decisión del 16-nov-2026: «sin `video_player`» era para mostrar la
+  duración; ahora la exige US-23, aprobada por Mateo el 17-nov-2026).
 
 ## Estructura del backend
 

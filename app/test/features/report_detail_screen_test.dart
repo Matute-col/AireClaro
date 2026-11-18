@@ -29,9 +29,15 @@ ReportDetail sampleDetail() => ReportDetail(
       requesterDocType: 'CC',
       requesterDocNumber: '0000000',
       requesterEmail: 'ana@ejemplo.test',
-      media: const [
-        ReportMedia(id: 'm1', kind: EvidenceKind.photo, sizeBytes: 300000),
-        ReportMedia(id: 'm2', kind: EvidenceKind.video, sizeBytes: 3355443, mimeType: 'video/mp4'),
+      media: [
+        const ReportMedia(id: 'm1', kind: EvidenceKind.photo, sizeBytes: 300000),
+        ReportMedia(
+          id: 'm2',
+          kind: EvidenceKind.video,
+          sizeBytes: 3355443,
+          mimeType: 'video/mp4',
+          frames: [for (var p = 1; p <= 4; p++) ReportFrame(id: 'f$p', position: p)],
+        ),
       ],
       authority: const Authority(
         id: 2,
@@ -160,5 +166,18 @@ void main() {
     await tester.tap(find.text('Reintentar'));
     await tester.pumpAndSettle();
     expect(find.text('XYZ789'), findsOneWidget);
+  });
+
+  testWidgets('US-23: the frames appear under the video card, in a row of 4', (tester) async {
+    repository.detail = sampleDetail();
+    await pumpDetail(tester);
+    expect(find.textContaining('Fotogramas del video'), findsNothing); // photo page
+
+    await tester.fling(find.byType(PageView), const Offset(-800, 0), 1500);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Fotogramas del video (4)'), findsOneWidget);
+    for (var p = 1; p <= 4; p++) {
+      expect(find.byKey(ValueKey('f$p')), findsOneWidget);
+    }
   });
 }

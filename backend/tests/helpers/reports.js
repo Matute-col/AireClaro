@@ -44,13 +44,24 @@ function validFields(overrides = {}) {
   };
 }
 
-/** POST /api/reports with fields and attachments [{buffer, name}]. */
-function postReport(token, fields, attachments = [{ buffer: files.jpeg(), name: 'placa.jpg' }]) {
+/**
+ * POST /api/reports with fields and attachments [{buffer, name}]. `frames` (US-23) maps the position of a video in `attachments` to its
+ * frame buffers, in order: { 0: [jpg1, jpg2, jpg3, jpg4] } → field frames_v0.
+ */
+function postReport(
+  token,
+  fields,
+  attachments = [{ buffer: files.jpeg(), name: 'placa.jpg' }],
+  frames = {},
+) {
   const req = request(app).post('/api/reports').set('Authorization', `Bearer ${token}`);
   for (const [key, value] of Object.entries(fields)) {
     if (value !== undefined) req.field(key, value);
   }
   for (const { buffer, name } of attachments) req.attach('files', buffer, name);
+  for (const [videoIndex, buffers] of Object.entries(frames)) {
+    buffers.forEach((buffer, i) => req.attach(`frames_v${videoIndex}`, buffer, `fotograma-${i + 1}.jpg`));
+  }
   return req;
 }
 

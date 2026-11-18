@@ -69,7 +69,8 @@ void main() {
   late FakeReportsRepository reports;
   late ProviderContainer container;
 
-  Future<void> pumpReview(WidgetTester tester, ReportDraft draft) async {
+  /// [settle] false: for screens with endless animations (e.g. extracting frames).
+  Future<void> pumpReview(WidgetTester tester, ReportDraft draft, {bool settle = true}) async {
     tester.view.physicalSize = const Size(1080, 3200);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -101,7 +102,12 @@ void main() {
       container: container,
       child: MaterialApp.router(routerConfig: router),
     ));
-    await tester.pumpAndSettle();
+    if (settle) {
+      await tester.pumpAndSettle();
+    } else {
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+    }
   }
 
   FilledButton generate(WidgetTester tester) =>
@@ -195,5 +201,24 @@ void main() {
 
     expect(find.text('Cada foto puede pesar máximo 8 MB.'), findsOneWidget);
     expect(find.text('Reintentar'), findsNothing);
+  });
+
+  testWidgets('US-23: «Generar solicitud» waits while the video frames are extracted', (tester) async {
+    final draft = completeDraft();
+    await pumpReview(
+      tester,
+      draft.copyWith(evidence: const [
+        EvidenceFile(
+          path: '/tmp/v.mp4',
+          kind: EvidenceKind.video,
+          sizeBytes: 5000,
+          framesStatus: FramesStatus.extracting,
+        ),
+      ]),
+      settle: false,
+    );
+
+    expect(find.textContaining('Extrayendo los fotogramas del video'), findsOneWidget);
+    expect(generate(tester).onPressed, isNull);
   });
 }

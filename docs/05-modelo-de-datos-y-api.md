@@ -58,6 +58,8 @@ erDiagram
     text file_path
     text mime_type
     int size_bytes
+    uuid source_media_id FK "solo fotogramas (US-23)"
+    smallint position "1..4, solo fotogramas"
   }
 ```
 
@@ -125,6 +127,12 @@ CREATE TABLE report_media (
 CREATE INDEX idx_media_report ON report_media (report_id);
 ```
 
+**Fotogramas del video (US-23, migración `1794970815342_add-video-frames`, 17-nov-2026):** `report_media.kind`
+admite `'frame'` (fotograma), con dos columnas nuevas que admiten nulos: `source_media_id` (el video de origen,
+`ON DELETE CASCADE`) y `position` (1 a 4). Un `CHECK` exige ambas en los fotogramas y ninguna en fotos y videos,
+y un índice único impide dos fotogramas en la misma posición del mismo video. Migración aditiva: el `CHECK` de
+`kind` se amplía y las filas existentes siguen siendo válidas.
+
 **Datos iniciales (`authorities`):**
 
 | code | name | email | portal_url | email_verified |
@@ -160,6 +168,7 @@ se ofrece «Radicar en el portal oficial». No inventes direcciones; cualquier c
 | `GET /authorities` | Lista de autoridades | — | `200 [{id, code, name, portal_url, can_email}]` (`can_email` = tiene correo verificado; el correo no se expone) |
 | `GET /geo/reverse` | Dirección desde coordenadas | `lat, lng` | `200 {address, municipality, state, suggested_authority_id}` |
 | `POST /reports` | Crear reporte | `multipart/form-data`: `vehicle_type, plate, smoke_color, description?, lat, lng, address?, occurred_at, authority_id?, requester_name, requester_doc_type, requester_doc_number, requester_email, requester_phone?` + `files[]` (1–3) | `201 {report}` con `status: generado`, `authority` y `media[]` · `400` validación, tipo de archivo (`INVALID_FILE_TYPE`), más de 3 archivos (`TOO_MANY_FILES`) o sin autoridad (`AUTHORITY_REQUIRED`) · `413` archivo grande. Reporte y archivos en una sola transacción; el dueño sale del token |
+| `POST /reports` (US-23) | Fotogramas del video | además de `files[]`: `frames_v<N>` = hasta 4 JPEG (≤ 300 KB) del video en la posición N de `files`, en orden (posición 1..4); no cuentan para los 3 archivos | `400 TOO_MANY_FRAMES / INVALID_FRAME_TYPE / INVALID_FRAME_SOURCE` · `413 FRAME_TOO_LARGE`; `GET /reports/:id` los devuelve dentro de su video (`media[].frames`) y `media_count` no los cuenta |
 | `GET /reports` | Mis reportes | `page=1, limit=20 (máx. 50), status?` | `200 {items, page, total}`, más reciente primero; cada item: `id, plate, vehicle_type, smoke_color, status, address, occurred_at, created_at, authority{code,name}, thumbnail_media_id` (una foto; `null` si solo hay videos), `media_count` |
 | `GET /reports/:id` | Detalle | — | `200 {report, media[], authority}` (`authority` con `can_email`, sin el correo; `media` sin rutas de archivo) · `404` si no es suyo, no existe o el id no es válido (misma respuesta) |
 | `DELETE /reports/:id` | Eliminar | — | `204` |
@@ -280,7 +289,8 @@ Tono: factual, sin acusar ni calificar. No afirmar que el vehículo «incumple»
 
   {nombre completo} · {tipo y número de documento}
   ```
-- **Adjuntos:** el PDF; la evidencia solo si el total ≤ 15 MB.
+- **Adjuntos:** el PDF; la evidencia solo si el total ≤ 15 MB. Los fotogramas del video (US-23) no se adjuntan
+  por separado: viajan dentro del PDF.
 - **Después de enviar:** `status = enviado`, `sent_via = email`, `sent_at = now()`, `send_mode = test|live`.
   Si el SMTP falla, no se cambia nada y se responde `502`. No se guardan cuerpos de correos en los logs.
 

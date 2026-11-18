@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:aireclaro/core/api_error.dart';
 import 'package:aireclaro/core/token_storage.dart';
 import 'package:aireclaro/features/auth/auth_repository.dart';
 import 'package:aireclaro/features/auth/user.dart';
 import 'package:aireclaro/features/history/report_summary.dart';
+import 'package:aireclaro/features/report/frame_extractor.dart';
 import 'package:aireclaro/features/report/reports_repository.dart';
 import 'package:aireclaro/shared/services/file_actions.dart';
 
@@ -122,5 +125,21 @@ class FakeFileActions implements FileActions {
   @override
   Future<void> share(String path, {required String mimeType, String? subject}) async {
     shared.add((path, mimeType, subject));
+  }
+}
+
+/// US-23 · Frame extractor without native plugins. [gate] keeps the extraction
+/// «in progress» until it is completed; [fail] makes it throw.
+class FakeFrameExtractor implements FrameExtractor {
+  bool fail = false;
+  Completer<void>? gate;
+  final calls = <String>[];
+
+  @override
+  Future<List<String>> extract(String videoPath) async {
+    calls.add(videoPath);
+    if (gate != null) await gate!.future;
+    if (fail) throw const FrameExtractionException('prueba');
+    return [for (var i = 1; i <= 4; i++) '$videoPath-fotograma-$i.jpg'];
   }
 }

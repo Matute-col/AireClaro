@@ -134,3 +134,35 @@ describe('ANEXOS label by delivery channel (Mateo, 17-nov-2026)', () => {
     expect(lines.join('\n')).not.toContain('adjunto');
   });
 });
+
+describe('US-23 · video frames in ANEXOS', () => {
+  const withFrames = [
+    media[0],
+    {
+      ...media[1],
+      id: 'video-1',
+      frames: [1, 2, 3, 4].map((position) => ({ id: `f${position}`, position, size_bytes: 40000 })),
+    },
+  ];
+
+  it('adds «Fotogramas del video 1 (4)» right after the video, inside this document', () => {
+    const lines = toPlainText(buildRequest(report, withFrames, authority, { channel: 'email', evidenceAttached: true }))
+      .split('ANEXOS\n')[1]
+      .split('\n\n')[0]
+      .split('\n');
+
+    expect(lines[1]).toBe('2. Video 1 (MP4, 3,2 MB) – Archivo adjunto al correo.');
+    expect(lines[2]).toBe(
+      '3. Fotogramas del video 1 (4) – fotogramas extraídos automáticamente del video; ' +
+        'se muestran en este documento.',
+    );
+    // Frames travel inside the PDF: never «adjunto» nor «disponible a solicitud».
+    expect(lines[2]).not.toMatch(/adjunto|solicitud/);
+  });
+
+  it('reports which video each group of frames belongs to (for the PDF grid)', () => {
+    const content = buildRequest(report, withFrames, authority);
+    expect(content.frameGroups).toEqual([{ videoNumber: 1, sourceMediaId: 'video-1', count: 4 }]);
+    expect(buildRequest(report, media, authority).frameGroups).toEqual([]);
+  });
+});

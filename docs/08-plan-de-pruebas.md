@@ -42,6 +42,7 @@
 | CP-27 | Portal oficial | Pulsar «Radicar en el portal oficial» | Abre la URL oficial en el navegador | RF-18 |
 | CP-28 | Modo live protegido | `MAIL_MODE=live` con autoridad `email_verified=false` | Rechaza el envío (422); nunca sale correo real | RB-08, RB-09 |
 | CP-29 | Dueño del reporte | Intentar enviar el reporte de otro usuario | 404 | RB-01 |
+| CP-30 | Fotogramas del video (US-23) | Crear un reporte con un video | 4 fotogramas en el detalle bajo el video y en ANEXOS del PDF («Fotogramas del video 1 (4)»), en cuadrícula; si la extracción falla, el reporte se crea sin ellos y la app lo avisa | RF-19 |
 
 ## Registro de evidencias
 Carpeta `docs/evidencias/`: capturas por caso (`CP-06.png`), resultados de `npm test` y `flutter analyze`,

@@ -2,7 +2,7 @@ const express = require('express');
 const { z } = require('zod');
 const requireAuth = require('../../middleware/auth');
 const validate = require('../../middleware/validate');
-const { receiveEvidence, checkEvidence } = require('../../middleware/upload');
+const { receiveEvidence, checkEvidence, uploadedPaths } = require('../../middleware/upload');
 const AppError = require('../../utils/AppError');
 const { removeFiles } = require('../../utils/storage');
 const { createReportSchema } = require('./reports.schema');
@@ -84,7 +84,8 @@ router.get('/:id/media/:mediaId', requireUuidParams('id', 'mediaId'), async (req
   });
 });
 
-// POST /api/reports (multipart/form-data): report fields + files[] (1 to 3).
+// POST /api/reports (multipart/form-data): report fields + files[] (1 to 3)
+// + frames_v<N> (up to 4 JPEG frames of the video at position N, US-23).
 // Order: receive files → validate fields → check files by content → save.
 router.post(
   '/',
@@ -92,7 +93,7 @@ router.post(
   validate(createReportSchema),
   checkEvidence,
   async (req, res) => {
-    const report = await reportsService.create(req.user.id, req.body, req.files);
+    const report = await reportsService.create(req.user.id, req.body, req.files, req.frames);
     res.status(201).json({ report });
   },
 );
@@ -101,7 +102,7 @@ router.post(
 // before the normal error handler answers.
 // eslint-disable-next-line no-unused-vars
 router.use(async (err, req, res, next) => {
-  await removeFiles((req.files || []).map((file) => file.path));
+  await removeFiles(uploadedPaths(req));
   next(err);
 });
 

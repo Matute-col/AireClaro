@@ -80,6 +80,9 @@ Tarjetas: «Mis reportes» (con el número de reportes), «Mapa de reportes», �
 «Elegir de la galería». Miniaturas con botón para quitar (los videos muestran una tarjeta «Video» con ícono y
 tamaño; sin duración, ver cambio del 16-nov-2026 en `docs/02`).
 Ayuda: «Procura que se vea la placa y el humo». Máximo 3 archivos. «Siguiente» activo con ≥ 1 archivo.
+**US-23:** al agregar un video se extraen 4 fotogramas; la tarjeta del video muestra «Fotogramas…», «4 fotogramas»
+o «Sin fotogramas». Si falla: aviso «No pudimos extraer los fotogramas del video. El reporte seguirá sin ellos.»
+En la revisión, «Generar solicitud» espera mientras se extraen.
 Fotos: `imageQuality ≈ 80`, `maxWidth ≈ 1600`. La cámara se abre con la app de cámara del sistema (no se declara
 el permiso `CAMERA`, ver `docs/04`).
 
@@ -132,7 +135,8 @@ Lista de `ReportCard` (miniatura, placa, tipo, fecha, chip de estado «Generado�
 primero, con paginación al desplazar. Estado vacío: «Aún no tienes reportes» y botón «Nuevo reporte».
 
 ### 13 · Detalle del reporte
-Carrusel de evidencia, datos completos, mapa pequeño, autoridad, estado. Botones: «Descargar solicitud»,
+Carrusel de evidencia (bajo la tarjeta de un video, sus fotogramas en una fila, US-23), datos completos, mapa
+pequeño, autoridad, estado. Botones: «Descargar solicitud»,
 «Compartir», «Enviar a la autoridad» (si no se ha enviado y `can_email`), «Radicar en el portal oficial»,
 «Marcar como enviado» y «Eliminar» (con confirmación; prioridad Could). El chip de estado indica «Enviado por correo» o «Enviado (manual)».
 

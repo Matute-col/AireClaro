@@ -42,8 +42,9 @@ async function resolveAuthority(data) {
  * @param {string} userId owner, taken from the token (never from the request body)
  * @param {object} data   fields validated by createReportSchema
  * @param {Array}  files  multer files already checked by checkEvidence
+ * @param {Array}  [frames] video frames [{file, videoIndex, position}] (US-23)
  */
-async function create(userId, data, files) {
+async function create(userId, data, files, frames = []) {
   const authority = await resolveAuthority(data);
 
   const client = await getPool().connect();
@@ -97,8 +98,23 @@ async function create(userId, data, files) {
       media.push(inserted.rows[0]);
     }
 
+    // US-23 · Frames, linked to their video and kept in order (position 1..4).
+    const savedFrames = [];
+    for (const { file, videoIndex, position } of frames) {
+      const relativePath = await storage.moveToReport(file.path, report.id, `${file.filename}.jpg`);
+      movedPaths.push(storage.resolveStored(relativePath));
+      const inserted = await client.query(
+        `INSERT INTO report_media
+           (report_id, kind, file_path, mime_type, size_bytes, source_media_id, position)
+         VALUES ($1, 'frame', $2, 'image/jpeg', $3, $4, $5)
+         RETURNING id, source_media_id, position, size_bytes`,
+        [report.id, relativePath, file.size, media[videoIndex].id, position],
+      );
+      savedFrames.push(inserted.rows[0]);
+    }
+
     await client.query('COMMIT');
-    return { ...report, authority, media };
+    return { ...report, authority, media, frames: savedFrames };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     await storage.removeFiles(movedPaths);
@@ -133,7 +149,8 @@ async function list(userId, { page, limit, status }) {
             (SELECT m.id FROM report_media m
               WHERE m.report_id = r.id AND m.kind = 'photo'
               ORDER BY m.file_path LIMIT 1) AS thumbnail_media_id,
-            (SELECT count(*)::int FROM report_media m WHERE m.report_id = r.id) AS media_count
+            (SELECT count(*)::int FROM report_media m
+              WHERE m.report_id = r.id AND m.kind <> 'frame') AS media_count
        FROM reports r
        JOIN authorities a ON a.id = r.authority_id
       WHERE ${filter}
@@ -196,11 +213,23 @@ async function getById(userId, reportId) {
     ...report
   } = rows[0];
 
-  const { rows: media } = await query(
-    `SELECT id, kind, mime_type, size_bytes FROM report_media
+  const { rows: allMedia } = await query(
+    `SELECT id, kind, mime_type, size_bytes, source_media_id, position FROM report_media
       WHERE report_id = $1 ORDER BY file_path`,
     [reportId],
   );
+  // Frames (US-23) are not separate evidence: they go inside their video, in order.
+  const frames = allMedia
+    .filter((m) => m.kind === 'frame')
+    .sort((a, b) => a.position - b.position);
+  const media = allMedia
+    .filter((m) => m.kind !== 'frame')
+    .map(({ source_media_id: _s, position: _p, ...item }) => ({
+      ...item,
+      frames: frames
+        .filter((f) => f.source_media_id === item.id)
+        .map((f) => ({ id: f.id, position: f.position, size_bytes: f.size_bytes })),
+    }));
 
   return {
     report,

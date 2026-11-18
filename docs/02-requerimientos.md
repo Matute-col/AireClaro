@@ -49,6 +49,7 @@ Cambios respecto al documento maestro (reflejarlos allí al final):
 | RF-15 | El usuario podrá ver el detalle de un reporte. | Media | Muestra evidencia, datos, mapa pequeño, autoridad y estado; permite descargar la solicitud. |
 | RF-16 | El usuario podrá eliminar un reporte propio. | Baja | Pide confirmación; el reporte y sus archivos desaparecen del historial y del mapa. |
 | RF-17 | El sistema enviará por correo electrónico la solicitud (PDF y evidencia) a la autoridad destinataria, a petición del usuario. | Alta | Botón «Enviar a la autoridad» con diálogo de confirmación. El correo sale desde el servidor con el PDF adjunto, el ciudadano en copia y como «responder a». Solo se habilita si la autoridad tiene un correo verificado. El estado pasa a `enviado` con fecha y modo (`test`/`live`). No permite enviar dos veces. En modo de prueba el correo va a un buzón de prueba y la app lo avisa. |
+| RF-19 | El sistema extraerá fotogramas de cada video de evidencia (agregado por Mateo, 17-nov-2026). | Media | Al agregar un video, la app extrae 4 fotogramas JPEG (10 %, 35 %, 65 % y 90 % de la duración), de máximo 300 KB cada uno, y los envía con el video; no cuentan para el límite de 3 archivos (máximo 4 por video). El servidor valida por bytes reales que sean JPEG y su tamaño. Si la extracción falla, el reporte continúa sin fotogramas y la app lo avisa. El PDF los muestra en ANEXOS («Fotogramas del video (4)») en cuadrícula y aclara que son extraídos del video; en el correo viajan dentro del PDF. El detalle los muestra bajo el video. |
 | RF-18 | El sistema ofrecerá un acceso al portal oficial de radicación de la autoridad. | Media | Botón «Radicar en el portal oficial» abre la URL oficial de la autoridad en el navegador; el PDF queda disponible para descargarlo y adjuntarlo; el usuario puede marcar el reporte como enviado (manual). |
 
 ## Requerimientos no funcionales
@@ -99,6 +100,7 @@ Cambios respecto al documento maestro (reflejarlos allí al final):
 | RF-08 | UC-07 | 10, 11 | `GET /reports/:id/pqrsd.pdf`, `PATCH /reports/:id/status` | US-13, US-14 (S3) |
 | RF-17 | UC-13 | 10, 11 | `POST /reports/:id/send` | US-21 (S3) |
 | RF-18 | UC-14 | 10, 11, 13 | `GET /authorities` (`portal_url`) | US-22 (S3) |
+| RF-19 | UC-05 | 05, 09, 13 | `POST /reports` (`frames_v<N>`), `GET /reports/:id`, `.../pqrsd.pdf` | US-23 (S3) |
 | RF-10 | UC-11 | 14 | `GET /map/reports` | US-15 (S3) |
 | RF-14 | UC-12 | 15 | — | US-16 (S3) |
 | RF-16 | UC-10 | 13 | `DELETE /reports/:id` | US-18 (S3) |

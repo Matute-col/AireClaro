@@ -10,6 +10,20 @@ import '../pqrsd/pqrsd_preview.dart';
 import '../../shared/services/file_actions.dart';
 import 'report_draft.dart';
 
+/// File parts of POST /reports, in order: the evidence in «files», then the frames of
+/// each video in `frames_v<N>` (N = position of the video in «files», US-23). Only
+/// frames that were extracted completely are sent; their order is their position.
+List<(String field, String path)> evidenceParts(ReportDraft draft) {
+  final parts = [for (final file in draft.evidence) ('files', file.path)];
+  for (var i = 0; i < draft.evidence.length; i++) {
+    final file = draft.evidence[i];
+    if (file.isVideo && file.framesStatus == FramesStatus.ready) {
+      parts.addAll(file.frames.map((frame) => ('frames_v$i', frame)));
+    }
+  }
+  return parts;
+}
+
 /// Text fields of POST /reports built from the draft (docs/05).
 Map<String, String> reportFormFields(ReportDraft draft) {
   final r = draft.requester;
@@ -44,9 +58,9 @@ class ReportsRepository {
   Future<String> create(ReportDraft draft, {void Function(double progress)? onProgress}) async {
     try {
       final form = FormData.fromMap(reportFormFields(draft));
-      for (final file in draft.evidence) {
+      for (final (field, path) in evidenceParts(draft)) {
         // The server ignores the file name and checks the real type itself.
-        form.files.add(MapEntry('files', await MultipartFile.fromFile(file.path)));
+        form.files.add(MapEntry(field, await MultipartFile.fromFile(path)));
       }
       final response = await _dio.post<Map<String, dynamic>>(
         '/reports',

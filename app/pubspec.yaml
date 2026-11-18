@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   dio: ^5.11.1
+  fc_native_video_thumbnail: ^4.0.0
   flutter:
     sdk: flutter
   flutter_map: ^8.3.2
@@ -22,6 +23,7 @@ dependencies:
   open_filex: ^5.0.0
   path_provider: ^2.1.6
   share_plus: ^13.3.1
+  video_player: ^2.14.1
 
 dev_dependencies:
   flutter_test:

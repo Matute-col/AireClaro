@@ -167,6 +167,11 @@ class _EvidenceCarouselState extends State<_EvidenceCarousel> {
           const SizedBox(height: AppSpacing.sm),
           Text('${_page + 1} de ${widget.media.length} · desliza para ver más'),
         ],
+        // US-23: the frames of the video shown above.
+        if (widget.media[_page].isVideo && widget.media[_page].frames.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.sm),
+          _FramesRow(reportId: widget.reportId, frames: widget.media[_page].frames),
+        ],
       ],
     );
   }
@@ -229,6 +234,48 @@ class _VideoCardState extends ConsumerState<_VideoCard> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// US-23 · Frames of a video in a row, with the note that they were extracted from it.
+class _FramesRow extends StatelessWidget {
+  const _FramesRow({required this.reportId, required this.frames});
+
+  final String reportId;
+  final List<ReportFrame> frames;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Fotogramas del video (${frames.length}) · extraídos al 10 %, 35 %, 65 % y 90 % de su duración',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Row(
+          children: [
+            for (final (i, frame) in frames.indexed) ...[
+              if (i > 0) const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppSpacing.xs),
+                    child: AuthNetworkImage(
+                      key: ValueKey(frame.id),
+                      url: mediaUrl(reportId, frame.id),
+                      cacheWidth: 300,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
     );
   }
 }

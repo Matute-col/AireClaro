@@ -117,11 +117,23 @@ function buildRequest(report, media, authority, { channel = 'download', evidence
   ];
   let photoNumber = 0;
   let videoNumber = 0;
-  const annexes = ordered.map((m) => {
+  const annexes = [];
+  // US-23 · Videos with extracted frames: they travel inside this PDF (never as separate
+  // attachments), so their line does not carry the availability label.
+  const frameGroups = [];
+  for (const m of ordered) {
     const label = m.kind === 'photo' ? `Fotografía ${++photoNumber}` : `Video ${++videoNumber}`;
     const format = FORMATS[m.mime_type] || m.mime_type;
-    return `${label} (${format}, ${formatSize(m.size_bytes)}) – ${availability}.`;
-  });
+    annexes.push(`${label} (${format}, ${formatSize(m.size_bytes)}) – ${availability}.`);
+    const frames = m.frames || [];
+    if (m.kind === 'video' && frames.length > 0) {
+      annexes.push(
+        `Fotogramas del video ${videoNumber} (${frames.length}) – fotogramas extraídos ` +
+          'automáticamente del video; se muestran en este documento.',
+      );
+      frameGroups.push({ videoNumber, sourceMediaId: m.id, count: frames.length });
+    }
+  }
 
   const phone = report.requester_phone ? ` y en el teléfono ${report.requester_phone}` : '';
 
@@ -144,6 +156,7 @@ function buildRequest(report, media, authority, { channel = 'download', evidence
         'la autoridad que corresponda e informarme de ello.',
     ],
     annexes,
+    frameGroups,
     notifications: `Recibiré notificaciones en el correo ${report.requester_email}${phone}.`,
     closing: 'Atentamente,',
     signature: [report.requester_name, `${report.requester_doc_type} ${report.requester_doc_number}`],

@@ -36,10 +36,33 @@ async function firstPhotoPath(reportId) {
   return fs.existsSync(absolute) ? absolute : undefined;
 }
 
+/** US-23 · Frame files of each video, in order: {videoMediaId: [absolutePath, …]}. */
+async function framePathsByVideo(reportId) {
+  const { rows } = await query(
+    `SELECT source_media_id, file_path FROM report_media
+      WHERE report_id = $1 AND kind = 'frame'
+      ORDER BY source_media_id, position`,
+    [reportId],
+  );
+  const byVideo = {};
+  for (const row of rows) {
+    const absolute = storage.resolveStored(row.file_path);
+    if (fs.existsSync(absolute)) (byVideo[row.source_media_id] ||= []).push(absolute);
+  }
+  return byVideo;
+}
+
 /** GET /reports/:id/pqrsd.pdf → {buffer, fileName}. */
 async function getPdf(userId, reportId) {
   const { detail, content } = await load(userId, reportId);
-  const buffer = await renderPdf(content, { photoPath: await firstPhotoPath(detail.report.id) });
+  const framePaths = await framePathsByVideo(detail.report.id);
+  const buffer = await renderPdf(content, {
+    photoPath: await firstPhotoPath(detail.report.id),
+    frameGroups: content.frameGroups.map((group) => ({
+      videoNumber: group.videoNumber,
+      paths: framePaths[group.sourceMediaId] || [],
+    })),
+  });
   return { buffer, fileName: `solicitud-${shortId(detail.report.id)}.pdf` };
 }
 

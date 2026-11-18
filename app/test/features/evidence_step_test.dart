@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:aireclaro/features/report/evidence_picker.dart';
 import 'package:aireclaro/features/report/evidence_step_screen.dart';
+import 'package:aireclaro/features/report/frame_extractor.dart';
 import 'package:aireclaro/features/report/report_draft.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+
+import '../helpers/fakes.dart';
 
 /// Returns prepared files instead of opening the camera or the gallery.
 class FakeEvidencePicker implements EvidencePicker {
@@ -36,6 +41,7 @@ PickedMedia video(String name, {int size = 5 * _mb}) =>
 
 void main() {
   late FakeEvidencePicker picker;
+  late FakeFrameExtractor extractor;
   late ProviderContainer container;
 
   Future<void> pumpScreen(WidgetTester tester) async {
@@ -44,7 +50,11 @@ void main() {
     addTearDown(tester.view.reset);
 
     picker = FakeEvidencePicker();
-    container = ProviderContainer(overrides: [evidencePickerProvider.overrideWithValue(picker)]);
+    extractor = FakeFrameExtractor();
+    container = ProviderContainer(overrides: [
+      evidencePickerProvider.overrideWithValue(picker),
+      frameExtractorProvider.overrideWithValue(extractor),
+    ]);
     addTearDown(container.dispose);
     await tester.pumpWidget(UncontrolledProviderScope(
       container: container,
@@ -115,5 +125,76 @@ void main() {
     expect(evidence(), isEmpty);
     expect(find.textContaining('El video supera 25 MB'), findsOneWidget);
     expect(find.textContaining('HEIC'), findsOneWidget);
+  });
+
+  group('US-23 · video frames', () {
+    Future<void> addVideo(WidgetTester tester) async {
+      picker.nextVideo = video('v');
+      await tester.tap(find.text('Grabar video (máx. 15 s)'));
+      await tester.pump();
+    }
+
+    testWidgets('adding a video extracts 4 frames, in order', (tester) async {
+      await pumpScreen(tester);
+      await addVideo(tester);
+      await tester.pumpAndSettle();
+
+      final file = evidence().single;
+      expect(extractor.calls, ['/tmp/v.mp4']);
+      expect(file.framesStatus, FramesStatus.ready);
+      expect(file.frames, [for (var i = 1; i <= 4; i++) '/tmp/v.mp4-fotograma-$i.jpg']);
+      expect(find.text('4 fotogramas'), findsOneWidget);
+    });
+
+    testWidgets('shows that the frames are being extracted', (tester) async {
+      await pumpScreen(tester);
+      extractor.gate = Completer<void>();
+      await addVideo(tester);
+
+      expect(find.text('Fotogramas…'), findsOneWidget);
+      expect(evidence().single.framesStatus, FramesStatus.extracting);
+      extractor.gate!.complete();
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('if extraction fails the report continues without frames and says so', (tester) async {
+      await pumpScreen(tester);
+      extractor.fail = true;
+      await addVideo(tester);
+      await tester.pumpAndSettle();
+
+      expect(evidence().single.framesStatus, FramesStatus.failed);
+      expect(evidence().single.frames, isEmpty);
+      expect(find.text('Sin fotogramas'), findsOneWidget);
+      expect(
+        find.text('No pudimos extraer los fotogramas del video. El reporte seguirá sin ellos.'),
+        findsOneWidget,
+      );
+      // «Siguiente» still works: the report continues.
+      expect(enabled(tester, 'Siguiente'), isTrue);
+    });
+
+    testWidgets('removing the video while extracting: no warning', (tester) async {
+      await pumpScreen(tester);
+      extractor
+        ..gate = Completer<void>()
+        ..fail = true;
+      await addVideo(tester);
+      await tester.tap(find.byTooltip('Quitar'));
+      await tester.pump();
+      extractor.gate!.complete();
+      await tester.pumpAndSettle();
+
+      expect(evidence(), isEmpty);
+      expect(find.textContaining('No pudimos extraer'), findsNothing);
+    });
+
+    testWidgets('photos do not extract frames', (tester) async {
+      await pumpScreen(tester);
+      picker.nextPhoto = photo('a');
+      await tester.tap(find.text('Tomar foto'));
+      await tester.pumpAndSettle();
+      expect(extractor.calls, isEmpty);
+    });
   });
 }
