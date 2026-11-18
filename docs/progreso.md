@@ -33,7 +33,10 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | US-11 | Hecha | c40a929 | API: `GET /reports/:id` con prueba de propiedad (otro usuario → 404 igual que inexistente; sin correo de la autoridad ni rutas de archivo). App: detalle con carrusel, datos, mapa pequeño, autoridad, estado y peticionario; tras crear un reporte se abre su detalle. Prueba (d) aprobada el 16-nov-2026 |
 | US-12 | Hecha | a7c2bef, a378120 | API: `GET /reports/:id/pqrsd` (texto, autoridad, placa, estado, modo de correo) y `.pdf` con `pdfkit` según `docs/05` y la Ley 1755 art. 16 (sección ANEXOS, encabezado solo con fecha, primera foto ≈ 6 cm). Solo el dueño (404). Pruebas leen el PDF real: tildes, eñ y signos. ANEXOS con etiqueta según el canal. Prueba (e) aprobada el 17-nov-2026 |
 | US-13 | Hecha | 3c2e941 | App: vista previa tras crear el reporte, «Descargar PDF» (abre el visor), «Compartir» (menú del teléfono), «Continuar» al detalle; en el detalle «Ver solicitud», PDF y «Abrir video» (CP-07). Prueba (e) aprobada el 17-nov-2026 |
-| US-14…US-22 | Pendiente | | |
+| US-14 | Hecha (falta prueba en celular) | 3d740e3, e875144 | Pantalla de confirmación («Solicitud enviada a…» / «Reporte generado» / «Reporte marcado como enviado») con «¿Cómo hacer seguimiento?»; «Marcar como enviado» con confirmación (`PATCH /reports/:id/status`, `sent_via=manual`). Prueba (g) pendiente |
+| US-15…US-20 | Pendiente | | |
+| US-21 | Hecha (falta prueba en celular y SMTP real) | 3d740e3 | `POST /reports/:id/send`: PDF del correo con «Archivo adjunto al correo» solo si la evidencia viaja (≤ 15 MB), fotogramas dentro del PDF, `MAIL_MODE=test` → `MAIL_TEST_TO` con `[PRUEBA]`, ciudadano en Cc y Reply-To; 400/404/409/422/502/503. Pruebas con transporte simulado. App: botón y diálogo en la vista previa, aviso de modo de prueba. Prueba (g) pendiente; CP-23 y CP-26 reales esperan el SMTP |
+| US-22 | Hecha (falta prueba en celular) | e875144 | «Radicar en el portal oficial» (url_launcher) para toda autoridad con `portal_url`, en vista previa, confirmación y detalle. Prueba (g) pendiente |
 | US-23 | Hecha | aa7f81f | Agregada por Mateo el 17-nov-2026 (RF-19, CP-30). App: 4 fotogramas JPEG por video (10/35/65/90 %, ≤ 300 KB) enviados en `frames_v<N>`; si falla, sigue sin ellos y avisa. API: validación por bytes y tamaño, máx. 4 por video, fuera del límite de 3; guardados como evidencia derivada con posición; PDF con «Fotogramas del video N (4)» en cuadrícula; detalle con la fila de fotogramas. Migración aplicada en `test` y, con autorización de Mateo, en la base principal el 18-nov-2026 (estructura idéntica; los 4 reportes existentes cargan detalle, texto y PDF). Prueba (f) aprobada en el celular el 18-nov-2026 |
 
 ## Decisiones tomadas durante el desarrollo
@@ -90,6 +93,9 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 
 - 17-nov-2026 · US-23 usa `video_player` solo para leer la duración del video (revisa la decisión «sin `video_player`» del 16-nov) y `fc_native_video_thumbnail` para extraer los fotogramas (`docs/04`).
 - 17-nov-2026 · Los fotogramas viajan en campos `frames_v<N>` (N = posición del video en `files`); su orden en el campo es su posición · sin leer nombres de archivo.
+
+- 18-nov-2026 · Doble envío corregido antes del commit: el candado por reporte se toma antes de leer el estado; una prueba de doble toque lo detectó (a veces salían dos correos). Un reporte marcado a mano ya no se puede enviar por correo, y viceversa (409).
+- 18-nov-2026 · En `MAIL_MODE=test` el ciudadano va en copia (CP-23); el destinatario principal es siempre `MAIL_TEST_TO`.
 
 ## Problemas abiertos
 - Migración `1794970815342_add-video-frames` en la base principal · resuelto el 18-nov-2026 con autorización de Mateo: antes estaban aplicadas las 3 migraciones previas; después, `report_media` quedó idéntica a la rama `test` (columnas, CHECK e índices) y los 4 reportes existentes cargan detalle, texto y PDF.
