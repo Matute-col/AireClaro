@@ -9,6 +9,7 @@ Registro de la ejecución de los casos CP-01 a CP-30 de `docs/08-plan-de-pruebas
   Los videos **no** se guardan aquí (pesan y `.gitignore` los excluye): se enlazan en el documento final.
 - **Antes de subir una captura**, revisa que no muestre datos personales reales (correo, documento, teléfono) ni
   credenciales; usa cuentas y datos de prueba.
+- CP-21 y CP-29 se pueden mostrar en vivo con `cp-21-cp-29.ps1` (ver el encabezado del script).
 - La columna «Prueba automática» indica qué pruebas de `backend/tests/` (`.test.js`) o `app/test/` (`_test`)
   cubren además ese caso.
 
@@ -49,7 +50,7 @@ Registro de la ejecución de los casos CP-01 a CP-30 de `docs/08-plan-de-pruebas
 
 ## Pruebas automáticas
 
-Salidas guardadas el 17-nov-2026 (se pueden regenerar con los mismos comandos):
+Salidas guardadas el 19-nov-2026 sobre `main` (se pueden regenerar con los mismos comandos):
 
 | Archivo | Comando | Resultado |
 |---|---|---|

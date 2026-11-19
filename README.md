@@ -29,6 +29,16 @@ La documentación completa está en `docs/` (empieza por `docs/README.md` y `doc
 - Un **celular Android** (7.0 o superior) con depuración USB activada.
 - Windows, VS Code y PowerShell (los comandos de abajo son para PowerShell).
 
+## 0. Obtener el código
+
+```powershell
+cd C:\proyectos
+git clone https://github.com/Matute-col/AireClaro.git
+cd AireClaro
+```
+
+Usa una ruta sin espacios ni tildes (por ejemplo `C:\proyectos\AireClaro`).
+
 ## 1. API (`backend/`)
 
 ```powershell
@@ -55,8 +65,8 @@ Variables de `backend/.env` (**nunca** se suben al repositorio; `.env` está en 
 Otros comandos:
 
 ```powershell
+npm run migrate:test   # la primera vez: crea las tablas en la base de pruebas (TEST_DATABASE_URL)
 npm test               # pruebas automáticas (usan TEST_DATABASE_URL y un servidor de correo simulado)
-npm run migrate:test   # aplica las migraciones en la base de pruebas
 ```
 
 ## 2. App Android (`app/`)
@@ -110,3 +120,5 @@ Si la IP del PC cambia, hay que volver a compilar el APK. Con cable sigue funcio
 
 - Plan de pruebas y casos CP-01 a CP-30: `docs/08-plan-de-pruebas.md`.
 - Tabla de resultados para llenar y salidas de las pruebas automáticas: `docs/evidencias/`.
+- Demostración en vivo de CP-21 y CP-29 (reporte ajeno → 404, sin imprimir tokens ni datos personales), con el
+  API encendido: `powershell -ExecutionPolicy Bypass -File .\docs\evidencias\cp-21-cp-29.ps1`.

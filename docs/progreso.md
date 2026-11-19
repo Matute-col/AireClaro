@@ -12,7 +12,7 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
 | Sprint 1 · Backend base y autenticación | Hecho | Rama `sprint-1`. Probado en el celular el 16-nov-2026. Pendiente con aprobación de Mateo: push, merge a `main` y tag `v0.1-sprint1` |
 | Sprint 2 · Flujo de reporte | Hecho | Rama `sprint-2`, cerrado el 16-nov-2026: pruebas (a)–(d) aprobadas en el celular; merge a `main` y tag `v0.2-sprint2`. Revisión y retrospectiva en `docs/sprints/sprint-2.md` |
 | Sprint 3 · PDF, mapa, pruebas | Hecho | Rama `sprint-3`, cerrado el 18-nov-2026: pruebas (e)–(h) aprobadas en el celular, correo real en modo de prueba verificado; merge a `main` y tag `v0.3-sprint3`. Revisión y retrospectiva en `docs/sprints/sprint-3.md`. Siguen las pruebas CP-01…CP-30 y el video desde el jueves 19-nov |
-| Validación TRL 5 y video | Pendiente | |
+| Validación TRL 5 y video | En curso | Desarrollo cerrado el 19-nov-2026 con el tag `v1.0-trl5`. Falta que Mateo ejecute CP-01…CP-30 con evidencia en `docs/evidencias/` y grabe el video; entrega el domingo 22-nov |
 
 ## Historias
 | ID | Estado (Pendiente / En curso / Hecha) | Commit | Notas |
@@ -118,6 +118,20 @@ Documento vivo. Claude Code lo actualiza al cerrar cada sesión.
   `.gitattributes`).
 - **Lo que sigue:** ejecutar CP-01…CP-30 con evidencia en `docs/evidencias/`, grabar el video y la entrega del
   domingo 22-nov (tag `v1.0-trl5`).
+
+## Cierre de la fase de desarrollo (19-nov-2026)
+- **Último trabajo:** rama `ui-polish` con la paleta del Figma de Mateo (solo colores y pesos de títulos; sin cambios
+  de textos, medidas ni funcionamiento; contraste ≥ 4,5:1 calculado), aprobada por Mateo tras probarla en el
+  celular; y el script `docs/evidencias/cp-21-cp-29.ps1` para mostrar en vivo CP-21 y CP-29 (aprobado). Ambas
+  ramas fusionadas en `main` con un merge cada una, sin conflictos.
+- **Estado final:** historias US-01…US-23 hechas (US-23 agregada por Mateo); `npm test` 192/192, `flutter test`
+  135/135, `flutter analyze` sin problemas; salidas regeneradas en `docs/evidencias/`. `MAIL_MODE=test`.
+- **Revisión de seguridad antes del push:** sin secretos ni datos personales reales en el diff y en cada commit
+  desde `v0.3-sprint3`; `.env`, `backend/uploads/`, los APK y `.vscode/extensions.json` no están rastreados.
+- **README:** se agregó cómo obtener el código, `npm run migrate:test` antes de la primera prueba y el script de
+  CP-21/CP-29; `backend/.env.example` incluye ahora `TEST_DATABASE_URL` (vacía).
+- **Pendiente para Mateo:** ejecutar CP-01…CP-30 y llenar la tabla de `docs/evidencias/README.md` (CP-20 con
+  `$env:JWT_EXPIRES_IN='1m'` en la terminal del API; CP-21/CP-29 con el script), grabar el video y entregar.
 
 ## Problemas abiertos
 - Migración `1794970815342_add-video-frames` en la base principal · resuelto el 17-nov-2026 con autorización de Mateo: antes estaban aplicadas las 3 migraciones previas; después, `report_media` quedó idéntica a la rama `test` (columnas, CHECK e índices) y los 4 reportes existentes cargan detalle, texto y PDF.
