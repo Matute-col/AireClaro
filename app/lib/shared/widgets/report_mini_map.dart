@@ -34,7 +34,7 @@ class ReportMiniMap extends StatelessWidget {
                     width: 40,
                     height: 40,
                     alignment: Alignment.topCenter,
-                    child: const Icon(Icons.location_on, size: 40, color: AppColors.error),
+                    child: const Icon(Icons.location_on, size: 40, color: AppColors.mapPinSelected),
                   ),
                 ]),
               ],

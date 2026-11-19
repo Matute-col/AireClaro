@@ -19,7 +19,10 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Hola, ${user?.firstName ?? ''}', style: textTheme.headlineSmall),
+        title: Text(
+          'Hola, ${user?.firstName ?? ''}',
+          style: textTheme.headlineSmall,
+        ),
         actions: [
           IconButton(
             tooltip: 'Perfil',
@@ -35,6 +38,10 @@ class HomeScreen extends ConsumerWidget {
           SizedBox(
             height: 72,
             child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.newReport,
+                foregroundColor: AppColors.onHomeCard,
+              ),
               onPressed: () {
                 ref.read(reportDraftProvider.notifier).reset();
                 context.push(Routes.reportEvidence);
@@ -42,7 +49,9 @@ class HomeScreen extends ConsumerWidget {
               icon: const Icon(Icons.add_a_photo_outlined, size: 28),
               label: Text(
                 'Nuevo reporte',
-                style: textTheme.titleLarge?.copyWith(color: Colors.white),
+                style: textTheme.titleLarge?.copyWith(
+                  color: AppColors.onHomeCard,
+                ),
               ),
             ),
           ),
@@ -50,7 +59,11 @@ class HomeScreen extends ConsumerWidget {
           _ShortcutCard(
             icon: Icons.list_alt,
             title: 'Mis reportes',
-            subtitle: ref.watch(reportsCountProvider).when(
+            color: AppColors.myReports,
+            foreground: AppColors.onHomeCard,
+            subtitle: ref
+                .watch(reportsCountProvider)
+                .when(
                   data: (n) => n == 1 ? '1 reporte' : '$n reportes',
                   loading: () => 'Cargando…',
                   error: (_, _) => 'Consulta tus reportes y su estado',
@@ -81,6 +94,8 @@ class _ShortcutCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.color,
+    this.foreground,
   });
 
   final IconData icon;
@@ -88,12 +103,19 @@ class _ShortcutCard extends StatelessWidget {
   final String subtitle;
   final VoidCallback onTap;
 
+  /// Optional card and text colors (from AppColors), e.g. «Mis reportes».
+  final Color? color;
+  final Color? foreground;
+
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: color,
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       clipBehavior: Clip.antiAlias,
       child: ListTile(
+        textColor: foreground,
+        iconColor: foreground,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.sm,
@@ -102,7 +124,11 @@ class _ShortcutCard extends StatelessWidget {
           backgroundColor: AppColors.primaryContainer,
           child: Icon(icon, color: AppColors.primary),
         ),
-        title: Text(title, style: Theme.of(context).textTheme.titleMedium),
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium
+              ?.copyWith(color: foreground),
+        ),
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,

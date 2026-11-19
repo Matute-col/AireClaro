@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../core/theme.dart';
+
 /// Text field with a visible label. Set [obscure] for passwords: it adds a
 /// show/hide button.
 class AppTextField extends StatefulWidget {
@@ -51,6 +53,7 @@ class _AppTextFieldState extends State<AppTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      style: const TextStyle(color: AppColors.onField),
       controller: widget.controller,
       validator: widget.validator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -86,7 +89,10 @@ class _AppTextFieldState extends State<AppTextField> {
 /// Turns what the user types into uppercase (document number, plate).
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     return newValue.copyWith(text: newValue.text.toUpperCase());
   }
 }
@@ -112,6 +118,11 @@ class AppDropdown<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<T>(
+      // Same style as the default (titleMedium, weight 500); only the color changes.
+      style: Theme.of(context).textTheme.titleMedium
+          ?.copyWith(color: AppColors.onField, fontWeight: FontWeight.w500),
+      dropdownColor: AppColors.field,
+      iconEnabledColor: AppColors.onField,
       initialValue: value,
       validator: validator,
       autovalidateMode: AutovalidateMode.onUserInteraction,

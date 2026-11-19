@@ -66,7 +66,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             child: Icon(
                               Icons.location_on,
                               size: 44,
-                              color: pin.id == _selected?.id ? AppColors.error : AppColors.primary,
+                              color: pin.id == _selected?.id ? AppColors.mapPinSelected : AppColors.mapPin,
                             ),
                           ),
                         ),

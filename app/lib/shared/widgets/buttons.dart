@@ -1,5 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../../core/theme.dart';
+
 /// Filled main action. Shows a spinner and ignores taps while [loading].
 /// Pass `onPressed: null` to disable it.
 class PrimaryButton extends StatelessWidget {
@@ -22,7 +24,7 @@ class PrimaryButton extends StatelessWidget {
         ? const SizedBox(
             width: 22,
             height: 22,
-            child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+            child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.onPrimaryButton),
           )
         : Text(label);
 
