@@ -13,7 +13,8 @@ import 'report_summary.dart';
 import 'reports_list_controller.dart';
 
 /// «16 nov 2026, 9:30 a. m.»
-String formatShortDate(DateTime date) => DateFormat("d MMM y, h:mm a", 'es_CO').format(date);
+String formatShortDate(DateTime date) =>
+    DateFormat("d MMM y, h:mm a", 'es_CO').format(date);
 
 /// Screen 12 · Mis reportes (US-10, RF-09).
 class ReportsScreen extends ConsumerWidget {
@@ -92,7 +93,11 @@ class _ListFooter extends StatelessWidget {
       );
     }
     if (state.loadMoreError != null) {
-      return MessageBanner(message: state.loadMoreError!, actionLabel: 'Reintentar', onAction: onRetry);
+      return MessageBanner(
+        message: state.loadMoreError!,
+        actionLabel: 'Reintentar',
+        onAction: onRetry,
+      );
     }
     if (!state.hasMore && state.total > 0) {
       return Padding(
@@ -133,7 +138,10 @@ class ReportCard extends StatelessWidget {
                   width: 72,
                   height: 72,
                   child: thumbnailId != null
-                      ? AuthNetworkImage(url: mediaUrl(report.id, thumbnailId), cacheWidth: 200)
+                      ? AuthNetworkImage(
+                          url: mediaUrl(report.id, thumbnailId),
+                          cacheWidth: 200,
+                        )
                       : const ColoredBox(
                           color: AppColors.primaryContainer,
                           child: Icon(Icons.videocam, color: AppColors.primary),
@@ -145,9 +153,21 @@ class ReportCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(report.plate, style: textTheme.titleMedium),
-                    Text(vehicleTypeLabels[report.vehicleType] ?? report.vehicleType),
-                    Text(formatShortDate(report.occurredAt), style: textTheme.bodySmall),
+                    Text(
+                      report.plate,
+                      style: textTheme.titleMedium?.copyWith(
+                        color: AppColors.onPlate,
+                        backgroundColor: AppColors.plate,
+                      ),
+                    ),
+                    Text(
+                      vehicleTypeLabels[report.vehicleType] ??
+                          report.vehicleType,
+                    ),
+                    Text(
+                      formatShortDate(report.occurredAt),
+                      style: textTheme.bodySmall,
+                    ),
                     const SizedBox(height: AppSpacing.xs),
                     StatusChip(status: report.status, sentVia: report.sentVia),
                   ],

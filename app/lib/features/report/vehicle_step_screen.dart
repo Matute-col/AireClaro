@@ -105,6 +105,7 @@ class _VehicleStepScreenState extends ConsumerState<VehicleStepScreen> {
                 maxLines: 4,
                 minLines: 2,
                 textCapitalization: TextCapitalization.sentences,
+                style: const TextStyle(color: AppColors.onField),
                 decoration: const InputDecoration(
                   labelText: 'Descripción (opcional)',
                   hintText: 'Ej.: humo negro denso al arrancar en el semáforo',

@@ -185,7 +185,7 @@ class _LocationStepScreenState extends ConsumerState<LocationStepScreen> {
                                   child: const Icon(
                                     Icons.location_on,
                                     size: 48,
-                                    color: AppColors.error,
+                                    color: AppColors.mapPinSelected,
                                   ),
                                 ),
                               ],

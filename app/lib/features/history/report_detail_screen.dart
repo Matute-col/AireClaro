@@ -116,7 +116,7 @@ class _DeleteButtonState extends ConsumerState<_DeleteButton> {
   @override
   Widget build(BuildContext context) {
     return TextButton.icon(
-      style: TextButton.styleFrom(foregroundColor: AppColors.error),
+      style: TextButton.styleFrom(foregroundColor: AppColors.danger),
       onPressed: _busy ? null : _delete,
       icon: _busy
           ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
@@ -314,7 +314,7 @@ class _VideoCardState extends ConsumerState<_VideoCard> {
                 ? const SizedBox(
                     width: 18,
                     height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.onPrimaryButton),
                   )
                 : const Icon(Icons.play_arrow),
             label: const Text('Abrir video'),

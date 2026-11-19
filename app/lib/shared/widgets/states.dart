@@ -156,7 +156,7 @@ class MessageBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
+        color: AppColors.appBar,
         borderRadius: BorderRadius.circular(AppSpacing.radius),
         border: Border.all(color: color),
       ),

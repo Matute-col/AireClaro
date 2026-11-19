@@ -24,13 +24,13 @@ class StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sent = status == 'enviado';
-    final color = sent ? AppColors.success : AppColors.primary;
+    const color = AppColors.onChip;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: AppColors.chip,
         borderRadius: BorderRadius.circular(AppSpacing.radius),
-        border: Border.all(color: color),
+        border: Border.all(color: AppColors.chip),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
